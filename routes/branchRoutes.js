@@ -17,7 +17,7 @@ router.get('/list',async (req, res) => {
 
         let formattedData = "";
         for (const row of rows) {
-            formattedData += `\n branch name: ${row.branch_name},\n branch address: ${row.branch_address},\n manager name: ${row.manager_name},\n branch contact information: ${row.branch_phone} }`; // Include desired columns
+            formattedData += `\n branch ID:${row.branch_id},\n branch name: ${row.branch_name},\n branch address: ${row.branch_address},\n manager name: ${row.manager_name},\n branch contact information: ${row.branch_phone} }`; // Include desired columns
         }
 
         res.status(200).send(formattedData);
