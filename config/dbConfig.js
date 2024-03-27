@@ -1,13 +1,20 @@
 require("dotenv").config();
 const { Client } = require("pg");
+const fs = require('fs');
 
 const isProduction = process.env.NODE_ENV === "production";
 
-connectionString = `postgresql://${process.env.DB_USER}:${process.env.DB_PASS}@${process.env.DB_HOST}:${process.env.DB_PORT}/${process.env.DB_DATABASE}`;
-
-const client = new Client({
-    connectionString: isProduction ? process.env.DATABASE_URL : connectionString,
-});
+const config = {
+    connectionString : `postgresql://${process.env.DB_USER}:${process.env.DB_PASS}@${process.env.DB_HOST}:${process.env.DB_PORT}/${process.env.DB_DATABASE}`,
+    // Beware! The ssl object is overwritten when parsing the connectionString
+    ssl: {
+      rejectUnauthorized: false,
+      ca: fs.readFileSync('D:/AE/web server key.PEM').toString(),
+    },
+  }
+const client = new Client(
+    config
+);
 
 async function connect (){
     try {
@@ -17,6 +24,7 @@ async function connect (){
         console.error('Connection error:', err.stack);
     } 
 };
+
 
 connect();
 
