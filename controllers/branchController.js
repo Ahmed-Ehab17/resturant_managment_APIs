@@ -1,4 +1,4 @@
-const { query } = require("express");
+const Joi = require("joi");
 const { client } = require("../config/dbConfig");
 
 const addNew = async (req, res) => {
@@ -140,25 +140,25 @@ const addBranchSection =async (req, res) => {
 const addStorage = async (req, res) => {
     try {
         const schema = Joi.object({
-            storageId: Joi.number().integer().positive().required(),
             storageName: Joi.string().required(),
             managerId: Joi.number().integer().positive().max(35),
             storageAddress: Joi.string().required(),
         });
         const { error } = schema.validate(req.body);
         if (error) {
-            res.status(404).send(error.detailes[0].message);
+            res.status(404).send(error.details[0].message);
             return;
         }
 
-        const { storageId, storageName, managerId, storageAddress } = req.body;
-        const query = `CALL pr_add_storage($1,$2,$3,$4)`;
-        const values = [storageId, storageName, managerId, storageAddress];
+        const { storageName, managerId, storageAddress } = req.body;
+        const query = `CALL pr_add_storage($1,$2,$3)`;
+        const values = [storageName, storageAddress, managerId];
         await client.query(query, values);
+
 
         res.status(201).json({
             message: "Storage created successfully",
-            data: { storageId, storageName, managerId, storageAddress },
+            data: { storageName, storageAddress, managerId },
         });
     } catch (error) {
         res.status(500).send("message:" + error.message);
@@ -168,10 +168,9 @@ const addStorage = async (req, res) => {
 const addMenuItem = async (req, res) => {
     try {
         const schema = Joi.object({
-            itemId: Joi.number().integer().positive(),
             itemName: Joi.string().max(35).required(),
-            categoryID: Joi.number().integer().positive().required(),
             itemDesc: Joi.string().max(254).required(),
+            categoryID: Joi.number().integer().positive().required(),
             prepTime: Joi.number(),
         });
         const { error } = schema.validate(req.body);
@@ -180,7 +179,7 @@ const addMenuItem = async (req, res) => {
             return;
         }
 
-        const { itemId, itemName, categoryID, itemDesc, prepTime } = req.body;
+        const { itemName, itemDesc, categoryID, prepTime } = req.body;
         const query = `CALL pr_menu_item($1, $2, $3, $4)`;
         const values = [itemName, itemDesc, categoryID, prepTime];
         await client.query(query, values);
@@ -198,6 +197,7 @@ const addIngredient = async (req, res) => {
         const values = [name, recipeUnit, shipmentUnit];
         await client.query(query, values);
 
+        console.log("qeury:" + test.message)
         res.status(201).json({
             message: "Ingredient added successfully",
             data: { name, recipeUnit, shipmentUnit },

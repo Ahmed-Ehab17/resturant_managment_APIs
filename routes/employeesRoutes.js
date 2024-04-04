@@ -8,7 +8,7 @@ const employeesController = require('../controllers/employeesController');
 
 router.post('/add-position', employeesController.addPosition);
 router.patch('/change-position', employeesController.changePosition);
-router.post("change-salary", employeesController.changeSalary);
+router.patch("/change-salary", employeesController.changeSalary);
 
 
 

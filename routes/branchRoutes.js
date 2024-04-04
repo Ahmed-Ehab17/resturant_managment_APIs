@@ -20,9 +20,9 @@ router.post('/add-branch-section', branchController.addBranchSection);
 
 router.post("/add-storage", branchController.addStorage);
 
-router.post("add-menu-item", branchController.addMenuItem);
+router.post("/add-menu-item", branchController.addMenuItem);
 
-router.post("add-ingredient", branchController.addIngredient);
+router.post("/add-ingredient", branchController.addIngredient);
 
 
 
