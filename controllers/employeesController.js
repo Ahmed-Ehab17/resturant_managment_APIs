@@ -45,6 +45,7 @@ const changePosition = async(req,res)=>{
      res.status(500).send('Error: Internal server error');
     }
 }
+
 const changeSalary = async (req, res) => {
     const { employeeId, changerId, newSalary, changeReason } = req.body;
     const query = `CALL pr_change_salary($1, $2, $3, $4)`;
@@ -56,10 +57,49 @@ const changeSalary = async (req, res) => {
     });
 };
 
+const addEmployeeAccount = async(req, res) => {
+    const { id, email, password } = req.body;   
+
+    if (!email || !password) {
+        return res.status(400).json({ message: "Missing email or password" });
+    }
+
+    // Check if email already exists
+    try {
+        const user = await client.query(
+            "SELECT * FROM employees_accounts WHERE employee_email = $1",
+            [email]
+        );
+        if (user.rows.length > 0) {
+            return res.status(409).json({ message: "Email already exists" });
+        }
+    } catch (error) {
+        console.error(error);
+        return res.status(500).json({ message: "Server Error" });
+    }
+
+    const salt = await bcrypt.genSalt(10);
+    const hashedPassword = await bcrypt.hash(password, salt);
+
+    // Insert new user into database
+    try {
+        await client.query("SELECT fn_insert_employee_account($1, $2, $3)", [
+            id,
+            email,
+            hashedPassword,
+        ]);
+        res.status(201).json({ message: "User registered successfully" });
+    } catch (error) {
+        console.error(error);
+        return res.status(500).json({ message: "Server Error" });
+    }
+};
+
 
 
 module.exports = {
     addPosition,
     changePosition,
-    changeSalary
+    changeSalary,
+
 }
