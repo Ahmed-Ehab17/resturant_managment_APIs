@@ -4,8 +4,8 @@ const { client } = require("../config/dbConfig");
 const addNew = async (req, res) => {
     try {
         console.log(req.body);
-        const { branchName, branchAddress, brachLocation, coverage, branchPhone } = req.body || {}; // Destructuring
-        if (!branchName || !branchAddress || !brachLocation || !coverage || !branchPhone) {
+        const { branchName, branchAddress, branchLocation, coverage, branchPhone } = req.body || {}; // Destructuring
+        if (!branchName || !branchAddress || !branchLocation || !coverage || !branchPhone) {
             // Check for required fields
             throw new Error("Missing required fields , please enter all the data");
         }
@@ -34,7 +34,7 @@ const addNew = async (req, res) => {
         }
 
         const query = "SELECT fn_add_branch($1, $2, $3 , $4, $5)";
-        const values = [branchName, branchAddress, brachLocation, coverage, branchPhone];
+        const values = [branchName, branchAddress, branchLocation, coverage, branchPhone];
 
         await client.query(query, values);
 
