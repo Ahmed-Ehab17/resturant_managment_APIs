@@ -24,6 +24,6 @@ router.post("add-menu-item", branchController.addMenuItem);
 
 router.post("add-ingredient", branchController.addIngredient);
 
-router.post("change-salary", branchController.changeSalary);
+
 
 module.exports = router;

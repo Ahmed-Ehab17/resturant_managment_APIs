@@ -207,16 +207,7 @@ const addIngredient = async (req, res) => {
     }
 };
 
-const changeSalary = async (req, res) => {
-    const { employeeId, changerId, newSalary, changeReason } = req.body;
-    const query = `CALL pr_change_salary($1, $2, $3, $4)`;
-    const values = [employeeId, changerId, newSalary, changeReason];
-    await client.query(query, values);
-    res.json({
-        message: "Salary updated successfully",
-        data: { employeeId, changerId, newSalary, changeReason },
-    });
-};
+
 
 
 
@@ -231,7 +222,6 @@ module.exports = {
     addStorage,
     addMenuItem,
     addIngredient,
-    changeSalary,
     addGeneralSection,
     addBranchSection
 };
