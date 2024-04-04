@@ -22,6 +22,11 @@ async function addTable(branchId, capacity , status) {
       if (!branchId || !capacity) {
         throw new Error('Missing required fields, please enter both branch ID and capacity');
       }
+      const branchExistsQuery = `SELECT EXISTS(SELECT 1 FROM branches WHERE branch_id = $1);`;
+      const branchExistsResult = await client.query(branchExistsQuery, [branchId]);
+      if (!branchExistsResult.rows[0].exists) {
+        return res.status(409).send({ message: `there is no branch with id ${branchId} ` });
+    }
   
       const message = await addTable(branchId, capacity , status);
       res.status(201).send(message); 
