@@ -14,6 +14,10 @@ router.post("/add-new", branchController.addNew);
 
 router.get("/list", branchController.branchList);
 
+router.post('/add-general-section', branchController.addGeneralSection);
+
+router.post('/add-branch-section', branchController.addBranchSection);
+
 router.post("/add-storage", branchController.addStorage);
 
 router.post("add-menu-item", branchController.addMenuItem);

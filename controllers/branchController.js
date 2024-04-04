@@ -73,6 +73,69 @@ const branchList = async (req, res) => {
         res.status(500).send("Error: Internal server error");
     }
 };
+const addGeneralSection = async(req,res)=>{
+  try {
+      const { section_name, section_description } = req.body || {};
+       // Check for section name before adding
+    const checkQuery = `SELECT EXISTS(SELECT 1 FROM sections WHERE section_name = $1)`;
+    const checkValues = [section_name];
+    const { rows: checkResults } = await client.query(checkQuery, checkValues);
+    if (checkResults[0].exists) {
+      res.status(409).send({ message: 'Section name already exists' });
+      return;
+    }
+
+      const query = `SELECT fn_add_general_section($1, $2)`;
+      const values = [section_name, section_description];
+      await client.query(query, values);
+  
+      res.status(201).send({ message: 'Section added successfully' });
+      
+     } catch (error) {
+      console.error('Error adding general section:', error);
+      res.status(500).send('Error: Internal server error');
+    }
+}
+
+const addBranchSection =async (req, res) => {
+  try {
+      const {branch_id, section_id, manager_id} = req.body || {};
+      if (!branch_id || !section_id) {
+        return res.status(400).send({ message: 'Error: Missing required fields, please enter all the data' });
+    }
+    //check if the branch exists or not
+    const branchExistsQuery = `SELECT EXISTS(SELECT 1 FROM branches WHERE branch_id = $1);`;
+    const branchExistsResult = await client.query(branchExistsQuery, [branch_id]);
+    if (!branchExistsResult.rows[0].exists) {
+      return res.status(409).send({ message: `branch id ${branch_id} is not existed` });
+    }
+    // check if the section exists or not
+    const sectionExistsQuery = `SELECT EXISTS(SELECT 1 FROM sections WHERE section_id = $1);`;
+    const sectionExistsResult = await client.query(sectionExistsQuery, [section_id]);
+
+    if (!sectionExistsResult.rows[0].exists) {
+      return res.status(409).send({ message: `Section id ${section_id} is not existed` });
+    }
+        // Check section association with branch (modify as needed)
+    const checkAssociationQuery = `SELECT EXISTS(
+      SELECT 1 FROM branch_sections bs WHERE bs.branch_id = $1 AND bs.section_id = $2);`;
+    const checkAssociationValues = [branch_id, section_id];
+    const { rows: associationResults } = await client.query(checkAssociationQuery, checkAssociationValues);
+
+    if (associationResults[0].exists) {
+      return res.status(409).send({ message: 'Section already exists for this branch' });
+    }
+      const query = `SELECT fn_add_branch_sections($1, $2, $3)`;
+      const values = [branch_id, section_id, manager_id];
+      await client.query(query, values);
+      
+      res.status(200).send( "Branch Section inserted successfully");
+} catch (error) {
+  console.error('Error adding branch section:', error);
+  res.status(500).send('Error: Internal server error');
+}  
+}
+
 
 const addStorage = async (req, res) => {
     try {
@@ -169,4 +232,6 @@ module.exports = {
     addMenuItem,
     addIngredient,
     changeSalary,
+    addGeneralSection,
+    addBranchSection
 };
