@@ -95,11 +95,30 @@ const addEmployeeAccount = async(req, res) => {
     }
 };
 
+const deleteEmployee = async(req, res) => {
+    const { id } = req.params;
+    if (!id) {
+        return res.status(400).json({ message: 'Missing employee ID' });
+    }
+    
+    const employee = await client.query(`SELECT * FROM employees WHERE employee_id = $1`, [id]);
+    if (employee.rowCount === 0) {
+        return res.status(400).json({ message: 'incorrect id' });
+    }
+    try {
+        const query = `DELETE FROM employees WHERE employee_id = $1`;
+        const values = [id];
+        await client.query(query, values);
+        res.status(200).json({ message: 'Employee deleted successfully', data: employee.rows[0] });
+    }catch (error) {
+        res.status(500).json({ message: 'Internal server error' });
+    }
+}
 
 
 module.exports = {
     addPosition,
     changePosition,
     changeSalary,
-
+    deleteEmployee,
 }
