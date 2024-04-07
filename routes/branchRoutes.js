@@ -1,8 +1,7 @@
-const Joi = require("joi");
 const express = require("express");
 const router = express.Router();
 const branchController = require("../controllers/branchController");
-const { client } = require("../config/dbConfig");
+
 
 router.get("/add-new", (req, res) => {
     res.status(200).sendFile("add-new.html", {
