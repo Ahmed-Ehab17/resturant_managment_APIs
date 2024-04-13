@@ -1,6 +1,62 @@
 const { client } = require("../config/dbConfig");
 
+const activeEmployeesList= async(req,res)=> {
+    try {
+        const query = `SELECT * FROM vw_active_employee`;
+        const result = await client.query(query);
+    
+        res.status(200).json(result.rows); // Send data as JSON
+      } catch (error) {
+        console.error('Error fetching employee data:', error);
+        res.status(500).send('Error: Internal server error');
+      }
+ }
 
+ const inactiveEmployeesList= async(req,res)=> {
+    try {
+        const query = `SELECT * FROM vw_inactive_employee`;
+        const result = await client.query(query);
+    
+        res.status(200).json(result.rows); // Send data as JSON
+      } catch (error) {
+        console.error('Error fetching employee data:', error);
+        res.status(500).send('Error: Internal server error');
+      }
+ }
+ const positionsList= async(req,res)=> {
+    try {
+        const query = `SELECT * FROM vw_positions`;
+        const result = await client.query(query);
+    
+        res.status(200).json(result.rows); // Send data as JSON
+      } catch (error) {
+        console.error('Error fetching employee data:', error);
+        res.status(500).send('Error: Internal server error');
+      }
+ }
+ const positionsChangesList= async(req,res)=> {
+    try {
+        const query = `SELECT * FROM vw_positions_changes`;
+        const result = await client.query(query);
+    
+        res.status(200).json(result.rows); // Send data as JSON
+      } catch (error) {
+        console.error('Error fetching employee data:', error);
+        res.status(500).send('Error: Internal server error');
+      }
+ }
+
+ const supplyEmployeesList= async(req,res)=> {
+    try {
+        const query = `SELECT * FROM vw_supply_employees`;
+        const result = await client.query(query);
+    
+        res.status(200).json(result.rows); // Send data as JSON
+      } catch (error) {
+        console.error('Error fetching employee data:', error);
+        res.status(500).send('Error: Internal server error');
+      }
+ }
 
 const addPosition = async(req,res)=>{
     try{
@@ -95,30 +151,15 @@ const addEmployeeAccount = async(req, res) => {
     }
 };
 
-const deleteEmployee = async(req, res) => {
-    const { id } = req.params;
-    if (!id) {
-        return res.status(400).json({ message: 'Missing employee ID' });
-    }
-    
-    const employee = await client.query(`SELECT * FROM employees WHERE employee_id = $1`, [id]);
-    if (employee.rowCount === 0) {
-        return res.status(400).json({ message: 'incorrect id' });
-    }
-    try {
-        const query = `DELETE FROM employees WHERE employee_id = $1`;
-        const values = [id];
-        await client.query(query, values);
-        res.status(200).json({ message: 'Employee deleted successfully', data: employee.rows[0] });
-    }catch (error) {
-        res.status(500).json({ message: 'Internal server error' });
-    }
-}
 
 
 module.exports = {
     addPosition,
     changePosition,
     changeSalary,
-    deleteEmployee,
+    activeEmployeesList,
+    inactiveEmployeesList,
+    positionsList,
+    positionsChangesList,
+    supplyEmployeesList
 }
