@@ -1,26 +1,51 @@
 const bcrypt = require("bcrypt");
+const { validationResult } = require("express-validator");
+const httpStatusText = require("../utils/httpStatusText"); 
 const { client } = require("../config/dbConfig");
 
 const register = async (req, res) => {
-    const { ssn, firstName, lastName, gender, salary, status, positionId, branchId, sectionId, birthDate, address, dateHired,} = req.body;
+    const { ssn, firstName, lastName, gender, salary, positionId, status, branchId, sectionId, birthDate, address, dateHired} = req.body;
 
-    const fn = 'fn_add_employee'
-    let query = `SELECT ${fn}(`;
-    let values = [ssn, firstName, lastName, gender, salary, status, positionId, branchId, sectionId, birthDate, address];
-
-    query += `$1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11`;
-
-    if (dateHired){
-        query += ', $12';
-        values.push(dateHired);
+    const errors = validationResult(req);
+    if(!errors.isEmpty()){
+        return res.status(400).json({status: httpStatusText.FAIL , data: errors.array()});
     }
-    query += ')';
 
+    if (!dateHired){
+        query = `SELECT fn_add_employee($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11)`
+        values = [ssn, firstName, lastName, gender, salary, positionId, status, branchId, sectionId, birthDate, address]
+    }else{
+        query = `SELECT fn_add_employee($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12)`
+        values = [ssn, firstName, lastName, gender, salary, positionId, status, branchId, sectionId, birthDate, address, dateHired]
+    }
+    try{
+        const result = await client.query(query, values)
+        res.status(201).json({status: httpStatusText.SUCCESS, message: Object.values(result.rows[0])[0]})
+    }catch (err) {
+        console.log(err.message);
+        return res.status(500).json({status: httpStatusText.ERROR, message: "Internal server Error" });
+    }
+};
+const employeeAccount = async (req, res) => {
+    const { id, email, password } = req.body;
+
+    const errors = validationResult(req);
+    if(!errors.isEmpty()){
+        console.log(errors);
+        return res.status(400).json({status: httpStatusText.FAIL, data: errors.array()});
+    }
+    const saltRounds = 10;
+    hashedPassword = await bcrypt.hash(password, saltRounds);
+    console.log(hashedPassword);
+
+    query = `SELECT fn_insert_employee_account($1, $2, $3)`;
+    values = [id, email, hashedPassword];
     try {
         const result = await client.query(query, values);
-        res.status(201).json({ message: eval(`result.rows[0].${fn}`)});
-    } catch (error) {
-        return res.status(500).json({ message: "Server Error" });
+        res.status(200).json({status: httpStatusText.SUCCESS, message: Object.values(result.rows[0])[0]})
+    }catch (err) {
+        console.log(err);
+        res.status(500).json({status: httpStatusText.ERROR, message: "Internal server Error"});
     }
 };
 
@@ -54,5 +79,6 @@ const login = async (req, res) => {
 
 module.exports = {
     login,
+    employeeAccount,
     register,
 };

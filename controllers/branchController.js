@@ -1,4 +1,3 @@
-const Joi = require("joi");
 const { client } = require("../config/dbConfig");
 
 const addNew = async (req, res) => {
@@ -139,17 +138,6 @@ const addBranchSection =async (req, res) => {
 
 const addStorage = async (req, res) => {
     try {
-        const schema = Joi.object({
-            storageName: Joi.string().required(),
-            managerId: Joi.number().integer().positive().max(35),
-            storageAddress: Joi.string().required(),
-        });
-        const { error } = schema.validate(req.body);
-        if (error) {
-            res.status(404).send(error.details[0].message);
-            return;
-        }
-
         const { storageName, managerId, storageAddress } = req.body;
         const query = `CALL pr_add_storage($1,$2,$3)`;
         const values = [storageName, storageAddress, managerId];
@@ -167,18 +155,6 @@ const addStorage = async (req, res) => {
 
 const addMenuItem = async (req, res) => {
     try {
-        const schema = Joi.object({
-            itemName: Joi.string().max(35).required(),
-            itemDesc: Joi.string().max(254).required(),
-            categoryID: Joi.number().integer().positive().required(),
-            prepTime: Joi.number(),
-        });
-        const { error } = schema.validate(req.body);
-        if (error) {
-            res.status(404).send(error.details[0].message);
-            return;
-        }
-
         const { itemName, itemDesc, categoryID, prepTime } = req.body;
         const query = `CALL pr_menu_item($1, $2, $3, $4)`;
         const values = [itemName, itemDesc, categoryID, prepTime];

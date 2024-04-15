@@ -47,13 +47,13 @@ const changePosition = async(req,res)=>{
 }
 
 const changeSalary = async (req, res) => {
+    const fn = 'fn_change_salary'
     const { employeeId, changerId, newSalary, changeReason } = req.body;
-    const query = `CALL pr_change_salary($1, $2, $3, $4)`;
+    const query = `SELECT ${fn}($1, $2, $3, $4)`;
     const values = [employeeId, changerId, newSalary, changeReason];
-    await client.query(query, values);
-    res.json({
-        message: "Salary updated successfully",
-        data: { employeeId, changerId, newSalary, changeReason },
+    const result = await client.query(query, values);
+
+    res.status(200).json({message: Object.values(result.rows[0])[0], data: { employeeId, changerId, newSalary, changeReason },
     });
 };
 
