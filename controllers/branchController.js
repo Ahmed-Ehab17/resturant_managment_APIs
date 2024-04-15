@@ -3,14 +3,13 @@ const { client } = require("../config/dbConfig");
 const addNew = async (req, res) => {
     try {
         console.log(req.body);
-        const { branchName, branchAddress, brachLocation, coverage, branchPhone } = req.body || {}; // Destructuring
-        if (!branchName || !branchAddress || !brachLocation || !coverage || !branchPhone) {
+        const { branchName, branchAddress, branchLocation, coverage, branchPhone, manager_id } = req.body || {}; // Destructuring
+        if (!branchName || !branchAddress || !branchLocation || !coverage || !branchPhone) {
             // Check for required fields
             throw new Error("Missing required fields , please enter all the data");
         }
         const nameCheckQuery = "SELECT EXISTS(SELECT 1 FROM vw_branches WHERE branch_name = $1)";
         const nameCheckValues = [branchName];
-
         const nameCheckResult = await client.query(nameCheckQuery, nameCheckValues);
 
         if (nameCheckResult.rows[0].exists) {
@@ -21,19 +20,33 @@ const addNew = async (req, res) => {
         }
         const phoneCheckQuery = "SELECT branch_name FROM branches WHERE branch_phone = $1";
         const phoneCheckValues = [branchPhone];
-
         const phoneCheckResult = await client.query(phoneCheckQuery, phoneCheckValues);
 
         if (phoneCheckResult.rows.length > 0) {
             const existingBranchName = phoneCheckResult.rows[0].branch_name;
-            res.status(409).send(
-                `can not use this number for ${branchName} branch because it is already used by branch: ${existingBranchName}`
-            );
-            return; // Exit the function if phone exists
+            res.status(409).send(`can not use this number for ${branchName} branch because it is already used by branch: ${existingBranchName}`);
+            return; 
         }
-
-        const query = "SELECT fn_add_branch($1, $2, $3 , $4, $5)";
-        const values = [branchName, branchAddress, brachLocation, coverage, branchPhone];
+        // Check manager ID existence
+        if (manager_id) {
+        const managerCheckQuery = "SELECT EXISTS(SELECT 1 FROM employees WHERE employee_id = $1)";
+        const managerCheckValues = [manager_id];
+        const managerCheckResult = await client.query(managerCheckQuery, managerCheckValues);
+  
+        if (!managerCheckResult.rows[0].exists) {
+          res.status(409).send(`Manager with ID ${manager_id} does not exist`);
+          return; 
+        }
+      }
+         // Construct the query with optional manager_id
+        let query;
+        if (manager_id) {
+        query = "SELECT fn_add_branch($1, $2, $3, $4, $5, $6)";
+        values = [branchName, branchAddress, branchLocation, coverage, branchPhone, manager_id];
+        } else {
+        query = "SELECT fn_add_branch($1, $2, $3, $4, $5)"; // Assuming fn_add_branch handles missing manager_id
+        values = [branchName, branchAddress, branchLocation, coverage, branchPhone];
+        }
 
         await client.query(query, values);
 
@@ -115,7 +128,7 @@ const addBranchSection =async (req, res) => {
     if (!sectionExistsResult.rows[0].exists) {
       return res.status(409).send({ message: `Section id ${section_id} is not existed` });
     }
-        // Check section association with branch (modify as needed)
+    // Check section association with branch (modify as needed)
     const checkAssociationQuery = `SELECT EXISTS(
       SELECT 1 FROM branch_sections bs WHERE bs.branch_id = $1 AND bs.section_id = $2);`;
     const checkAssociationValues = [branch_id, section_id];
@@ -124,15 +137,34 @@ const addBranchSection =async (req, res) => {
     if (associationResults[0].exists) {
       return res.status(409).send({ message: 'Section already exists for this branch' });
     }
-      const query = `SELECT fn_add_branch_sections($1, $2, $3)`;
-      const values = [branch_id, section_id, manager_id];
-      await client.query(query, values);
-      
-      res.status(200).send( "Branch Section inserted successfully");
-} catch (error) {
-  console.error('Error adding branch section:', error);
-  res.status(500).send('Error: Internal server error');
-}  
+    // Check manager ID existence
+    if (manager_id) {
+        const managerCheckQuery = "SELECT EXISTS(SELECT 1 FROM employees WHERE employee_id = $1)";
+        const managerCheckValues = [manager_id];
+        const managerCheckResult = await client.query(managerCheckQuery, managerCheckValues);
+  
+        if (!managerCheckResult.rows[0].exists) {
+          res.status(409).send(`Manager with ID ${manager_id} does not exist`);
+          return; 
+        }
+      }
+      // Construct the query with optional manager_id
+    let query;
+    if (manager_id) {
+      query = `SELECT fn_add_branch_sections($1, $2, $3)`;
+      values = [branch_id, section_id, manager_id];
+    } else {
+      query = `SELECT fn_add_branch_sections($1, $2)`; 
+      values = [branch_id, section_id];
+    }
+
+    await client.query(query, values);
+
+    res.status(200).send("Branch Section inserted successfully");
+  } catch (error) {
+    console.error('Error adding branch section:', error);
+    res.status(500).send('Error: Internal server error');
+  }
 }
 
 
