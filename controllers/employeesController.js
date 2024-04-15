@@ -8,8 +8,8 @@ const activeEmployeesList= async(req,res)=> {
         res.status(200).json(result.rows); // Send data as JSON
       } catch (error) {
         console.error('Error fetching employee data:', error);
-        res.status(500).send('Error: Internal server error');
-      }
+        res.status(500).json({ message: "server error, " + error });
+     }
  }
 
  const inactiveEmployeesList= async(req,res)=> {
@@ -20,8 +20,8 @@ const activeEmployeesList= async(req,res)=> {
         res.status(200).json(result.rows); // Send data as JSON
       } catch (error) {
         console.error('Error fetching employee data:', error);
-        res.status(500).send('Error: Internal server error');
-      }
+        res.status(500).json({ message: "server error, " + error });
+    }
  }
  const positionsList= async(req,res)=> {
     try {
@@ -31,8 +31,8 @@ const activeEmployeesList= async(req,res)=> {
         res.status(200).json(result.rows); // Send data as JSON
       } catch (error) {
         console.error('Error fetching employee data:', error);
-        res.status(500).send('Error: Internal server error');
-      }
+        res.status(500).json({ message: "server error, " + error });
+          }
  }
  const positionsChangesList= async(req,res)=> {
     try {
@@ -42,8 +42,8 @@ const activeEmployeesList= async(req,res)=> {
         res.status(200).json(result.rows); // Send data as JSON
       } catch (error) {
         console.error('Error fetching employee data:', error);
-        res.status(500).send('Error: Internal server error');
-      }
+        return res.status(500).json({ message: "Server Error" });
+        }
  }
 
  const supplyEmployeesList= async(req,res)=> {
@@ -54,29 +54,31 @@ const activeEmployeesList= async(req,res)=> {
         res.status(200).json(result.rows); // Send data as JSON
       } catch (error) {
         console.error('Error fetching employee data:', error);
-        res.status(500).send('Error: Internal server error');
+        return res.status(500).json({ message: "Server Error" });
       }
  }
 
 const addPosition = async(req,res)=>{
     try{
         const {position_name , jop_description} = req.body || {};
+        if (!position_name || !jop_description ) {
+            return res.status(400).json({ message: 'Error: Missing required fields, please enter all the data' });
+        }
         const positionCheckQuery = 'SELECT EXISTS(SELECT 1 FROM positions WHERE position_name = $1)';
         const positionCheckValues = [position_name];
 
         const positionCheckResult = await client.query(positionCheckQuery, positionCheckValues);
 
         if (positionCheckResult.rows[0].exists) {
-            res.status(409).send(`can not add ${position_name} position because it's already exists`);
-            return; 
+            return res.status(409).json({ message: `can not add ${position_name} position because it's already exists` });
     }
         const query = `SELECT fn_add_position($1, $2)`;
         const values = [position_name, jop_description];
         await client.query(query, values);
-        res.status(201).send({ message: 'position added successfully' });
+        res.status(201).json({ message: "position added successfully", data: values });
     } catch (error) {
      console.error('Error adding position:', error);
-     res.status(500).send('Error: Internal server error');
+     return res.status(500).json({ message: "Server Error, " + error});
    }
     
 }
@@ -84,10 +86,15 @@ const addPosition = async(req,res)=>{
 const changePosition = async(req,res)=>{
     try{
         const { employee_id, position_changer_id, new_position, position_change_type } = req.body || {};
+        if (!employee_id || !position_changer_id || !new_position || !position_change_type ) {
+            return res.status(400).json({ message: 'Error: Missing required fields, please enter all the data' });
+        }
+
         const query = `SELECT fn_change_employee_position($1, $2, $3, $4)`;
         const values = [employee_id, position_changer_id, new_position, position_change_type];
         await client.query(query, values);
-        res.status(201).send({ message: 'position changed successfully' });
+        res.status(201).json({ message: 'position changed successfully' });
+
         // Check if employee exists
     const employeeExistsQuery = 'SELECT 1 FROM employees WHERE employee_id = $1';
     const employeeExistsValues = [employee_id];
@@ -96,10 +103,9 @@ const changePosition = async(req,res)=>{
       client.release();
       return res.status(404).json({ error: 'Employee not found' });
     }
-    }catch{
+    }catch (error){
         console.error('Error changing position:', error);
-     res.status(500).send('Error: Internal server error');
-    }
+        return res.status(500).json({ message: "Server Error" });    }
 }
 
 const changeSalary = async (req, res) => {
