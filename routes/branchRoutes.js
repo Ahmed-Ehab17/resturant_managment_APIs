@@ -9,18 +9,20 @@ router.get("/add-new", (req, res) => {
     });
 });
 
+
+
+router.get("/branches-list", branchController.branchesList);
+router.get("/ingredient-suppliers-list", branchController.ingredientSuppliersList);
+router.get("/categories-list", branchController.categoriesList);
+router.get("/recipes-list", branchController.recipesList);
+router.get("/general-menu-list", branchController.generalMenuList);
+router.get("/branch-price-changes-list", branchController.branchPriceChangesList);
+
 router.post("/add-new", branchController.addNew);
-
-router.get("/list", branchController.branchList);
-
 router.post('/add-general-section', branchController.addGeneralSection);
-
 router.post('/add-branch-section', branchController.addBranchSection);
-
 router.post("/add-storage", branchController.addStorage);
-
 router.post("/add-menu-item", branchController.addMenuItem);
-
 router.post("/add-ingredient", branchController.addIngredient);
 
 

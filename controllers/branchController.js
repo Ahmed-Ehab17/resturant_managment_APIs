@@ -1,5 +1,96 @@
 const { client } = require("../config/dbConfig");
 
+
+const branchesList = async (req, res) => {
+    try {
+        const query = "SELECT * FROM vw_branches";
+        const result = await client.query(query);
+        const rows = result.rows;
+
+        // Create an empty array to store branch objects
+        const branchData = [];
+
+        for (const row of rows) {
+            // Create a new object for each branch
+            const branch = {
+                "branch ID": row.branch_id,
+                "branch name": row.branch_name,
+                "branch address": row.branch_address,
+                "manager name": row.manager_name === null ? "null" : row.manager_name, // Handle null values
+                "branch contact information": row.branch_phone,
+                "branch tables":row.tables_number,
+                "branch tables capacity":row.tables_capacity
+            };
+
+            // Add the branch object to the array
+            branchData.push(branch);
+        }
+
+        res.status(200).send(branchData);
+    } catch (error) {
+        console.error("Error fetching data:", error);
+        res.status(500).send("Error: Internal server error");
+    }
+};
+
+const ingredientSuppliersList= async(req,res)=> {
+    try {
+        const query = `SELECT * FROM vw_ingredient_suppliers`;
+        const result = await client.query(query);
+    
+        res.status(200).json(result.rows); // Send data as JSON
+      } catch (error) {
+        console.error('Error fetching employee data:', error);
+        res.status(500).send('Error: Internal server error');
+      }
+ }
+const categoriesList= async(req,res)=> {
+    try {
+        const query = `SELECT * FROM vw_categories`;
+        const result = await client.query(query);
+    
+        res.status(200).json(result.rows); // Send data as JSON
+      } catch (error) {
+        console.error('Error fetching employee data:', error);
+        res.status(500).send('Error: Internal server error');
+      }
+ }
+const recipesList= async(req,res)=> {
+    try {
+        const query = `SELECT * FROM vw_recipes`;
+        const result = await client.query(query);
+    
+        res.status(200).json(result.rows); // Send data as JSON
+      } catch (error) {
+        console.error('Error fetching employee data:', error);
+        res.status(500).send('Error: Internal server error');
+      }
+ }
+const generalMenuList= async(req,res)=> {
+    try {
+        const query = `SELECT * FROM vw_general_menu`;
+        const result = await client.query(query);
+    
+        res.status(200).json(result.rows); // Send data as JSON
+      } catch (error) {
+        console.error('Error fetching employee data:', error);
+        res.status(500).send('Error: Internal server error');
+      }
+ }
+const branchPriceChangesList= async(req,res)=> {
+    try {
+        const query = `SELECT * FROM vw_branch_price_changes`;
+        const result = await client.query(query);
+    
+        res.status(200).json(result.rows); // Send data as JSON
+      } catch (error) {
+        console.error('Error fetching employee data:', error);
+        res.status(500).send('Error: Internal server error');
+      }
+ }
+
+
+
 const addNew = async (req, res) => {
     try {
         console.log(req.body);
@@ -49,40 +140,10 @@ const addNew = async (req, res) => {
         }
 
         await client.query(query, values);
-
-        res.status(201).send("Data inserted successfully");
+        res.status(201).json({ message: "Data inserted successfully", data: values });
     } catch (error) {
         console.error("Error inserting data:", error);
         res.status(500).send("Error: " + error.message); // Informative error message
-    }
-};
-const branchList = async (req, res) => {
-    try {
-        const query = "SELECT * FROM vw_branches";
-        const result = await client.query(query);
-        const rows = result.rows;
-
-        // Create an empty array to store branch objects
-        const branchData = [];
-
-        for (const row of rows) {
-            // Create a new object for each branch
-            const branch = {
-                "branch ID": row.branch_id,
-                "branch name": row.branch_name,
-                "branch address": row.branch_address,
-                "manager name": row.manager_name === null ? "null" : row.manager_name, // Handle null values
-                "branch contact information": row.branch_phone,
-            };
-
-            // Add the branch object to the array
-            branchData.push(branch);
-        }
-
-        res.status(200).send(branchData);
-    } catch (error) {
-        console.error("Error fetching data:", error);
-        res.status(500).send("Error: Internal server error");
     }
 };
 const addGeneralSection = async(req,res)=>{
@@ -101,7 +162,7 @@ const addGeneralSection = async(req,res)=>{
       const values = [section_name, section_description];
       await client.query(query, values);
   
-      res.status(201).send({ message: 'Section added successfully' });
+      res.status(201).json({ message: "Section added successfully", data: values });
       
      } catch (error) {
       console.error('Error adding general section:', error);
@@ -160,7 +221,7 @@ const addBranchSection =async (req, res) => {
 
     await client.query(query, values);
 
-    res.status(200).send("Branch Section inserted successfully");
+    res.status(200).json({ message: "Branch Section added successfully", data: values });
   } catch (error) {
     console.error('Error adding branch section:', error);
     res.status(500).send('Error: Internal server error');
@@ -226,10 +287,16 @@ const addIngredient = async (req, res) => {
 
 module.exports = {
     addNew,
-    branchList,
+    branchesList,
     addStorage,
     addMenuItem,
     addIngredient,
     addGeneralSection,
-    addBranchSection
+    addBranchSection,
+    addBranchSection,
+    ingredientSuppliersList,
+    categoriesList,
+    recipesList,
+    generalMenuList,
+    branchPriceChangesList
 };
