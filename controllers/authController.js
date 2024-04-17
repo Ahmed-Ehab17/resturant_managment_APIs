@@ -1,15 +1,9 @@
 const bcrypt = require("bcrypt");
-const { validationResult } = require("express-validator");
 const httpStatusText = require("../utils/httpStatusText"); 
 const { client } = require("../config/dbConfig");
 
 const register = async (req, res) => {
     const { ssn, firstName, lastName, gender, salary, positionId, status, branchId, sectionId, birthDate, address, dateHired} = req.body;
-
-    const errors = validationResult(req);
-    if(!errors.isEmpty()){
-        return res.status(400).json({status: httpStatusText.FAIL , data: errors.array()});
-    }
 
     if (!dateHired){
         query = `SELECT fn_add_employee($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11)`
@@ -29,11 +23,6 @@ const register = async (req, res) => {
 const employeeAccount = async (req, res) => {
     const { id, email, password } = req.body;
 
-    const errors = validationResult(req);
-    if(!errors.isEmpty()){
-        console.log(errors);
-        return res.status(400).json({status: httpStatusText.FAIL, data: errors.array()});
-    }
     const saltRounds = 10;
     hashedPassword = await bcrypt.hash(password, saltRounds);
     console.log(hashedPassword);
@@ -52,25 +41,22 @@ const employeeAccount = async (req, res) => {
 const login = async (req, res) => {
     try {
         const { email, password } = req.body;
-        if (!email || !password) {
-            return res.status(400).json({ message: "Missing email or password" });
-        }
 
         const query = `SELECT * FROM employees_accounts WHERE employee_email = $1`;
         const values = [email];
         const employee = await client.query(query, values);
 
         if (employee.rows.length === 0) {
-            return res.status(401).json({ message: "Invalid email or password" });
+            return res.status(401).json({status: httpStatusText.FAIL, message: "Invalid email or password"});
         }
 
         const dbPassword = employee.rows[0].employee_password;
 
         const isMatch = await bcrypt.compare(password, dbPassword);
         if (isMatch) {
-            res.status(200).json({ message: "success" });
+            res.status(200).json({status: httpStatusText.SUCCESS, message: "Log in successfully"});
         } else {
-            res.status(401).json({ message: "Invalid email or password" });
+            res.status(401).json({status: httpStatusText.FAIL, message: "Invalid email or password"});
         }
     } catch (error) {
         res.status(500).json({ status: "500", message: "Internal Server Error" });
