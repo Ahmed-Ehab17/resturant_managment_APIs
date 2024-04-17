@@ -1,6 +1,7 @@
 const express = require("express");
 const router = express.Router();
 const branchController = require("../controllers/branchController");
+const branchValidator = require("../utils/validators/branchValidator");
 
 
 router.get("/add-new", (req, res) => {
@@ -23,7 +24,7 @@ router.post('/add-general-section', branchController.addGeneralSection);
 router.post('/add-branch-section', branchController.addBranchSection);
 router.post("/add-storage", branchController.addStorage);
 router.post("/add-menu-item", branchController.addMenuItem);
-router.post("/add-ingredient", branchController.addIngredient);
+router.post("/add-ingredient", branchValidator.addIngredientValidator, branchController.addIngredient);
 
 
 
