@@ -1,4 +1,5 @@
 const { client } = require("../config/dbConfig");
+const httpStatusText = require("../utils/httpStatusText");
 
 
 const branchesList = async (req, res) => {
@@ -22,7 +23,7 @@ const ingredientSuppliersList= async(req,res)=> {
         console.error('Error fetching employee data:', error);
         res.status(500).json({ message: "server error, " + error });
       }
- }
+}
 const categoriesList= async(req,res)=> {
     try {
         const query = `SELECT * FROM vw_categories`;
@@ -33,7 +34,7 @@ const categoriesList= async(req,res)=> {
         console.error('Error fetching employee data:', error);
         res.status(500).json({ message: "server error, " + error });
       }
- }
+}
 const recipesList= async(req,res)=> {
     try {
         const query = `SELECT * FROM vw_recipes`;
@@ -44,7 +45,7 @@ const recipesList= async(req,res)=> {
         console.error('Error fetching employee data:', error);
         res.status(500).json({ message: "server error, " + error });
       }
- }
+}
 const generalMenuList= async(req,res)=> {
     try {
         const query = `SELECT * FROM vw_general_menu`;
@@ -55,7 +56,7 @@ const generalMenuList= async(req,res)=> {
         console.error('Error fetching employee data:', error);
         res.status(500).json({ message: "server error, " + error });
       }
- }
+}
 const branchPriceChangesList= async(req,res)=> {
     try {
         const query = `SELECT * FROM vw_branch_price_changes`;
@@ -66,7 +67,7 @@ const branchPriceChangesList= async(req,res)=> {
         console.error('Error fetching employee data:', error);
         res.status(500).json({ message: "server error, " + error });
       }
- }
+}
 
 
 
@@ -243,17 +244,21 @@ const addMenuItem = async (req, res) => {
 const addIngredient = async (req, res) => {
     try {
         const { name, recipeUnit, shipmentUnit } = req.body;
+
+        const ingredientExistsQuery = `SELECT EXISTS(SELECT 1 FROM ingredients WHERE ingredients_name = $1);`;
+        const ingredientExistsResult = await client.query(ingredientExistsQuery, [name]);
+
+        if (ingredientExistsResult.rows[0].exists) {
+          return res.status(409).json({ status: httpStatusText.FAIL, message: 'ingredient is already exist' });
+        }
+
         const query = `CALL pr_add_ingredient($1, $2, $3)`;
         const values = [name, recipeUnit, shipmentUnit];
         await client.query(query, values);
-
-        console.log("qeury:" + test.message)
-        res.status(201).json({
-            message: "Ingredient added successfully",
-            data: { name, recipeUnit, shipmentUnit },
-        });
+        
+        res.status(201).json({ status: httpStatusText.SUCCESS, data: { name, recipeUnit, shipmentUnit }});
     } catch (error) {
-        res.status(500).send("message:" + error.message);
+        res.status(500).json({status: httpStatusText.ERROR, message: 'Internal Server Error'});
     }
 };
 
