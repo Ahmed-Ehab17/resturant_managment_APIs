@@ -19,9 +19,9 @@ router.get("/recipes-list", branchController.recipesList);
 router.get("/general-menu-list", branchController.generalMenuList);
 router.get("/branch-price-changes-list", branchController.branchPriceChangesList);
 
-router.post("/add-new", branchController.addNew);
-router.post('/add-general-section', branchController.addGeneralSection);
-router.post('/add-branch-section', branchController.addBranchSection);
+router.post("/add-new",branchValidator.addNewBranchValidator, branchController.addNew);
+router.post('/add-general-section',branchValidator.addGeneralSectionValidator, branchController.addGeneralSection);
+router.post('/add-branch-section',branchValidator.addBranchSectionValidator, branchController.addBranchSection);
 router.post("/add-storage", branchController.addStorage);
 router.post("/add-menu-item", branchController.addMenuItem);
 router.post("/add-ingredient", branchValidator.addIngredientValidator, branchController.addIngredient);
