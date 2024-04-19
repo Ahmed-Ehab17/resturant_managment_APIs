@@ -25,7 +25,6 @@ const employeeAccount = async (req, res) => {
 
     const saltRounds = 10;
     hashedPassword = await bcrypt.hash(password, saltRounds);
-    console.log(hashedPassword);
 
     query = `SELECT fn_insert_employee_account($1, $2, $3)`;
     values = [id, email, hashedPassword];
