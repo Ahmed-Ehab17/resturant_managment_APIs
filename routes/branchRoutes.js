@@ -18,6 +18,7 @@ router.get("/categories-list", branchController.categoriesList);
 router.get("/recipes-list", branchController.recipesList);
 router.get("/general-menu-list", branchController.generalMenuList);
 router.get("/branch-price-changes-list", branchController.branchPriceChangesList);
+router.get("/activeEmployees/:branchId", branchController.getActiveEmployees);
 
 router.post("/add-new",branchValidator.addNewBranchValidator, branchController.addNew);
 router.post('/add-general-section',branchValidator.addGeneralSectionValidator, branchController.addGeneralSection);

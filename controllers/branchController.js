@@ -62,6 +62,18 @@ const branchPriceChangesList= async(req,res)=> {
         res.status(500).json({status:httpStatusText.ERROR, message:'server error', error});
       }
 }
+const getActiveEmployees = async(req, res) => {
+  const branchId = req.params.branchId
+    try{
+      const query = `SELECT * FROM fn_get_branch_active_emlpoyees(${branchId})`;
+      console.log('query: ', query);
+      const result = await client.query(query);
+      res.status(200).json({status: httpStatusText.SUCCESS, message: result.rows});
+    }catch (err){
+      res.status(500).json({status: httpStatusText.ERROR, message: 'Internal Server Error'});
+      console.log(err)
+    }
+}
 
 
 
@@ -270,5 +282,6 @@ module.exports = {
     categoriesList,
     recipesList,
     generalMenuList,
-    branchPriceChangesList
+    branchPriceChangesList,
+    getActiveEmployees
 };
