@@ -65,15 +65,91 @@ const branchPriceChangesList= async(req,res)=> {
 const getActiveEmployees = async(req, res) => {
   const branchId = req.params.branchId
     try{
-      const query = `SELECT * FROM fn_get_branch_active_emlpoyees(${branchId})`;
-      console.log('query: ', query);
+      const query = `SELECT * FROM fn_get_branch_active_employees(${branchId})`;
       const result = await client.query(query);
-      res.status(200).json({status: httpStatusText.SUCCESS, message: result.rows});
+      res.status(200).json({status: httpStatusText.SUCCESS, data: {employees: result.rows}});
     }catch (err){
-      res.status(500).json({status: httpStatusText.ERROR, message: 'Internal Server Error'});
-      console.log(err)
+      res.status(500).json({status: httpStatusText.ERROR, message: err.message});
     }
 }
+const getEmployeesAttendance = async (req, res) => {  
+  const branchId  = req.params.branchId
+  const {fromDate, toDate} = req.query
+    try{
+      const query = `SELECT * FROM fn_get_branch_employees_attendance($1, $2, $3)`
+      const values = [branchId, fromDate, toDate]
+      const result = await client.query(query, values)
+      res.status(200).json({status: httpStatusText.SUCCESS, data: {attendance: result.rows}});
+      }catch(err) {
+      res.status(500).json({status: httpStatusText.ERROR, message: err.message});
+      }
+}
+const getEmployeesSchedule = async (req, res) => {
+  const branchId  = req.params.branchId
+  const {fromDate, toDate} = req.query
+    try{
+      const query = `SELECT * FROM fn_get_branch_employees_schedule($1, $2, $3)`
+      const values = [branchId, fromDate, toDate]
+      const result = await client.query(query, values)
+      res.status(200).json({status: httpStatusText.SUCCESS, data: {attendance: result.rows}});
+      }catch(err) {
+      res.status(500).json({status: httpStatusText.ERROR, message: err.message});
+      }
+}
+const getItemPriceChanges = async (req, res) => {
+  const branchId = req.params.branchId
+  try {
+    const query = `SELECT * FROM fn_get_branch_item_price_changes(${branchId})`
+    const result = await client.query(query)
+    res.status(200).json({ status: httpStatusText.SUCCESS, data: {items: result.rows} })
+  }catch(err) {
+    res.status(500).json({ status: httpStatusText.ERROR, message: err.message })
+  }
+}
+const getMenu = async (req, res) => {
+  const branchId = req.params.branchId
+  try {
+    const query = `SELECT * FROM fn_get_branch_menu(${branchId})`
+    const result = await client.query(query)
+    res.status(200).json({ status: httpStatusText.SUCCESS, data: { menu: result.rows}})
+  }catch (err){
+    res.status(500).json({ status: httpStatusText.ERROR, message: err.message })
+    console.log(err)
+  }
+}
+const getMenuByTime = async (req, res) => {
+  const branchId = req.params.branchId
+  const dayTime = req.query.dayTime
+  try {
+    const query = `SELECT * FROM fn_get_branch_menu_by_time($1, $2)`
+    const values = [ branchId, dayTime ]
+    const result = await client.query(query, values)
+    res.status(200).json({ status: httpStatusText.SUCCESS, data: { menu: result.rows}})
+  }catch (err){
+    res.status(500).json({ status: httpStatusText.ERROR, message: err.message })
+  }
+}
+const getSections = async (req, res) => {
+  const branchId = req.params.branchId
+  try {
+    const query = `SELECT * FROM fn_get_branch_sections(${branchId})`
+    const result = await client.query(query)
+    res.status(200).json({ status: httpStatusText.SUCCESS, data: {sections: result.rows} })
+  }catch(err) {
+    res.status(500).json({ status: httpStatusText.ERROR, message: err.message })
+  }
+}
+const getTables = async (req, res) => {
+  const branchId = req.params.branchId
+  try {
+    const query = `SELECT * FROM fn_get_branch_tables(${branchId})`
+    const result = await client.query(query)
+    res.status(200).json({ status: httpStatusText.SUCCESS, data: {tables: result.rows} })
+  }catch(err) {
+    res.status(500).json({ status: httpStatusText.ERROR, message: err.message })
+  }
+}
+
 
 
 
@@ -283,5 +359,12 @@ module.exports = {
     recipesList,
     generalMenuList,
     branchPriceChangesList,
-    getActiveEmployees
+    getActiveEmployees,
+    getEmployeesAttendance,
+    getItemPriceChanges,
+    getEmployeesSchedule,
+    getMenu,
+    getMenuByTime,
+    getSections,
+    getTables,
 };

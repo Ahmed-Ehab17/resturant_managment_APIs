@@ -19,6 +19,13 @@ router.get("/recipes-list", branchController.recipesList);
 router.get("/general-menu-list", branchController.generalMenuList);
 router.get("/branch-price-changes-list", branchController.branchPriceChangesList);
 router.get("/activeEmployees/:branchId", branchController.getActiveEmployees);
+router.get("/employeesAttendance/:branchId", branchController.getEmployeesAttendance);
+router.get("/employeesSchedule/:branchId", branchController.getEmployeesAttendance);
+router.get("/itemPriceChanges/:branchId", branchController.getItemPriceChanges);
+router.get("/menu/:branchId", branchController.getMenu);
+router.get("/menuByTime/:branchId", branchController.getMenuByTime);
+router.get("/sections/:branchId", branchController.getSections);
+router.get("/tables/:branchId", branchController.getTables);
 
 router.post("/add-new",branchValidator.addNewBranchValidator, branchController.addNew);
 router.post('/add-general-section',branchValidator.addGeneralSectionValidator, branchController.addGeneralSection);
