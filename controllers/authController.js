@@ -1,3 +1,4 @@
+const createToken = require("../utils/createToken");
 const bcrypt = require("bcrypt");
 const httpStatusText = require("../utils/httpStatusText"); 
 const { client } = require("../config/dbConfig");
@@ -30,7 +31,7 @@ const employeeAccount = async (req, res) => {
     values = [id, email, hashedPassword];
     try {
         const result = await client.query(query, values);
-        res.status(200).json({status: httpStatusText.SUCCESS, message: Object.values(result.rows[0])[0]})
+        res.status(201).json({status: httpStatusText.SUCCESS, message: Object.values(result.rows[0])[0]})
     }catch (err) {
         console.log(err);
         res.status(500).json({status: httpStatusText.ERROR, message: "Internal server Error"});
@@ -38,27 +39,31 @@ const employeeAccount = async (req, res) => {
 };
 
 const login = async (req, res) => {
+    const { email, password } = req.body;
     try {
-        const { email, password } = req.body;
-
         const query = `SELECT * FROM employees_accounts WHERE employee_email = $1`;
         const values = [email];
-        const employee = await client.query(query, values);
+        const queryResult = await client.query(query, values);
+        const employee = queryResult.rows[0]
 
-        if (employee.rows.length === 0) {
+        if (queryResult.rows.length === 0) {
             return res.status(401).json({status: httpStatusText.FAIL, message: "Invalid email or password"});
         }
 
-        const dbPassword = employee.rows[0].employee_password;
-
+        const dbPassword = employee.employee_password;
         const isMatch = await bcrypt.compare(password, dbPassword);
-        if (isMatch) {
-            res.status(200).json({status: httpStatusText.SUCCESS, message: "Log in successfully"});
-        } else {
-            res.status(401).json({status: httpStatusText.FAIL, message: "Invalid email or password"});
+        if (!isMatch) {
+            return res.status(401).json({status: httpStatusText.FAIL, message: "Invalid email or password"});
         }
+
+        const token = await createToken({id: employee.employee_id});
+        delete employee.employee_password;
+        delete employee.account_created_date;
+
+        res.status(200).json({ status: httpStatusText.SUCCESS, data: { employee, token }});
     } catch (error) {
-        res.status(500).json({ status: "500", message: "Internal Server Error" });
+        res.status(500).json({ status: httpStatusText.ERROR, message: "Internal Server Error" });
+        console.log(error)
     }
 };
 

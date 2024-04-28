@@ -2,6 +2,7 @@ const express = require("express");
 const router = express.Router();
 const branchController = require("../controllers/branchController");
 const branchValidator = require("../utils/validators/branchValidator");
+const auth = require("../middlewares/auth");
 
 
 router.get("/add-new", (req, res) => {
