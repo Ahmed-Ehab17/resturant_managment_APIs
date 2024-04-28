@@ -1,20 +1,24 @@
 const express = require("express");
 const router = express.Router();
-const employeesController = require('../controllers/employeesController');
-const employeesValidator = require('../utils/validators/employeesValidator')
+const employeeControllers = require('../controllers/employeeControllers');
+const employeeValidator = require('../utils/validators/employeeValidator')
 
 
-router.get('/manager-employees-list', employeesController.managerEmployeesList);
-router.get('/active-employees-list', employeesController.activeEmployeesList);
-router.get('/inactive-employees-list', employeesController.inactiveEmployeesList);
-router.get('/positions-list',employeesController.positionsList);
-router.get('/positions-changes-list',employeesController.positionsChangesList);
-router.get("/supply-employees-list", employeesController.supplyEmployeesList);
-router.get('/search-employees-attendance',employeesValidator.searchEmployeesAttendance, employeesController.searchEmployeesAttendance);
-router.get('/search-employees-phones',employeesValidator.searchEmployeesPhones, employeesController.searchEmployeesPhones);
-router.post('/add-position',employeesValidator.addPosition, employeesController.addPosition);
-router.patch('/change-position', employeesController.changePosition);
-router.patch("/change-salary", employeesController.changeSalary);
+router.get('/manager-employees-list', employeeControllers.managerEmployeesList);
+router.get('/active-employees-list', employeeControllers.activeEmployeesList);
+router.get('/inactive-employees-list', employeeControllers.inactiveEmployeesList);
+router.get('/positions-list',employeeControllers.positionsList);
+router.get('/positions-changes-list',employeeControllers.positionsChangesList);
+router.get("/supply-employees-list", employeeControllers.supplyEmployeesList);
+router.get('/attendance/:employeeId', employeeControllers.getEmployeesAttendance);
+router.get('/phones/:employeeId', employeeControllers.getEmployeesPhones);
+router.get('/PositionsChanges/:employeeId', employeeControllers.getPositionsChanges);
+router.get('/schedule/:employeeId', employeeControllers.getSchedule);
+router.post('/add-position',employeeValidator.addPosition, employeeControllers.addPosition);
+router.patch('/change-position', employeeControllers.changePosition);
+router.patch("/change-salary", employeeControllers.changeSalary);
+router.patch("/updateEmployeeAddress",employeeValidator.updateEmployeeAddress, employeeControllers.updateEmployeeAddress);
+router.patch("/updateEmployeePhone",employeeValidator.updateEmployeePhone, employeeControllers.updateEmployeePhone);
 
 
 

@@ -70,56 +70,65 @@ const activeEmployeesList= async(req,res)=> {
 
 
 
- const searchEmployeesAttendance = async(req,res)=>{
+ const getEmployeesAttendance = async (req, res) => {  
+  const employeeId  = req.params.employeeId
+  const {fromDate, toDate} = req.query
     try{
-    const {employeeId, dateFrom, dateTo} = req.body || {};
-        
-        let query = `SELECT * FROM fn_get_employee_attendance($1, $2, $3)`;
-        let values = [employeeId , dateFrom , dateTo]; 
-    
-        // Adjust the query and values based on provided dates
-        if (!dateFrom && !dateTo) {
-          query = `SELECT * FROM fn_get_employee_attendance($1)`;
-          values = [employeeId];
-        } else if (!dateFrom) {
-          query = `SELECT * FROM fn_get_employee_attendance($1, $2)`;
-          values = [employeeId, dateTo];
-        } else if (!dateTo) {
-            query = `SELECT * FROM fn_get_employee_attendance($1, $2)`;
-            values = [employeeId, dateFrom];
-        }
-
-    const result = await client.query(query, values);
-
-    if (result.rows.length === 0) {
-      res.status(404).json({status:httpStatusText.ERROR, message: 'Employee not found'});
-    } else {
-      res.status(201).json({status:httpStatusText.SUCCESS, message: `Employees attendance:`, data:result.rows});
+      const query = `SELECT * FROM fn_get_employee_attendance($1, $2, $3)`;
+      const values = [employeeId, fromDate, toDate]
+      const result = await client.query(query, values)
+      res.status(200).json({status: httpStatusText.SUCCESS, data: {attendance: result.rows}});
+      }catch(err) {
+      res.status(500).json({status: httpStatusText.ERROR, message: err.message});
+      }
     }
-  } catch (err) {
-    console.error('Error fetching data:', err);
-    res.status(500).json({status:httpStatusText.ERROR, message: 'Error retrieving employee attendance, ' + err});
-  }
-};
 
-const searchEmployeesPhones = async(req,res)=>{
+ const getEmployeesPhones = async (req, res) => {  
+  const employeeId  = req.params.employeeId
     try{
-    const {phoneID, phone} = req.body || {};
-        
-    let query = `SELECT * FROM fn_get_employee_phones($1, $2)`;
-    let values = [phoneID , phone]; 
-    const result = await client.query(query, values);
+       const query = `SELECT * FROM fn_get_employee_phones($1)`;
+       const values =  [employeeId];
+       const result = await client.query(query, values)
+       res.status(200).json({status: httpStatusText.SUCCESS, data: {attendance: result.rows}});
+       }catch(err) {
+       res.status(500).json({status: httpStatusText.ERROR, message: err.message});
+       }
+      }
 
-    if (result.rows.length === 0) {
-      res.status(404).json({status:httpStatusText.FAIL, message: 'Employee phone not found'});
-    } else {
-      res.status(201).json({status:httpStatusText.SUCCESS, message: `Employee phone:`, data:result.rows});
-    }
-  } catch (err) {
-    console.error('Error fetching data:', err);
-    res.status(500).json({status:httpStatusText.ERROR, message: 'Error retrieving employee attendance, ' + err});
+ const getPositionsChanges = async (req, res) => {  
+  const employeeId  = req.params.employeeId
+    try{
+       const query = `SELECT * FROM fn_get_employee_positions_changes($1)`;
+       const values =  [employeeId];
+       const result = await client.query(query, values)
+       res.status(200).json({status: httpStatusText.SUCCESS, data: {attendance: result.rows}});
+       }catch(err) {
+       res.status(500).json({status: httpStatusText.ERROR, message: err.message});
+       }
+      }
+const getSchedule = async (req, res) => {  
+  const employeeId  = req.params.employeeId
+  const {fromDate, toDate} = req.query
+    try{
+       const query = `SELECT * FROM fn_get_employee_schedule($1, $2, $3)`;
+       const values =  [employeeId, fromDate, toDate];
+       const result = await client.query(query, values)
+       res.status(200).json({status: httpStatusText.SUCCESS, data: {attendance: result.rows}});
+       }catch(err) {
+       res.status(500).json({status: httpStatusText.ERROR, message: err.message});
+       }
+      }
+
+const getItemPriceChanges = async (req, res) => {
+  const branchId = req.params.branchId
+  try {
+    const query = `SELECT * FROM fn_get_item_price_changes(${branchId})`
+    const result = await client.query(query)
+    res.status(200).json({ status: httpStatusText.SUCCESS, data: {items: result.rows} })
+  }catch(err) {
+    res.status(500).json({ status: httpStatusText.ERROR, message: err.message })
   }
-};
+}
 
 const addPosition = async(req,res)=>{
     try{
@@ -182,6 +191,44 @@ const changeSalary = async (req, res) => {
     });
 };
 
+const updateEmployeeAddress = async(req,res)=>{
+  try{
+      const { employeeId, newAddress } = req.body || {};
+      
+      const query = `SELECT fn_update_employee_address($1, $2)`;
+      const values = [employeeId, newAddress];
+      const result = await client.query(query, values);
+      res.status(200).json({status:httpStatusText.SUCCESS, message: Object.values(result.rows[0])[0], data:values})
+
+  }catch (error){
+      console.error('Error updating address:', error);
+      console.log(error);
+      return res.status(500).json({ status:httpStatusText.ERROR, message: "Server Error" });    
+    }
+}
+
+
+const updateEmployeePhone = async(req,res)=>{
+    try{
+        const { employeeId, oldPhone, newPhone } = req.body;
+        
+        const query = `call pr_update_employee_phone($1, $2, $3)`;
+        const values = [employeeId, oldPhone, newPhone];
+        const result = await client.query(query, values);
+        console.log(values);
+        res.status(200).json({
+          status: httpStatusText.SUCCESS,
+          message: Object.values(result.rows?.[0])?.[0], 
+          data: values,
+        });
+  
+    }catch (error){
+      console.log(error)
+        res.status(500).json({status:httpStatusText.ERROR, message: 'server error', error})
+  }
+}
+
+
 const addEmployeeAccount = async(req, res) => {
     const { id, email, password } = req.body;   
 
@@ -232,6 +279,12 @@ module.exports = {
     positionsChangesList,
     supplyEmployeesList,
     managerEmployeesList,
-    searchEmployeesAttendance,
-    searchEmployeesPhones,
+    getEmployeesAttendance,
+    getEmployeesPhones,
+    getPositionsChanges,
+    getSchedule,
+    getItemPriceChanges,
+    updateEmployeeAddress,
+    updateEmployeePhone,
+    
 }

@@ -1,6 +1,6 @@
 const express = require("express");
 const router = express.Router();
-const branchController = require("../controllers/branchController");
+const branchControllers = require("../controllers/branchControllers");
 const branchValidator = require("../utils/validators/branchValidator");
 
 
@@ -12,27 +12,31 @@ router.get("/add-new", (req, res) => {
 
 
 
-router.get("/branches-list", branchController.branchesList);
-router.get("/ingredient-suppliers-list", branchController.ingredientSuppliersList);
-router.get("/categories-list", branchController.categoriesList);
-router.get("/recipes-list", branchController.recipesList);
-router.get("/general-menu-list", branchController.generalMenuList);
-router.get("/branch-price-changes-list", branchController.branchPriceChangesList);
-router.get("/activeEmployees/:branchId", branchController.getActiveEmployees);
-router.get("/employeesAttendance/:branchId", branchController.getEmployeesAttendance);
-router.get("/employeesSchedule/:branchId", branchController.getEmployeesAttendance);
-router.get("/itemPriceChanges/:branchId", branchController.getItemPriceChanges);
-router.get("/menu/:branchId", branchController.getMenu);
-router.get("/menuByTime/:branchId", branchController.getMenuByTime);
-router.get("/sections/:branchId", branchController.getSections);
-router.get("/tables/:branchId", branchController.getTables);
+router.get("/branches-list", branchControllers.branchesList);
+router.get("/ingredient-suppliers-list", branchControllers.ingredientSuppliersList);
+router.get("/categories-list", branchControllers.categoriesList);
+router.get("/recipes-list", branchControllers.recipesList);
+router.get("/general-menu-list", branchControllers.generalMenuList);
+router.get("/branch-price-changes-list", branchControllers.branchPriceChangesList);
+router.get("/activeEmployees/:branchId", branchControllers.getActiveEmployees);
+router.get("/employeesAttendance/:branchId", branchControllers.getEmployeesAttendance);
+router.get("/employeesSchedule/:branchId", branchControllers.getEmployeesAttendance);
+router.get("/itemPriceChanges/:branchId", branchControllers.getItemPriceChanges);
+router.get("/menu/:branchId", branchControllers.getMenu);
+router.get("/menuByTime/:branchId", branchControllers.getMenuByTime);
+router.get("/sections/:branchId", branchControllers.getSections);
+router.get("/tables/:branchId", branchControllers.getTables);
+router.get("/stock/:branchId", branchControllers.getStock);
 
-router.post("/add-new",branchValidator.addNewBranchValidator, branchController.addNew);
-router.post('/add-general-section',branchValidator.addGeneralSectionValidator, branchController.addGeneralSection);
-router.post('/add-branch-section',branchValidator.addBranchSectionValidator, branchController.addBranchSection);
-router.post("/add-storage", branchController.addStorage);
-router.post("/add-menu-item", branchController.addMenuItem);
-router.post("/add-ingredient", branchValidator.addIngredientValidator, branchController.addIngredient);
+router.patch("/updateStock", branchControllers.updateStock);
+
+
+router.post("/add-new",branchValidator.addNewBranchValidator, branchControllers.addNew);
+router.post('/add-general-section',branchValidator.addGeneralSectionValidator, branchControllers.addGeneralSection);
+router.post('/add-branch-section',branchValidator.addBranchSectionValidator, branchControllers.addBranchSection);
+router.post("/add-storage", branchControllers.addStorage);
+router.post("/add-menu-item", branchControllers.addMenuItem);
+router.post("/add-ingredient", branchValidator.addIngredientValidator, branchControllers.addIngredient);
 
 
 
