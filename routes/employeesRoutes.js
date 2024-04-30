@@ -1,11 +1,12 @@
 const express = require("express");
 const router = express.Router();
 const employeeControllers = require('../controllers/employeeControllers');
-const employeeValidator = require('../utils/validators/employeeValidator')
+const employeeValidator = require('../utils/validators/employeeValidator');
+const auth = require('../middlewares/auth');
 
 
 router.get('/manager-employees-list', employeeControllers.managerEmployeesList);
-router.get('/active-employees-list', employeeControllers.activeEmployeesList);
+router.get('/active-employees-list',auth, employeeControllers.activeEmployeesList);
 router.get('/inactive-employees-list', employeeControllers.inactiveEmployeesList);
 router.get('/positions-list',employeeControllers.positionsList);
 router.get('/positions-changes-list',employeeControllers.positionsChangesList);
