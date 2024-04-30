@@ -61,9 +61,9 @@ const login = async (req, res) => {
         delete employee.account_created_date;
 
         res.status(200).json({ status: httpStatusText.SUCCESS, data: { employee, token }});
-    } catch (error) {
+    } catch (err) {
         res.status(500).json({ status: httpStatusText.ERROR, message: "Internal Server Error" });
-        console.log(error)
+        console.log(err)
     }
 };
 

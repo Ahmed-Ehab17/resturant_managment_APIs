@@ -25,6 +25,9 @@ async function connect (){
     } 
 };
 
+client.on('notice', (notice) => {
+    console.warn('PostgreSQL Notice:', notice.message);
+});
 
 connect();
 

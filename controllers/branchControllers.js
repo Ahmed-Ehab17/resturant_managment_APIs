@@ -151,6 +151,32 @@ const getTables = async (req, res) => {
 }
 
 
+const getStock = async (req, res) => {  
+  const branchId  = req.params.branchId
+    try{
+       const query = `SELECT * FROM fn_get_stock_branch($1)`;
+       const values =  [branchId];
+       const result = await client.query(query, values)
+       res.status(200).json({status: httpStatusText.SUCCESS, data: {attendance: result.rows}});
+       }catch(err) {
+       res.status(500).json({status: httpStatusText.ERROR, message: err.message});
+       }
+}
+
+const updateStock = async(req,res)=>{
+    try{
+        const { branchId , ingredientId , quantity} = req.body || {};
+        
+        const query = `SELECT fn_update_stock($1, $2, $3)`;
+        const values = [branchId , ingredientId , quantity];
+        const result = await client.query(query, values);
+        res.status(200).json({status:httpStatusText.SUCCESS, message: Object.values(result.rows[0])[0], data:values})
+  
+    }catch (error){
+        console.error('Error updating address:', error);
+        res.status(500).json({status:httpStatusText.ERROR, message: 'server error'})
+  }
+}
 
 
 const addNew = async (req, res) => {
@@ -367,4 +393,6 @@ module.exports = {
     getMenuByTime,
     getSections,
     getTables,
+    getStock,
+    updateStock,
 };

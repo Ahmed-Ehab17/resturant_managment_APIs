@@ -14,7 +14,10 @@ app.use("/admin/auth", require("./routes/authRoutes"));
 app.use("/admin/branch", require("./routes/branchRoutes"));
 app.use("/admin/table", require("./routes/tableRoutes"));
 app.use("/admin/employees", require("./routes/employeesRoutes"));
+app.use("/admin/customers", require("./routes/customerRoutes"));
+app.use("/admin/items", require("./routes/itemRoutes"));
 
 app.listen(PORT, () => {
     console.log(`listening on port ${PORT}`);
 });
+

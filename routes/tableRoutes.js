@@ -1,10 +1,10 @@
 const express = require("express");
 const router = express.Router();
-const tableController = require("../controllers/tableController");
+const tableControllers = require("../controllers/tableControllers");
 const tableValidator = require('../utils/validators/tableValidator')
 
 
 
-router.post('/add-newTable',tableValidator.addNewTable,tableController.newTable);
+router.post('/add-newTable',tableValidator.addNewTable,tableControllers.newTable);
 
 module.exports = router;
