@@ -3,7 +3,7 @@ const router = express.Router();
 const itemControllers = require('../controllers/itemControllers');
 const itemValidator = require("../utils/validators/itemValidator");
 
-//router.get('/itemPriceChanges/:itemId', itemControllers.getItemPriceChanges);
+router.get('/itemPriceChanges/:itemId', itemControllers.getItemPriceChanges);
 router.get('/itemPriceRecipes/:itemId', itemControllers.getItemPriceRecipes);
 
 
