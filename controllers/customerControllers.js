@@ -58,6 +58,26 @@ const getFriendsList = async (req, res) => {
   }
 
 
+  const updateCustomerAddress = async (req, res) => {
+    const { customerId, addressId, customerAddress, customerCity, locationCoordinates } = req.body;
+
+    try {
+      const query = `call pr_update_customer_address($1, $2, $3, $4, $5)`;
+      const values = [customerId, addressId, customerAddress, customerCity, locationCoordinates];
+      await client.query(query, values);
+  
+      res.status(200).json({
+        status: httpStatusText.SUCCESS,
+        message: res.locals.notice,
+        data: values
+      });
+    } catch (error) {
+      console.log(error);
+      res.status(500).json({ status: httpStatusText.ERROR, message: "Server Error" }); 
+    }
+  };
+  
+
 
 
 
@@ -77,4 +97,5 @@ const getFriendsList = async (req, res) => {
     getCustomerPhones,
     getFriendRequests,
     getFriendsList,
+    updateCustomerAddress,
   }
