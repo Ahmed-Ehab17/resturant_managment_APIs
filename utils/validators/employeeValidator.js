@@ -16,6 +16,120 @@ const addPosition = [
 
         validatorMiddleware,
 ]
+const addEmployee = [
+body('ssn')
+    .trim()
+    .notEmpty()
+    .withMessage('employee ssn is required'),
+
+body('firstName')
+    .trim()
+    .notEmpty()
+    .withMessage('first Name is required'),
+   
+body('lastName')
+    .trim()
+    .notEmpty()
+    .withMessage('last Name is required'),
+
+body('gender')
+    .trim()
+    .notEmpty()
+    .withMessage('gender is required'),
+   
+body('salary')
+    .trim()
+    .notEmpty()
+    .withMessage('salary is required'),
+
+body('positionId')
+    .trim()
+    .notEmpty()
+    .withMessage('position Id is required'),
+
+body('status')
+    .trim()
+    .notEmpty()
+    .withMessage('status is required'),
+
+body('branchId')
+    .trim()
+    .notEmpty()
+    .withMessage('branch Id is required'),
+
+body('sectionId')
+    .trim()
+    .notEmpty()
+    .withMessage('section Id is required'),
+
+body('birthDate')
+    .trim()
+    .notEmpty()
+    .withMessage('birth Date is required'),
+
+body('address')
+    .trim()
+    .notEmpty()
+    .withMessage('address is required'),
+    
+body('dateHired')
+    .trim()
+    .notEmpty()
+    .withMessage('date Hired is required'),
+
+    validatorMiddleware,
+    
+]
+const addEmployeePhone = [
+    body('employeeId')
+    .trim()
+    .notEmpty()
+    .withMessage('employee id is required'),
+    
+    body('employeePhone')
+    .trim()
+    .notEmpty()
+    .withMessage('employee Phone is required'),
+    validatorMiddleware,
+]
+const addEmployeeSchedule = [
+    body('employeeId')
+    .trim()
+    .notEmpty()
+    .withMessage('employee id is required'),
+    
+    body('shiftStartTime')
+    .trim()
+    .notEmpty()
+    .withMessage('shift start time is required'),
+    body('shiftEndTime')
+    .trim()
+    .notEmpty()
+    .withMessage('shift end time is required'),
+    validatorMiddleware,
+]
+
+const addEmployeeVacation = [
+    body('employeeId')
+    .trim()
+    .notEmpty()
+    .withMessage('employee id is required'),
+    
+    body('vacationStartDate')
+    .trim()
+    .notEmpty()
+    .withMessage('vacation Start Date is required'),
+    body('vacationEndDate')
+    .trim()
+    .notEmpty()
+    .withMessage('vacation End Date is required'),
+    body('vacationReason')
+    .trim()
+    .notEmpty()
+    .withMessage('vacation Reason is required'),
+
+    validatorMiddleware,
+]
 
 const changePosition = [
     body('employee_id')
@@ -81,6 +195,10 @@ const updateEmployeePhone = [
 
 module.exports = {
     addPosition,
+    addEmployee,
+    addEmployeePhone,
+    addEmployeeSchedule,
+    addEmployeeVacation,
     changePosition,
     updateEmployeeAddress,
     updateEmployeePhone,

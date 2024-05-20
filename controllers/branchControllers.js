@@ -91,7 +91,7 @@ const getEmployeesSchedule = async (req, res) => {
       const query = `SELECT * FROM fn_get_branch_employees_schedule($1, $2, $3)`
       const values = [branchId, fromDate, toDate]
       const result = await client.query(query, values)
-      res.status(200).json({status: httpStatusText.SUCCESS, data: {attendance: result.rows}});
+      res.status(200).json({status: httpStatusText.SUCCESS, data: {schedule: result.rows}});
       }catch(err) {
       res.status(500).json({status: httpStatusText.ERROR, message: err.message});
       }
@@ -157,7 +157,7 @@ const getStock = async (req, res) => {
        const query = `SELECT * FROM fn_get_stock_branch($1)`;
        const values =  [branchId];
        const result = await client.query(query, values)
-       res.status(200).json({status: httpStatusText.SUCCESS, data: {attendance: result.rows}});
+       res.status(200).json({status: httpStatusText.SUCCESS, data: {stock: result.rows}});
        }catch(err) {
        res.status(500).json({status: httpStatusText.ERROR, message: err.message});
        }

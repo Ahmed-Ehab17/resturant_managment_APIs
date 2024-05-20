@@ -22,6 +22,7 @@ app.use("/admin/table", require("./routes/tableRoutes"));
 app.use("/admin/employees", require("./routes/employeesRoutes"));
 app.use("/admin/customers", require("./routes/customerRoutes"));
 app.use("/admin/items", require("./routes/itemRoutes"));
+app.use("/admin/social", require("./routes/socialRoutes"));
 
 app.listen(PORT, () => {
     console.log(`listening on port ${PORT}`);
