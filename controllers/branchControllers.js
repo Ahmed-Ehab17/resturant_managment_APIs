@@ -139,15 +139,32 @@ const getSections = async (req, res) => {
     res.status(500).json({ status: httpStatusText.ERROR, message: err.message })
   }
 }
-const getTables = async (req, res) => {
-  const branchId = req.params.branchId
+// const getTables = async (req, res) => {
+//   const branchId = req.params.branchId
+//   try {
+//     const query = `SELECT * FROM fn_get_branch_tables(${branchId})`
+//     const result = await client.query(query)
+//     res.status(200).json({ status: httpStatusText.SUCCESS, data: {tables: result.rows} })
+//   }catch(err) {
+//     res.status(500).json({ status: httpStatusText.ERROR, message: err.message })
+//   }
+// }
+
+
+
+const getTables = async(req, res) => {
+  const branchId = req.params.branchId;
+  const stat = req.params.stat;
   try {
-    const query = `SELECT * FROM fn_get_branch_tables(${branchId})`
-    const result = await client.query(query)
-    res.status(200).json({ status: httpStatusText.SUCCESS, data: {tables: result.rows} })
-  }catch(err) {
-    res.status(500).json({ status: httpStatusText.ERROR, message: err.message })
-  }
+    const query = `SELECT * FROM fn_get_branch_tables($1, $2)`; 
+    const values = [branchId, stat];
+    const result = await client.query(query, values);
+
+    res.status(200).json({ status:httpStatusText.SUCCESS, data: { tables: result.rows } });
+  } catch (err) {
+    console.log(err);
+    res.status(500).json({ status: httpStatusText.ERROR, err });
+  } 
 }
 
 

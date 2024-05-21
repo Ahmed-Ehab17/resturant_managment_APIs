@@ -214,17 +214,16 @@ const updateEmployeePhone = async(req,res)=>{
         
         const query = `call pr_update_employee_phone($1, $2, $3)`;
         const values = [employeeId, oldPhone, newPhone];
-        const result = await client.query(query, values);
-        console.log(values);
+        await client.query(query, values);
+        
         res.status(200).json({
           status: httpStatusText.SUCCESS,
-          message: Object.values(result.rows?.[0])?.[0], 
           data: values,
         });
   
     }catch (error){
       console.log(error)
-        res.status(500).json({status:httpStatusText.ERROR, message: 'server error', error})
+        res.status(500).json({status:httpStatusText.ERROR, message: error.message})
   }
 }
 
@@ -277,16 +276,16 @@ const addEmployee = async (req, res) => {
     salary,
     positionId,
     status,
-    branchId,
-    sectionId,
+    branchId = null,
+    sectionId = null,
     birthDate,
     address,
-    dateHired
+    dateHired = null
   } = req.body;
 
   try {
-    const query = `SELECT fn_add_employee($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12)`
-    const values = [ssn, firstName, lastName, gender, salary, positionId, status, branchId, sectionId, birthDate, address, dateHired]
+    query = `SELECT fn_add_employee($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12)`;
+    values = [ssn, firstName, lastName, gender, salary, positionId, status, branchId, sectionId, birthDate, address, dateHired]
     const result = await client.query(query, values);
 
     res.status(201).json({status:httpStatusText.SUCCESS, message: result.rows[0].fn_add_employee, data:values });
@@ -340,10 +339,27 @@ const addEmployeeVacation = async (req, res) => {
       data: values
     });
   } catch (error) {
-    console.error(error);
+    console.log(error);
     res.status(500).json({ status:httpStatusText.ERROR, message: "Server Error" });
   }
 };
+
+const addIngredientSupplier = async (req, res) => {
+  const { supplierId, ingredientId } = req.body;
+
+  try {
+    const query = `call pr_add_ingredient_supplier($1, $2)`;
+    const values = [supplierId, ingredientId];
+    const result = await client.query(query, values);
+
+    res.status(201).json({ status: httpStatusText.SUCCESS, data: values});
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({ status:httpStatusText.ERROR, message: "Server Error" });
+  }
+};
+
+
 
 
 
@@ -370,6 +386,7 @@ module.exports = {
     addEmployee,
     addEmployeePhone,
     addEmployeeSchedule,
-    addEmployeeVacation
+    addEmployeeVacation,
+    addIngredientSupplier,
     
 }

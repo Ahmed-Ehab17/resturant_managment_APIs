@@ -11,6 +11,12 @@ router.get('/friendRequests/:accountId', customerControllers.getFriendRequests);
 router.get('/friendsList/:accountId', customerControllers.getFriendsList);
 router.patch('/update-customer-address', customerValidator.updateCustomerAddress, customerControllers.updateCustomerAddress);
 
+router.post("/customer",customerValidator.addCustomer, customerControllers.addCustomer);
+router.post("/customer-address",customerValidator.addCustomerAddress, customerControllers.addCustomerAddress);
+router.post("/customer-phone",customerValidator.addCustomerPhone, customerControllers.addCustomerPhone);
+
+
+
 
 
 

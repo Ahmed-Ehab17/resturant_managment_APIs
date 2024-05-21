@@ -44,6 +44,7 @@ body('salary')
 
 body('positionId')
     .trim()
+    .isInt()
     .notEmpty()
     .withMessage('position Id is required'),
 
@@ -51,16 +52,6 @@ body('status')
     .trim()
     .notEmpty()
     .withMessage('status is required'),
-
-body('branchId')
-    .trim()
-    .notEmpty()
-    .withMessage('branch Id is required'),
-
-body('sectionId')
-    .trim()
-    .notEmpty()
-    .withMessage('section Id is required'),
 
 body('birthDate')
     .trim()
@@ -72,17 +63,13 @@ body('address')
     .notEmpty()
     .withMessage('address is required'),
     
-body('dateHired')
-    .trim()
-    .notEmpty()
-    .withMessage('date Hired is required'),
-
     validatorMiddleware,
     
 ]
 const addEmployeePhone = [
     body('employeeId')
     .trim()
+    .isInt()
     .notEmpty()
     .withMessage('employee id is required'),
     
@@ -95,6 +82,7 @@ const addEmployeePhone = [
 const addEmployeeSchedule = [
     body('employeeId')
     .trim()
+    .isInt()
     .notEmpty()
     .withMessage('employee id is required'),
     
@@ -112,6 +100,7 @@ const addEmployeeSchedule = [
 const addEmployeeVacation = [
     body('employeeId')
     .trim()
+    .isInt()
     .notEmpty()
     .withMessage('employee id is required'),
     
@@ -131,16 +120,31 @@ const addEmployeeVacation = [
     validatorMiddleware,
 ]
 
+const addIngredientSupplier = [
+    body('supplierId' )
+    .trim()
+    .isInt()
+    .notEmpty()
+    .withMessage('supplier id is required'),
+
+    body('ingredientId')
+    .trim()
+    .isInt()
+    .notEmpty()
+    .withMessage('ingredient id is required'),
+    validatorMiddleware
+]
+
 const changePosition = [
     body('employee_id')
     .trim()
-    .toInt()
+    .isInt()
     .notEmpty()
     .withMessage('employee id is required'),
 
     body('position_changer_id')
     .trim()
-    .toInt()
+    .isInt()
     .notEmpty()
     .withMessage('position changer id is required'),
 
@@ -160,7 +164,7 @@ const changePosition = [
 const updateEmployeeAddress = [
     body('employeeId')
     .trim()
-    .toInt()
+    .isInt()
     .notEmpty()
     .withMessage('employee id is required'),
     body('newAddress')
@@ -173,7 +177,7 @@ const updateEmployeeAddress = [
 const updateEmployeePhone = [
     body('employeeId')
     .trim()
-    .toInt()
+    .isInt()
     .notEmpty()
     .withMessage('employee id is required'),
     body('oldPhone')
@@ -202,5 +206,6 @@ module.exports = {
     changePosition,
     updateEmployeeAddress,
     updateEmployeePhone,
+    addIngredientSupplier,
 
 }

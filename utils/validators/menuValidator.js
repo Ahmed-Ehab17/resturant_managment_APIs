@@ -29,9 +29,26 @@ const addRecipes = [
 
     validatorMiddleware,
 ]
+ const addCategory = [
+    body('sectionId')
+    .trim()
+    .notEmpty()
+    .withMessage('section id is required'),
 
+    body('categoryName')
+    .trim()
+    .notEmpty()
+    .withMessage('category name is required'),
+
+    body('categoryDescription')
+    .trim()
+    .notEmpty()
+    .withMessage('category description is required'),
+    validatorMiddleware
+ ]
 
 
 module.exports = {
     addRecipes,
+    addCategory
 }
