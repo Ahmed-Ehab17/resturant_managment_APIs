@@ -89,7 +89,7 @@ const activeEmployeesList= async(req,res)=> {
        const query = `SELECT * FROM fn_get_employee_phones($1)`;
        const values =  [employeeId];
        const result = await client.query(query, values)
-       res.status(200).json({status: httpStatusText.SUCCESS, data: {phones: result.rows}});
+       res.status(200).json({status: httpStatusText.SUCCESS, data: {attendance: result.rows}});
        }catch(err) {
        res.status(500).json({status: httpStatusText.ERROR, message: err.message});
        }
@@ -101,7 +101,7 @@ const activeEmployeesList= async(req,res)=> {
        const query = `SELECT * FROM fn_get_employee_positions_changes($1)`;
        const values =  [employeeId];
        const result = await client.query(query, values)
-       res.status(200).json({status: httpStatusText.SUCCESS, data: {positionChanges: result.rows}});
+       res.status(200).json({status: httpStatusText.SUCCESS, data: {attendance: result.rows}});
        }catch(err) {
        res.status(500).json({status: httpStatusText.ERROR, message: err.message});
        }
@@ -113,7 +113,7 @@ const getSchedule = async (req, res) => {
        const query = `SELECT * FROM fn_get_employee_schedule($1, $2, $3)`;
        const values =  [employeeId, fromDate, toDate];
        const result = await client.query(query, values)
-       res.status(200).json({status: httpStatusText.SUCCESS, data: {schedule: result.rows}});
+       res.status(200).json({status: httpStatusText.SUCCESS, data: {attendance: result.rows}});
        }catch(err) {
        res.status(500).json({status: httpStatusText.ERROR, message: err.message});
        }
@@ -124,7 +124,7 @@ const getItemPriceChanges = async (req, res) => {
   try {
     const query = `SELECT * FROM fn_get_item_price_changes(${branchId})`
     const result = await client.query(query)
-    res.status(200).json({ status: httpStatusText.SUCCESS, data: {ItemPriceChanges: result.rows} })
+    res.status(200).json({ status: httpStatusText.SUCCESS, data: {items: result.rows} })
   }catch(err) {
     res.status(500).json({ status: httpStatusText.ERROR, message: err.message })
   }
@@ -154,6 +154,19 @@ const addPosition = async(req,res)=>{
    }
     
 }
+
+const addtimeInAttendance = async (req, res) => {
+  const {scheduleId, employeeId, timeIn} = req.body
+  try{
+    query = `SELECT fn_add_time_in_attendance($1, $2, $3)`
+    values = [scheduleId, employeeId, timeIn]
+    const result = await client.query(query, values)
+    res.status(200).json({status: httpStatusText.SUCCESS, data: result})
+    console.log(result);
+  }catch(err){
+    return res.status(500).json({status: httpStatusText.ERROR, message: err.message});
+  }
+};
 
 const changePosition = async(req,res)=>{
     try{
@@ -266,7 +279,6 @@ const addEmployeeAccount = async(req, res) => {
     }
 };
 
-
 const addEmployee = async (req, res) => {
   const {
     ssn,
@@ -362,31 +374,31 @@ const addIngredientSupplier = async (req, res) => {
 
 
 
-
-
-
-
 module.exports = {
     addPosition,
+    addEmployee,
+    addEmployeePhone,
+    addEmployeeSchedule,
+    addEmployeeVacation,
+    addIngredientSupplier,
+    addtimeInAttendance,
+  
     changePosition,
     changeSalary,
+  
     activeEmployeesList,
     inactiveEmployeesList,
     positionsList,
     positionsChangesList,
     supplyEmployeesList,
     managerEmployeesList,
+  
     getEmployeesAttendance,
     getEmployeesPhones,
     getPositionsChanges,
     getSchedule,
     getItemPriceChanges,
+  
     updateEmployeeAddress,
-    updateEmployeePhone,
-    addEmployee,
-    addEmployeePhone,
-    addEmployeeSchedule,
-    addEmployeeVacation,
-    addIngredientSupplier,
-    
+    updateEmployeePhone, 
 }
