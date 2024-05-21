@@ -15,7 +15,13 @@ router.get('/attendance/:employeeId', employeeControllers.getEmployeesAttendance
 router.get('/phones/:employeeId', employeeControllers.getEmployeesPhones);
 router.get('/PositionsChanges/:employeeId', employeeControllers.getPositionsChanges);
 router.get('/schedule/:employeeId', employeeControllers.getSchedule);
+
 router.post('/add-position',employeeValidator.addPosition, employeeControllers.addPosition);
+router.post('/employee',employeeValidator.addEmployee, employeeControllers.addEmployee);
+router.post('/employee-phone',employeeValidator.addEmployeePhone, employeeControllers.addEmployeePhone);
+router.post('/employee-schedule',employeeValidator.addEmployeeSchedule, employeeControllers.addEmployeeSchedule);
+router.post('/employee-vacation',employeeValidator.addEmployeeVacation, employeeControllers.addEmployeeVacation);
+router.post('/ingredient-supplier',employeeValidator.addIngredientSupplier, employeeControllers.addIngredientSupplier);
 router.post('/add-employee',employeeValidator.addEmployee, employeeControllers.addEmployee);
 router.post('/add-employee-phone',employeeValidator.addEmployeePhone, employeeControllers.addEmployeePhone);
 router.post('/add-employee-schedule',employeeValidator.addEmployeeSchedule, employeeControllers.addEmployeeSchedule);
@@ -26,8 +32,8 @@ router.post('/timeInAttendance', employeeControllers.addtimeInAttendance);
 
 router.patch('/change-position', employeeControllers.changePosition);
 router.patch("/change-salary", employeeControllers.changeSalary);
-router.patch("/updateEmployeeAddress",employeeValidator.updateEmployeeAddress, employeeControllers.updateEmployeeAddress);
-router.patch("/updateEmployeePhone",employeeValidator.updateEmployeePhone, employeeControllers.updateEmployeePhone);
+router.patch("/update-employee-address",employeeValidator.updateEmployeeAddress, employeeControllers.updateEmployeeAddress);
+router.patch("/update-employee-phone",employeeValidator.updateEmployeePhone, employeeControllers.updateEmployeePhone);
 
 
 

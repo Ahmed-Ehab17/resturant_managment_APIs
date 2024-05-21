@@ -28,10 +28,77 @@ const updateCustomerAddress = [
 
     validatorMiddleware
 ]
+ const addCustomer = [
+    body('firstName')
+    .trim()
+    .isString()
+    .notEmpty()
+    .withMessage('first name is required'),
 
+    body('lastName')
+    .trim()
+    .isString()
+    .notEmpty()
+    .withMessage('last name is required'),
+
+    body('gender')
+    .trim()
+    .notEmpty()
+    .withMessage('gender is required'),
+
+    body('phone')
+    .trim()
+    .isMobilePhone()
+    .notEmpty()
+    .withMessage('phone is required'),
+
+    body('address')
+    .trim()
+    .isString()
+    .notEmpty()
+    .withMessage('address is required'),
+
+    validatorMiddleware
+        
+    
+ ]
+
+ const addCustomerAddress = [
+    body('customerId')
+    .trim()
+    .isInt()
+    .notEmpty()
+    .withMessage('customer id is required'),
+
+    body('address')
+    .trim()
+    .isString()
+    .notEmpty()
+    .withMessage('address is required'),
+
+    validatorMiddleware
+ ]
+ const addCustomerPhone = [
+    body('customerId')
+    .trim()
+    .isInt()
+    .notEmpty()
+    .withMessage('customer id is required'),
+
+    body('phone')
+    .trim()
+    .isMobilePhone()
+    .notEmpty()
+    .withMessage('phone is required'),
+
+    validatorMiddleware
+ ]
 
 
 module.exports = {
-    updateCustomerAddress
+    updateCustomerAddress,
+    addCustomer,
+    addCustomerAddress,
+    addCustomerPhone,
 
 }

@@ -57,7 +57,6 @@ const getFriendsList = async (req, res) => {
          }
   }
 
-
   const updateCustomerAddress = async (req, res) => {
     const { customerId, addressId, customerAddress, customerCity, locationCoordinates } = req.body;
 
@@ -77,9 +76,59 @@ const getFriendsList = async (req, res) => {
     }
   };
   
+const addCustomer = async(req,res) =>{
+  const {
+    firstName,
+    lastName,
+    gender,
+    phone,
+    address,
+    city = null,
+    locationCoordinates = null,
+    birthDate = null,
+  } = req.body;
 
+    try {
+      const query = `call pr_add_customer($1, $2, $3, $4, $5, $6, $7, $8)`;
+      const values = [firstName, lastName, gender, phone, address, city, locationCoordinates, birthDate];
+      await client.query(query, values);
 
+      res.status(201).json({ status:httpStatusText.SUCCESS, data:values });
+    }catch (error) {
+    console.log(error);
+    res.status(500).json({ status: httpStatusText.ERROR, message: 'Server Error' });
+  }
+};
 
+const addCustomerAddress = async(req,res) =>{
+  const { customerId, address, city = null, locationCoordinates = null} = req.body;
+
+    try {
+      const query = `call pr_add_customer_address($1, $2, $3, $4)`;
+      const values = [customerId, address, city, locationCoordinates];
+      await client.query(query, values);
+
+      res.status(201).json({ status:httpStatusText.SUCCESS, data:values });
+    }catch (error) {
+    console.log(error);
+    res.status(500).json({ status: httpStatusText.ERROR, message: 'Server Error' });
+  }
+};
+
+const addCustomerPhone = async(req,res) =>{
+  const { customerId, phone} = req.body;
+
+    try {
+      const query = `call pr_add_customer_phone($1, $2)`;
+      const values = [customerId, phone];
+      await client.query(query, values);
+
+      res.status(201).json({ status:httpStatusText.SUCCESS, data:values });
+    }catch (error) {
+    console.log(error);
+    res.status(500).json({ status: httpStatusText.ERROR, message: 'Server Error' });
+  }
+};
 
 
 
@@ -98,4 +147,7 @@ const getFriendsList = async (req, res) => {
     getFriendRequests,
     getFriendsList,
     updateCustomerAddress,
+    addCustomer,
+    addCustomerAddress,
+    addCustomerPhone,
   }

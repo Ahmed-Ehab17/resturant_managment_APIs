@@ -26,7 +26,7 @@ router.get("/itemPriceChanges/:branchId", branchControllers.getItemPriceChanges)
 router.get("/menu/:branchId", branchControllers.getMenu);
 router.get("/menuByTime/:branchId", branchControllers.getMenuByTime);
 router.get("/sections/:branchId", branchControllers.getSections);
-router.get("/tables/:branchId", branchControllers.getTables);
+router.get("/tables/:branchId/:stat", branchControllers.getTables);
 router.get("/stock/:branchId", branchControllers.getStock);
 
 router.patch("/updateStock", branchControllers.updateStock);
