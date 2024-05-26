@@ -38,6 +38,8 @@ router.post('/add-branch-section',branchValidator.addBranchSectionValidator, bra
 router.post("/add-storage", branchControllers.addStorage);
 router.post("/add-menu-item", branchControllers.addMenuItem);
 router.post("/add-ingredient", branchValidator.addIngredientValidator, branchControllers.addIngredient);
+router.post("/addIngredientToStock", branchControllers.addIngredientToStock);
+router.post("/addItemBranchMenu", branchValidator.addItemBranchMenuValidator,branchControllers.addItemBranchMenu);
 
 
 

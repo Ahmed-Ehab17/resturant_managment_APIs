@@ -20,7 +20,8 @@ router.post('/add-employee',employeeValidator.addEmployee, employeeControllers.a
 router.post('/add-employee-phone',employeeValidator.addEmployeePhone, employeeControllers.addEmployeePhone);
 router.post('/add-employee-schedule',employeeValidator.addEmployeeSchedule, employeeControllers.addEmployeeSchedule);
 router.post('/add-employee-vacation',employeeValidator.addEmployeeVacation, employeeControllers.addEmployeeVacation);
-router.post('/timeInAttendance', employeeControllers.addtimeInAttendance);
+router.post('/timeInAttendance', employeeControllers.addTimeInAttendance);
+router.post('/timeOutAttendance', employeeControllers.addTimeOutAttendance);
 
 
 
