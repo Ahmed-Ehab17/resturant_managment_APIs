@@ -139,18 +139,6 @@ const getSections = async (req, res) => {
     res.status(500).json({ status: httpStatusText.ERROR, message: err.message })
   }
 }
-// const getTables = async (req, res) => {
-//   const branchId = req.params.branchId
-//   try {
-//     const query = `SELECT * FROM fn_get_branch_tables(${branchId})`
-//     const result = await client.query(query)
-//     res.status(200).json({ status: httpStatusText.SUCCESS, data: {tables: result.rows} })
-//   }catch(err) {
-//     res.status(500).json({ status: httpStatusText.ERROR, message: err.message })
-//   }
-// }
-
-
 
 const getTables = async(req, res) => {
   const branchId = req.params.branchId;
@@ -179,6 +167,34 @@ const getStock = async (req, res) => {
        res.status(500).json({status: httpStatusText.ERROR, message: err.message});
        }
 }
+
+const getBookings = async (req, res) => {
+  const branchId = req.params.branchId;
+
+  try {
+    const query = `SELECT * FROM fn_get_branch_bookings($1)`;
+    const values = [branchId];
+    const result = await client.query(query, values);
+    res.status(200).json({ status: httpStatusText.SUCCESS, data: { bookings: result.rows } });
+  } catch (err) {
+    res.status(500).json({ status: httpStatusText.ERROR, message: err.message });
+  }
+};
+
+const getBookingsByStatus = async (req, res) => {
+  const branchId = req.params.branchId;
+  const bookingStatus = req.params.bookingStatus;
+
+  try {
+    const query = `SELECT * FROM fn_get_bookings_by_status($1, $2)`;
+    const values = [branchId, bookingStatus];
+    const result = await client.query(query, values);
+    res.status(200).json({ status: httpStatusText.SUCCESS, data: { bookings: result.rows } });
+  } catch (err) {
+    res.status(500).json({ status: httpStatusText.ERROR, message: err.message });
+  }
+};
+
 
 const updateStock = async(req,res)=>{
     try{
@@ -347,9 +363,9 @@ const addStorage = async (req, res) => {
 
 const addMenuItem = async (req, res) => {
     try {
-        const { itemName, itemDesc, categoryID, prepTime } = req.body;
-        const query = `CALL pr_menu_item($1, $2, $3, $4)`;
-        const values = [itemName, itemDesc, categoryID, prepTime];
+        const { itemName, itemDesc, categoryID, prepTime, picPath, vegetarian, healthy } = req.body;
+        const query = `CALL pr_add_menu_item($1, $2, $3, $4, $5, $6, $7)`;
+        const values = [itemName, itemDesc, categoryID, prepTime, picPath, vegetarian, healthy];
         await client.query(query, values);
 
         res.status(201).json({ message: "Menu Item Added Successfully", data: values });
@@ -390,18 +406,20 @@ const addIngredient = async (req, res) => {
 
 module.exports = {
     addNew,
-    branchesList,
     addStorage,
     addMenuItem,
     addIngredient,
     addGeneralSection,
     addBranchSection,
     addBranchSection,
+
+    branchesList,
     ingredientSuppliersList,
     categoriesList,
     recipesList,
     generalMenuList,
     branchPriceChangesList,
+
     getActiveEmployees,
     getEmployeesAttendance,
     getItemPriceChanges,
@@ -411,5 +429,8 @@ module.exports = {
     getSections,
     getTables,
     getStock,
+    getBookings,
+    getBookingsByStatus,
+
     updateStock,
 };

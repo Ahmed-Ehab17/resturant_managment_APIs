@@ -119,6 +119,19 @@ const getSchedule = async (req, res) => {
        }
       }
 
+  const getEmployeeSignInInfo = async (req, res) => {
+    const employeeEmail = req.params.employeeEmail;
+      
+      try {
+          const query = `SELECT * FROM fn_get_employee_sign_in_info($1)`;
+          const values = [employeeEmail];
+          const result = await client.query(query, values);
+          res.status(200).json({ status: httpStatusText.SUCCESS, data: { employee: result.rows } });
+        }catch (err) {
+        res.status(500).json({ status: httpStatusText.ERROR, message: err.message });
+      }
+};
+
 const getItemPriceChanges = async (req, res) => {
   const branchId = req.params.branchId
   try {
@@ -132,7 +145,7 @@ const getItemPriceChanges = async (req, res) => {
 
 const addPosition = async(req,res)=>{
     try{
-        const {position_name , jop_description} = req.body || {};
+        const {position_name, employeeRole, jop_description} = req.body || {};
         
         const positionCheckQuery = 'SELECT EXISTS(SELECT 1 FROM positions WHERE position_name = $1)';
         const positionCheckValues = [position_name];
@@ -142,10 +155,10 @@ const addPosition = async(req,res)=>{
         if (positionCheckResult.rows[0].exists) {
             return res.status(409).json({ message: `can not add ${position_name} position because it's already exists` });
     }
-        const query = `SELECT fn_add_position($1, $2)`;
-        const values = [position_name, jop_description];
+        const query = `call pr_add_position($1, $2, $3)`;
+        const values = [position_name, employeeRole, jop_description];
         await client.query(query, values);
-        res.status(201).json({status:httpStatusText.SUCCESS, message: 'position added successfully', data: values });
+        res.status(201).json({status:httpStatusText.SUCCESS, data: values });
 
     } catch (error) {
      console.error('Error adding position:', error);
@@ -398,6 +411,7 @@ module.exports = {
     getPositionsChanges,
     getSchedule,
     getItemPriceChanges,
+    getEmployeeSignInInfo,
   
     updateEmployeeAddress,
     updateEmployeePhone, 
