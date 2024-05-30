@@ -28,6 +28,8 @@ router.get("/menuByTime/:branchId", branchControllers.getMenuByTime);
 router.get("/sections/:branchId", branchControllers.getSections);
 router.get("/tables/:branchId/:stat", branchControllers.getTables);
 router.get("/stock/:branchId", branchControllers.getStock);
+router.get("/bookings/:branchId", branchControllers.getBookings);
+router.get("/bookingsByStatus/:branchId/:bookingStatus", branchControllers.getBookingsByStatus);
 
 router.patch("/updateStock", branchControllers.updateStock);
 

@@ -15,6 +15,8 @@ router.get('/attendance/:employeeId', employeeControllers.getEmployeesAttendance
 router.get('/phones/:employeeId', employeeControllers.getEmployeesPhones);
 router.get('/PositionsChanges/:employeeId', employeeControllers.getPositionsChanges);
 router.get('/schedule/:employeeId', employeeControllers.getSchedule);
+router.get('/EmployeeSignInInfo/:employeeEmail', employeeControllers.getEmployeeSignInInfo);
+
 
 router.post('/add-position',employeeValidator.addPosition, employeeControllers.addPosition);
 router.post('/employee',employeeValidator.addEmployee, employeeControllers.addEmployee);

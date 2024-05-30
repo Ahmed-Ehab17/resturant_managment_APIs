@@ -57,6 +57,47 @@ const getFriendsList = async (req, res) => {
          }
   }
 
+  const getCustomerOrders = async (req, res) => {
+    const customerId = req.params.customerId;
+    const limit = req.params.limit; 
+  
+    try {
+      const query = `SELECT * FROM fn_get_customer_orders($1, $2)`;
+      const values = [customerId, limit];
+      const result = await client.query(query, values);
+         res.status(200).json({status: httpStatusText.SUCCESS, data: {orders: result.rows}});
+         }catch(err) {
+         res.status(500).json({status: httpStatusText.ERROR, message: err.message});
+         }
+  }
+
+  const getCustomerBookings = async (req, res) => {
+    const customerId = req.params.customerId;
+  
+    try {
+      const query = `SELECT * FROM fn_get_customer_bookings($1)`;
+      const values = [customerId];
+      const result = await client.query(query, values);
+      res.status(200).json({ status: httpStatusText.SUCCESS, data: { bookings: result.rows } });
+    } catch (err) {
+      res.status(500).json({ status: httpStatusText.ERROR, message: err.message });
+    }
+  };
+
+  const getCustomerSignInInfo = async (req, res) => {
+    const customerPhone = req.params.customerPhone;
+  
+    try {
+      const query = `SELECT * FROM fn_get_customer_sign_in_info($1)`;
+      const values = [customerPhone];
+      const result = await client.query(query, values);
+      res.status(200).json({ status: httpStatusText.SUCCESS, data: { customer: result.rows } });
+    } catch (err) {
+    res.status(500).json({ status: httpStatusText.ERROR, message: err.message });
+  }
+};
+  
+
   const updateCustomerAddress = async (req, res) => {
     const { customerId, addressId, customerAddress, customerCity, locationCoordinates } = req.body;
 
@@ -145,8 +186,14 @@ const addCustomerPhone = async(req,res) =>{
     getCustomerInformation,
     getCustomerPhones,
     getFriendRequests,
+    getCustomerOrders,
+    getCustomerBookings,
+    getCustomerSignInInfo,
+
     getFriendsList,
+
     updateCustomerAddress,
+
     addCustomer,
     addCustomerAddress,
     addCustomerPhone,
