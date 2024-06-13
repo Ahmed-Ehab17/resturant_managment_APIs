@@ -119,6 +119,19 @@ const getSchedule = async (req, res) => {
        }
       }
 
+  const getEmployeeSignInInfo = async (req, res) => {
+    const employeeEmail = req.params.employeeEmail;
+      
+      try {
+          const query = `SELECT * FROM fn_get_employee_sign_in_info($1)`;
+          const values = [employeeEmail];
+          const result = await client.query(query, values);
+          res.status(200).json({ status: httpStatusText.SUCCESS, data: { employee: result.rows } });
+        }catch (err) {
+        res.status(500).json({ status: httpStatusText.ERROR, message: err.message });
+      }
+};
+
 const getItemPriceChanges = async (req, res) => {
   const branchId = req.params.branchId
   try {
@@ -132,7 +145,7 @@ const getItemPriceChanges = async (req, res) => {
 
 const addPosition = async(req,res)=>{
     try{
-        const {position_name , jop_description} = req.body || {};
+        const {position_name, employeeRole, jop_description} = req.body || {};
         
         const positionCheckQuery = 'SELECT EXISTS(SELECT 1 FROM positions WHERE position_name = $1)';
         const positionCheckValues = [position_name];
@@ -142,10 +155,10 @@ const addPosition = async(req,res)=>{
         if (positionCheckResult.rows[0].exists) {
             return res.status(409).json({ message: `can not add ${position_name} position because it's already exists` });
     }
-        const query = `SELECT fn_add_position($1, $2)`;
-        const values = [position_name, jop_description];
+        const query = `call pr_add_position($1, $2, $3)`;
+        const values = [position_name, employeeRole, jop_description];
         await client.query(query, values);
-        res.status(201).json({status:httpStatusText.SUCCESS, message: 'position added successfully', data: values });
+        res.status(201).json({status:httpStatusText.SUCCESS, data: values });
 
     } catch (error) {
      console.error('Error adding position:', error);
@@ -319,17 +332,16 @@ const updateEmployeePhone = async(req,res)=>{
         
         const query = `call pr_update_employee_phone($1, $2, $3)`;
         const values = [employeeId, oldPhone, newPhone];
-        const result = await client.query(query, values);
-        console.log(values);
+        await client.query(query, values);
+        
         res.status(200).json({
           status: httpStatusText.SUCCESS,
-          message: Object.values(result.rows?.[0])?.[0], 
           data: values,
         });
   
     }catch (error){
       console.log(error)
-        res.status(500).json({status:httpStatusText.ERROR, message: 'server error', error})
+        res.status(500).json({status:httpStatusText.ERROR, message: error.message})
   }
 }
 
@@ -372,30 +384,127 @@ const addEmployeeAccount = async(req, res) => {
     }
 };
 
+const addEmployee = async (req, res) => {
+  const {
+    ssn,
+    firstName,
+    lastName,
+    gender,
+    salary,
+    positionId,
+    status,
+    branchId = null,
+    sectionId = null,
+    birthDate,
+    address,
+    dateHired = null
+  } = req.body;
+
+  try {
+    query = `SELECT fn_add_employee($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12)`;
+    values = [ssn, firstName, lastName, gender, salary, positionId, status, branchId, sectionId, birthDate, address, dateHired]
+    const result = await client.query(query, values);
+
+    res.status(201).json({status:httpStatusText.SUCCESS, message: result.rows[0].fn_add_employee, data:values });
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({status:httpStatusText.ERROR, message: "Server Error" });
+  }
+};
+
+const addEmployeePhone = async (req, res) => {
+  const { employeeId, employeePhone } = req.body;
+
+  try {
+    const query = `SELECT fn_add_employee_phone($1, $2)`
+    const values = [employeeId, employeePhone]
+    const result = await client.query(query, values);
+
+    res.status(201).json({status:httpStatusText.SUCCESS, message: result.rows[0].fn_add_employee_phone, data:values });
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({status:httpStatusText.ERROR, message: "Server Error" });
+  }
+};
+
+const addEmployeeSchedule = async (req, res) => {
+  const { employeeId, shiftStartTime, shiftEndTime } = req.body;
+
+  try {
+    const query = `SELECT fn_add_employee_schedule($1, $2, $3)`;
+    const values = [employeeId, shiftStartTime, shiftEndTime];
+    const result = await client.query(query, values);
+
+    res.status(201).json({status: httpStatusText.SUCCESS, message: result.rows[0].fn_add_employee_schedule, data: values });
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({ status: httpStatusText.ERROR, message: "Server Error" });
+  }
+};
+
+const addEmployeeVacation = async (req, res) => {
+  const { employeeId, vacationStartDate, vacationEndDate, vacationReason } = req.body;
+
+  try {
+    const query = `SELECT fn_add_employee_vacation($1, $2, $3, $4)`;
+    const values = [employeeId, vacationStartDate, vacationEndDate, vacationReason];
+    const result = await client.query(query, values);
+
+    res.status(201).json({
+      status: httpStatusText.SUCCESS,
+      message: result.rows[0].fn_add_employee_vacation,
+      data: values
+    });
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({ status:httpStatusText.ERROR, message: "Server Error" });
+  }
+};
+
+const addIngredientSupplier = async (req, res) => {
+  const { supplierId, ingredientId } = req.body;
+
+  try {
+    const query = `call pr_add_ingredient_supplier($1, $2)`;
+    const values = [supplierId, ingredientId];
+    const result = await client.query(query, values);
+
+    res.status(201).json({ status: httpStatusText.SUCCESS, data: values});
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({ status:httpStatusText.ERROR, message: "Server Error" });
+  }
+};
+
 
 
 
 module.exports = {
     addPosition,
+    addEmployee,
+    addEmployeePhone,
+    addEmployeeSchedule,
+    addEmployeeVacation,
+    addIngredientSupplier,
+    addtimeInAttendance,
+  
     changePosition,
     changeSalary,
+  
     activeEmployeesList,
     inactiveEmployeesList,
     positionsList,
     positionsChangesList,
     supplyEmployeesList,
     managerEmployeesList,
+  
     getEmployeesAttendance,
     getEmployeesPhones,
     getPositionsChanges,
     getSchedule,
     getItemPriceChanges,
+    getEmployeeSignInInfo,
+  
     updateEmployeeAddress,
     updateEmployeePhone,
-    addEmployee,
-    addEmployeePhone,
-    addEmployeeSchedule,
-    addEmployeeVacation,
-    addTimeInAttendance,
-    addTimeOutAttendance,
 }

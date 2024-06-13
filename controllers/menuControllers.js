@@ -79,6 +79,34 @@ const addSeason = async (req, res) => {
   }
 }
 
+const addCategory = async (req, res) => {
+  const { sectionId, categoryName, categoryDescription } = req.body;
+    try {
+      const query = 'CALL pr_add_category($1, $2, $3)';
+      const values = [sectionId, categoryName, categoryDescription];
+      await client.query(query, values);
+
+      res.status(200).json({status: httpStatusText.SUCCESS, message: 'Category added successfully', data:values});
+    } catch (err) {
+      console.log(err);
+      res.status(400).json({status: httpStatusText.ERROR, message: err.message });
+    }    
+};
+
+
+const changeItemPrice = async(req, res) =>{
+  const {itemId, branchId, changer, changeType, newValue } = req.body;
+    try {
+      const query = 'call pr_change_item_price($1, $2, $3, $4, $5)';
+      const values = [itemId, branchId, changer, changeType, newValue];
+      await client.query(query, values);
+
+      res.status(200).json({ status: httpStatusText.SUCCESS, data:values });
+    } catch (err) {
+      res.status(400).json({ status: httpStatusText.ERROR, message: err.message });
+    } 
+}
+
 
 
 
@@ -103,4 +131,6 @@ module.exports = {
     addItemTimeByTime,
     addRecipes,
     addSeason,
+    addCategory,
+    changeItemPrice,
 }

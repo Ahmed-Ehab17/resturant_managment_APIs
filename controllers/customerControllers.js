@@ -57,6 +57,46 @@ const getFriendsList = async (req, res) => {
          }
   }
 
+  const getCustomerOrders = async (req, res) => {
+    const customerId = req.params.customerId;
+    const limit = req.params.limit; 
+  
+    try {
+      const query = `SELECT * FROM fn_get_customer_orders($1, $2)`;
+      const values = [customerId, limit];
+      const result = await client.query(query, values);
+         res.status(200).json({status: httpStatusText.SUCCESS, data: {orders: result.rows}});
+         }catch(err) {
+         res.status(500).json({status: httpStatusText.ERROR, message: err.message});
+         }
+  }
+
+  const getCustomerBookings = async (req, res) => {
+    const customerId = req.params.customerId;
+  
+    try {
+      const query = `SELECT * FROM fn_get_customer_bookings($1)`;
+      const values = [customerId];
+      const result = await client.query(query, values);
+      res.status(200).json({ status: httpStatusText.SUCCESS, data: { bookings: result.rows } });
+    } catch (err) {
+      res.status(500).json({ status: httpStatusText.ERROR, message: err.message });
+    }
+  };
+
+  const getCustomerSignInInfo = async (req, res) => {
+    const customerPhone = req.params.customerPhone;
+  
+    try {
+      const query = `SELECT * FROM fn_get_customer_sign_in_info($1)`;
+      const values = [customerPhone];
+      const result = await client.query(query, values);
+      res.status(200).json({ status: httpStatusText.SUCCESS, data: { customer: result.rows } });
+    } catch (err) {
+    res.status(500).json({ status: httpStatusText.ERROR, message: err.message });
+  }
+};
+  
 
   const updateCustomerAddress = async (req, res) => {
     const { customerId, addressId, customerAddress, customerCity, locationCoordinates } = req.body;
@@ -77,9 +117,59 @@ const getFriendsList = async (req, res) => {
     }
   };
   
+const addCustomer = async(req,res) =>{
+  const {
+    firstName,
+    lastName,
+    gender,
+    phone,
+    address,
+    city = null,
+    locationCoordinates = null,
+    birthDate = null,
+  } = req.body;
 
+    try {
+      const query = `call pr_add_customer($1, $2, $3, $4, $5, $6, $7, $8)`;
+      const values = [firstName, lastName, gender, phone, address, city, locationCoordinates, birthDate];
+      await client.query(query, values);
 
+      res.status(201).json({ status:httpStatusText.SUCCESS, data:values });
+    }catch (error) {
+    console.log(error);
+    res.status(500).json({ status: httpStatusText.ERROR, message: 'Server Error' });
+  }
+};
 
+const addCustomerAddress = async(req,res) =>{
+  const { customerId, address, city = null, locationCoordinates = null} = req.body;
+
+    try {
+      const query = `call pr_add_customer_address($1, $2, $3, $4)`;
+      const values = [customerId, address, city, locationCoordinates];
+      await client.query(query, values);
+
+      res.status(201).json({ status:httpStatusText.SUCCESS, data:values });
+    }catch (error) {
+    console.log(error);
+    res.status(500).json({ status: httpStatusText.ERROR, message: 'Server Error' });
+  }
+};
+
+const addCustomerPhone = async(req,res) =>{
+  const { customerId, phone} = req.body;
+
+    try {
+      const query = `call pr_add_customer_phone($1, $2)`;
+      const values = [customerId, phone];
+      await client.query(query, values);
+
+      res.status(201).json({ status:httpStatusText.SUCCESS, data:values });
+    }catch (error) {
+    console.log(error);
+    res.status(500).json({ status: httpStatusText.ERROR, message: 'Server Error' });
+  }
+};
 
 
 
@@ -96,6 +186,15 @@ const getFriendsList = async (req, res) => {
     getCustomerInformation,
     getCustomerPhones,
     getFriendRequests,
+    getCustomerOrders,
+    getCustomerBookings,
+    getCustomerSignInInfo,
+
     getFriendsList,
+
     updateCustomerAddress,
+
+    addCustomer,
+    addCustomerAddress,
+    addCustomerPhone,
   }
