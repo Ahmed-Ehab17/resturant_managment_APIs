@@ -23,6 +23,7 @@ app.use("/admin/employees", require("./routes/employeesRoutes"));
 app.use("/admin/customers", require("./routes/customerRoutes"));
 app.use("/admin/menu", require("./routes/menuRoutes"));
 app.use("/admin/social", require("./routes/socialRoutes"));
+app.use("/admin/supply", require("./routes/supplyRoutes"));
 app.use("/user/order", require("./routes/orderRoutes"));
 
 app.listen(PORT, () => {

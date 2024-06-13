@@ -168,7 +168,84 @@ const addPosition = async(req,res)=>{
     
 }
 
-const addtimeInAttendance = async (req, res) => {
+const addEmployee = async (req, res) => {
+  const {
+    ssn,
+    firstName,
+    lastName,
+    gender,
+    salary,
+    positionId,
+    status,
+    branchId,
+    sectionId,
+    birthDate,
+    address,
+    dateHired
+  } = req.body;
+
+  try {
+    const query = `SELECT fn_add_employee($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12)`
+    const values = [ssn, firstName, lastName, gender, salary, positionId, status, branchId, sectionId, birthDate, address, dateHired]
+    const result = await client.query(query, values);
+
+    res.status(201).json({status:httpStatusText.SUCCESS, message: result.rows[0].fn_add_employee, data:values });
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({status:httpStatusText.ERROR, message: "Server Error" });
+  }
+};
+
+const addEmployeePhone = async (req, res) => {
+  const { employeeId, employeePhone } = req.body;
+
+  try {
+    const query = `SELECT fn_add_employee_phone($1, $2)`
+    const values = [employeeId, employeePhone]
+    const result = await client.query(query, values);
+
+    res.status(201).json({status:httpStatusText.SUCCESS, message: result.rows[0].fn_add_employee_phone, data:values });
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({status:httpStatusText.ERROR, message: "Server Error" });
+  }
+};
+
+const addEmployeeSchedule = async (req, res) => {
+  const { employeeId, shiftStartTime, shiftEndTime } = req.body;
+
+  try {
+    const query = `SELECT fn_add_employee_schedule($1, $2, $3)`;
+    const values = [employeeId, shiftStartTime, shiftEndTime];
+    const result = await client.query(query, values);
+
+    res.status(201).json({status: httpStatusText.SUCCESS, message: result.rows[0].fn_add_employee_schedule, data: values });
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({ status: httpStatusText.ERROR, message: "Server Error" });
+  }
+};
+
+const addEmployeeVacation = async (req, res) => {
+  const { employeeId, vacationStartDate, vacationEndDate, vacationReason } = req.body;
+
+  try {
+    const query = `SELECT fn_add_employee_vacation($1, $2, $3, $4)`;
+    const values = [employeeId, vacationStartDate, vacationEndDate, vacationReason];
+    const result = await client.query(query, values);
+
+    res.status(201).json({
+      status: httpStatusText.SUCCESS,
+      message: result.rows[0].fn_add_employee_vacation,
+      data: values
+    });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ status:httpStatusText.ERROR, message: "Server Error" });
+  }
+};
+
+const addTimeInAttendance = async (req, res) => {
   const {scheduleId, employeeId, timeIn} = req.body
   try{
     query = `SELECT fn_add_time_in_attendance($1, $2, $3)`
@@ -177,9 +254,24 @@ const addtimeInAttendance = async (req, res) => {
     res.status(200).json({status: httpStatusText.SUCCESS, data: result})
     console.log(result);
   }catch(err){
-    return res.status(500).json({status: httpStatusText.ERROR, message: err.message});
+    res.status(500).json({status: httpStatusText.ERROR, message: err.message});
   }
 };
+
+const addTimeOutAttendance = async(req, res) => {
+  const {scheduleId, employeeId, timeOut} = req.body
+  try{
+    query = `SELECT fn_add_time_out_attendance($1, $2, $3)`
+    values = [scheduleId, employeeId, timeOut]
+    const result = await client.query(query, values)
+    res.status(200).json({status: httpStatusText.SUCCESS, data: result})
+    console.log(result);
+  }catch(err){
+    res.status(500).json({status: httpStatusText.ERROR, message: err.message});
+  }
+};
+
+
 
 const changePosition = async(req,res)=>{
     try{
@@ -414,5 +506,5 @@ module.exports = {
     getEmployeeSignInInfo,
   
     updateEmployeeAddress,
-    updateEmployeePhone, 
+    updateEmployeePhone,
 }
