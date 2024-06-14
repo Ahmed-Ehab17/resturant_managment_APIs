@@ -195,18 +195,18 @@ const getBookingsByStatus = async (req, res) => {
 };
 
 
-const updateStock = async(req,res)=>{
-    try{
-        const { branchId , ingredientId , quantity} = req.body || {};
+// const updateStock = async(req,res)=>{
+//     try{
+//         const { branchId , ingredientId , quantity} = req.body || {};
         
-        const query = `SELECT fn_update_stock($1, $2, $3)`;
-        const values = [branchId , ingredientId , quantity];
-        const result = await client.query(query, values);
-        res.status(200).json({ status: httpStatusText.SUCCESS, data: { stock: result.rows } });
-    } catch (err) {
-        res.status(500).json({ status: httpStatusText.ERROR, message: err.message });
-    }
-};
+//         const query = `SELECT fn_update_stock($1, $2, $3)`;
+//         const values = [branchId , ingredientId , quantity];
+//         const result = await client.query(query, values);
+//         res.status(200).json({ status: httpStatusText.SUCCESS, data: { stock: result.rows } });
+//     } catch (err) {
+//         res.status(500).json({ status: httpStatusText.ERROR, message: err.message });
+//     }
+// };
 
 const updateStock = async (req, res) => {
     try {
