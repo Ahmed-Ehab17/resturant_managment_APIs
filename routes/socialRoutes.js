@@ -4,6 +4,7 @@ const socialControllers = require('../controllers/socialControllers');
 const socialValidators = require('../utils/validators/socialValidator');
 
 router.get('/friend-requests/:accountId', socialControllers.getFriendRequests);
+router.get('/friendsList/:accountId', socialControllers.getFriendsList);
 
 router.post('/friend-request', socialValidators.addFriendRequest, socialControllers.addFriendRequests);
 

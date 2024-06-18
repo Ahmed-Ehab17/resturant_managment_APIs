@@ -22,7 +22,7 @@ router.patch('/update-customer-address', customerValidator.updateCustomerAddress
 router.post("/customer",customerValidator.addCustomer, customerControllers.addCustomer);
 router.post("/customer-address",customerValidator.addCustomerAddress, customerControllers.addCustomerAddress);
 router.post("/customer-phone",customerValidator.addCustomerPhone, customerControllers.addCustomerPhone);
-
+router.post('/addFavorite', customerControllers.addFavorite);
 
 
 

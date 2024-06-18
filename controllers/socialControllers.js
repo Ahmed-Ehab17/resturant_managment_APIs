@@ -44,9 +44,24 @@ const updatFriendRequest = async (req, res) => {
     }
 };
 
+const getFriendsList = async(req, res) => {
+    const { accountId } = req.params
+    console.log( accountId);
+    try{
+        const query = `SELECT fn_get_friends_list($1)`;
+        const values = [accountId];
+        const result = await client.query(query, values);
+        console.log({'Resulttt':result});
+        res.status(200).json({ status: httpStatusText.SUCCESS, data: { friends : result.rows } });
+    }catch(err){
+        res.status(500).json({ status: httpStatusText.ERROR, message: err.message });
+    }
+};
+
 module.exports = {
     getFriendRequests,
     addFriendRequests,
     updatFriendRequest,
-    
+    getFriendsList,
+
 };

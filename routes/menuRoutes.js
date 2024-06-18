@@ -13,6 +13,7 @@ router.post('/itemByTime', menuControllers.addItemTimeByTime);
 router.post('/recipe', menuValidator.addRecipes, menuControllers.addRecipes);
 router.post('/season', menuControllers.addSeason);
 router.post('/category',menuValidator.addCategory, menuControllers.addCategory);
+router.post('/addRating', menuControllers.addRating);
 
 
 router.patch('/change-item-price', menuControllers.changeItemPrice );

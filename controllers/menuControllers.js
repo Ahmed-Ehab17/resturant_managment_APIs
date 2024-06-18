@@ -107,6 +107,21 @@ const changeItemPrice = async(req, res) =>{
     } 
 }
 
+const addRating = async (req, res) => {
+  const { customerId, itemId, rating } = req.body;
+  try {
+    const query = `CALL p_add_rating($1, $2, $3)`;
+    const values = [ customerId, itemId, rating ];
+    await client.query(query, values);
+    res.status(200).json({ status: httpStatusText.SUCCESS, data: {
+      "customerId": customerId,
+      "itemId": itemId,
+      "rating": rating
+    }});
+  }catch (err) {
+    res.status(500).json({ status: httpStatusText.ERROR, message: err.message });
+  }
+};
 
 
 
@@ -133,4 +148,5 @@ module.exports = {
     addSeason,
     addCategory,
     changeItemPrice,
+    addRating,
 }

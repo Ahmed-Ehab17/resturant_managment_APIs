@@ -171,6 +171,22 @@ const addCustomerPhone = async(req,res) =>{
   }
 };
 
+const addFavorite = async (req, res) => {
+  const { customerId, itemId } = req.body;
+  try{
+    const query = `CALL pr_add_favorite($1, $2)`;
+    const values = [ customerId, itemId ];
+    await client.query(query, values);
+    res.status(200).json({ status: httpStatusText.SUCCESS, data: {
+      "customerId": customerId,
+      "itemId": itemId
+    }})
+  }catch (err) {
+    console.log(err);
+    res.status(500).json({ status: httpStatusText.ERROR, message: err.message });
+  }
+};
+
 
 
 
@@ -197,4 +213,5 @@ const addCustomerPhone = async(req,res) =>{
     addCustomer,
     addCustomerAddress,
     addCustomerPhone,
+    addFavorite,
   }
