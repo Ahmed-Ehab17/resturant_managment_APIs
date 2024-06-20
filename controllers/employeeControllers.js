@@ -171,10 +171,10 @@ const addPosition = async(req,res)=>{
 
 
 const addTimeInAttendance = async (req, res) => {
-  const {scheduleId, employeeId, timeIn} = req.body
+  const {employeeId} = req.body
   try{
-    query = `SELECT fn_add_time_in_attendance($1, $2, $3)`
-    values = [scheduleId, employeeId, timeIn]
+    query = `call check_in_employee($1)`
+    values = [employeeId]
     const result = await client.query(query, values)
     res.status(200).json({status: httpStatusText.SUCCESS, data: result})
     console.log(result);
@@ -184,10 +184,10 @@ const addTimeInAttendance = async (req, res) => {
 };
 
 const addTimeOutAttendance = async(req, res) => {
-  const {scheduleId, employeeId, timeOut} = req.body
+  const {employeeId} = req.body
   try{
-    query = `SELECT fn_add_time_out_attendance($1, $2, $3)`
-    values = [scheduleId, employeeId, timeOut]
+    query = `call check_out_employee($1)`
+    values = [employeeId]
     const result = await client.query(query, values)
     res.status(200).json({status: httpStatusText.SUCCESS, data: result})
     console.log(result);
