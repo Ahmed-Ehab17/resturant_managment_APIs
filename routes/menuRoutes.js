@@ -5,7 +5,7 @@ const menuValidator = require("../utils/validators/menuValidator");
 
 
 router.get('/seasonsList', menuControllers.seasonList);
-router.get('/sectionsList', menuControllers.seasonList);
+router.get('/sectionsList', menuControllers.sectionList);
 
 
 router.get('/itemPriceChanges/:itemId', menuControllers.getItemPriceChanges);
