@@ -15,7 +15,7 @@ const sectionList = async (req, res) => {
   try{
      const query = `SELECT * FROM sections`;
      const result = await client.query(query)
-     res.status(200).json({status: httpStatusText.SUCCESS, data: {seasons : result.rows}});
+     res.status(200).json({status: httpStatusText.SUCCESS, data: {sections : result.rows}});
      }catch(err) {
      res.status(500).json({status: httpStatusText.ERROR, message: err.message});
      }
