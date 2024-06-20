@@ -109,6 +109,19 @@ const addNonVirtualOrder = async (req, res) => {
   }
 };
 
+const updateOrderStatus = async (req, res) => {
+  const {orderId,orderStatus} = req.body;
+
+  try {
+    const query = `call pr_change_order_status($1, $2)`;
+    const values = [orderId,orderStatus];
+    await client.query(query, values);
+    res.status(201).json({ status: httpStatusText.SUCCESS, data: values });
+} catch (err) {
+  res.status(500).json({ status: httpStatusText.ERROR, message: err.message });
+}
+};
+
 
 
 
@@ -130,5 +143,8 @@ module.exports = {
 
     addVirtualOrder,
     addNonVirtualOrder,
+    
+    
+    updateOrderStatus,
     
 }

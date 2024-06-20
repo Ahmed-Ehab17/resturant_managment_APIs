@@ -121,6 +121,61 @@ const addItemBranchMenuValidator = [
     validatorMiddleware
 ]
 
+const addBooking = [
+    body('customerId')
+        .notEmpty()
+        .withMessage('customer id is required')
+        .isInt()
+        .withMessage('Id must be a number'),
+    
+    body('tableId')
+        .notEmpty()
+        .withMessage('table id is required')
+        .isInt()
+        .withMessage('Id must be a number'),
+
+    body('branchId')
+        .notEmpty()
+        .withMessage('branch id is required')
+        .isInt()
+        .withMessage('Id must be a number'),
+
+    validatorMiddleware,
+]
+
+
+const addOrderToBooking = [
+    body('bookingId')
+        .notEmpty()
+        .withMessage('id is required')
+        .isInt()
+        .withMessage('Id must be a number'),
+    
+    body('orderId')
+        .notEmpty()
+        .withMessage('id is required')
+        .isInt()
+        .withMessage('Id must be a number'),
+
+    validatorMiddleware,
+]
+
+const updateBookingStatus = [
+    body('bookingId')
+        .notEmpty()
+        .withMessage('id is required')
+        .isInt()
+        .withMessage('Id must be a number'),
+    
+    body('bookingStatus')
+        .notEmpty()
+        .withMessage('status is required')
+        .isString()
+        .withMessage('status must be a word'),
+
+    validatorMiddleware,
+]
+
 
 
 
@@ -130,4 +185,10 @@ module.exports = {
     addGeneralSectionValidator,
     addBranchSectionValidator,
     addItemBranchMenuValidator,
+    addBooking,
+    addOrderToBooking,
+
+
+    
+    updateBookingStatus,
 }

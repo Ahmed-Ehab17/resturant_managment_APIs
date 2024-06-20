@@ -3,8 +3,16 @@ const router = express.Router();
 const menuControllers = require('../controllers/menuControllers');
 const menuValidator = require("../utils/validators/menuValidator");
 
+
+router.get('/seasonsList', menuControllers.seasonList);
+router.get('/sectionsList', menuControllers.seasonList);
+
+
 router.get('/itemPriceChanges/:itemId', menuControllers.getItemPriceChanges);
 router.get('/itemPriceRecipes/:itemId', menuControllers.getItemPriceRecipes);
+router.get('/itemRecipes/:itemId', menuControllers.getItemPriceRecipes);
+router.get('/branchMenuFilter/:branchId/:seasonId?/:itemType?/:categoryId?/:itemStatus?/:vegetarian?/:healthy?', menuControllers.branchMenuFilter);
+router.get('/getBranchMenuByTimeAndSeason/:branchId/:timeType/:seasonId', menuControllers.getItemPriceRecipes);
 
 
 
