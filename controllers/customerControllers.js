@@ -57,13 +57,14 @@ const getFriendsList = async (req, res) => {
          }
   }
 
-  const getCustomerOrders = async (req, res) => {
+const getCustomerOrders = async (req, res) => {
     const customerId = req.params.customerId;
     const limit = req.params.limit; 
+    const status = req.params.status;
   
     try {
-      const query = `SELECT * FROM fn_get_customer_orders($1, $2)`;
-      const values = [customerId, limit];
+      const query = `SELECT * FROM fn_get_customer_orders($1, $2, $3)`;
+      const values = [customerId, limit, status];
       const result = await client.query(query, values);
          res.status(200).json({status: httpStatusText.SUCCESS, data: {orders: result.rows}});
          }catch(err) {
@@ -71,7 +72,7 @@ const getFriendsList = async (req, res) => {
          }
   }
 
-  const getCustomerBookings = async (req, res) => {
+const getCustomerBookings = async (req, res) => {
     const customerId = req.params.customerId;
   
     try {
@@ -84,7 +85,7 @@ const getFriendsList = async (req, res) => {
     }
   };
 
-  const getCustomerSignInInfo = async (req, res) => {
+const getCustomerSignInInfo = async (req, res) => {
     const customerPhone = req.params.customerPhone;
   
     try {
@@ -96,9 +97,22 @@ const getFriendsList = async (req, res) => {
     res.status(500).json({ status: httpStatusText.ERROR, message: err.message });
   }
 };
+
+const getCustomerMenuRatings = async (req, res) => {
+  const customerId = req.params.customerId;
+
+  try {
+    const query = `SELECT * FROM fn_get_customer_menu_ratings($1)`;
+    const values = [customerId];
+    const result = await client.query(query, values);
+    res.status(200).json({ status: httpStatusText.SUCCESS, data: { customerMenuRatings: result.rows } });
+  } catch (err) {
+  res.status(500).json({ status: httpStatusText.ERROR, message: err.message });
+}
+};
   
 
-  const updateCustomerAddress = async (req, res) => {
+const updateCustomerAddress = async (req, res) => {
     const { customerId, addressId, customerAddress, customerCity, locationCoordinates } = req.body;
 
     try {
@@ -205,6 +219,7 @@ const addFavorite = async (req, res) => {
     getCustomerOrders,
     getCustomerBookings,
     getCustomerSignInInfo,
+    getCustomerMenuRatings,
 
     getFriendsList,
 

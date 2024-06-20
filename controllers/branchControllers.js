@@ -61,6 +61,18 @@ const branchPriceChangesList = async (req, res) => {
         res.status(500).json({ status: httpStatusText.ERROR, message: "server error", error });
     }
 };
+
+const ingredientList = async (req,res)=>{
+    try {
+        const query = `SELECT * FROM ingredients`;
+        const result = await client.query(query);
+
+        res.status(200).json({ status: httpStatusText.SUCCESS, data: result.rows });
+    } catch (error) {
+        res.status(500).json({ status: httpStatusText.ERROR, message: "server error", error });
+    }
+
+}
 const getActiveEmployees = async (req, res) => {
     const branchId = req.params.branchId;
     try {
@@ -225,6 +237,20 @@ const updateStock = async (req, res) => {
         res.status(500).json({ status: httpStatusText.ERROR, message: "server error" });
     }
 };
+
+const updateBookingStatus = async (req, res) => {
+    const {bookingId,bookingStatus} = req.body;
+  
+    try {
+      const query = `call pr_update_booking_status($1, $2)`;
+      const values = [bookingId,bookingStatus];
+      await client.query(query, values);
+      res.status(201).json({ status: httpStatusText.SUCCESS, data: values });
+  } catch (err) {
+    res.status(500).json({ status: httpStatusText.ERROR, message: err.message });
+  }
+  };
+
 
 const addNew = async (req, res) => {
     try {
@@ -471,6 +497,53 @@ const addItemBranchMenu = async (req, res) => {
   }
 };
 
+
+
+const addBooking = async (req, res) => {
+    const {customerId, tableId, branchId, bookingStarTtime, bookingEndTime, bookingStatus} = req.body;
+  
+    try {
+      const query = `call pr_add_booking($1, $2, $3, $4, $5, $6)`;
+      const values = [customerId, tableId, branchId, bookingStarTtime, bookingEndTime, bookingStatus];
+      await client.query(query, values);
+      res.status(201).json({ status: httpStatusText.SUCCESS, data: values });
+  } catch (err) {
+    res.status(500).json({ status: httpStatusText.ERROR, message: err.message });
+  }
+  };
+  
+  const addOrderToBooking = async (req, res) => {
+    const {bookingId,orderId} = req.body;
+  
+    try {
+      const query = `call pr_add_order_to_booking($1, $2)`;
+      const values = [bookingId,orderId];
+      await client.query(query, values);
+      res.status(201).json({ status: httpStatusText.SUCCESS, data: values });
+  } catch (err) {
+    res.status(500).json({ status: httpStatusText.ERROR, message: err.message });
+  }
+  };
+  
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 module.exports = {
     addNew,
     addStorage,
@@ -479,6 +552,10 @@ module.exports = {
     addGeneralSection,
     addBranchSection,
     addBranchSection,
+    addIngredientToStock,
+    addItemBranchMenu,
+    addBooking,
+    addOrderToBooking,
 
     branchesList,
     ingredientSuppliersList,
@@ -486,6 +563,7 @@ module.exports = {
     recipesList,
     generalMenuList,
     branchPriceChangesList,
+    ingredientList,
 
     getActiveEmployees,
     getEmployeesAttendance,
@@ -500,6 +578,6 @@ module.exports = {
     getBookingsByStatus,
 
     updateStock,
-    addIngredientToStock,
-    addItemBranchMenu
+    updateBookingStatus,
+    
 };

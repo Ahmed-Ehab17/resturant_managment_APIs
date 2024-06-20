@@ -19,6 +19,7 @@ router.get("/categories-list", branchControllers.categoriesList);
 router.get("/recipes-list", branchControllers.recipesList);
 router.get("/general-menu-list", branchControllers.generalMenuList);
 router.get("/branch-price-changes-list", branchControllers.branchPriceChangesList);
+router.get("/ingredients", branchControllers.ingredientList);
 router.get("/activeEmployees/:branchId", branchControllers.getActiveEmployees);
 router.get("/employeesAttendance/:branchId", branchControllers.getEmployeesAttendance);
 router.get("/employeesSchedule/:branchId", branchControllers.getEmployeesAttendance);
@@ -32,6 +33,8 @@ router.get("/bookings/:branchId", branchControllers.getBookings);
 router.get("/bookingsByStatus/:branchId/:bookingStatus", branchControllers.getBookingsByStatus);
 
 router.patch("/updateStock", branchControllers.updateStock);
+router.patch("/updateBookingStatus",branchValidator.updateBookingStatus, branchControllers.updateBookingStatus)
+
 
 
 router.post("/add-new",branchValidator.addNewBranchValidator, branchControllers.addNew);
@@ -42,6 +45,8 @@ router.post("/add-menu-item", branchControllers.addMenuItem);
 router.post("/add-ingredient", branchValidator.addIngredientValidator, branchControllers.addIngredient);
 router.post("/addIngredientToStock", branchControllers.addIngredientToStock);
 router.post("/addItemBranchMenu", branchValidator.addItemBranchMenuValidator,branchControllers.addItemBranchMenu);
+router.post("/addBooking",branchValidator.addBooking, branchControllers.addBooking);
+router.post("/addOrderToBooking",branchValidator.addOrderToBooking, branchControllers.addOrderToBooking);
 
 
 

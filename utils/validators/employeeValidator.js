@@ -195,6 +195,41 @@ const updateEmployeePhone = [
     validatorMiddleware
 ]
 
+const updateEmployeeSalaryPosition = [
+    body('employeeId')
+    .trim()
+    .isInt()
+    .notEmpty()
+    .withMessage('employee id is required'),
+    body('changerId')
+    .trim()
+    .isInt()
+    .notEmpty()
+    .withMessage('changer id is required'),
+    body('newSalary')
+    .trim()
+    .notEmpty()
+    .withMessage('new salary is required'),
+    body('positionChangeType')
+    .trim()
+    .notEmpty()
+    .withMessage('new salary is required')
+    .isString()
+    .withMessage('the position must be a word'),
+    body('changeReason')
+    .trim()
+    .notEmpty()
+    .withMessage('new salary is required')
+    .isString()
+    .withMessage('the reason must be a word'),
+    
+    
+    
+
+
+    validatorMiddleware
+]
+
 
 
 module.exports = {
@@ -206,6 +241,7 @@ module.exports = {
     changePosition,
     updateEmployeeAddress,
     updateEmployeePhone,
+    updateEmployeeSalaryPosition,
     addIngredientSupplier,
 
 }
