@@ -9,9 +9,10 @@ router.get('/customerInformation/:customerId', customerControllers.getCustomerIn
 router.get('/customerPhones/:customerId', customerControllers.getCustomerPhones);
 router.get('/friendRequests/:accountId', customerControllers.getFriendRequests);
 router.get('/friendsList/:accountId', customerControllers.getFriendsList);
-router.get('/customerOrders/:customerId/:limit', customerControllers.getCustomerOrders);
+router.get('/customerOrders/:customerId/:limit/:status', customerControllers.getCustomerOrders);
 router.get('/customerBookings/:customerId', customerControllers.getCustomerBookings);
 router.get('/CustomerSignInInfo/:customerPhone', customerControllers.getCustomerSignInInfo);
+router.get('/customerMenuRatings/:customerId', customerControllers.getCustomerMenuRatings);
 
 
 

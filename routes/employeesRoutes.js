@@ -30,11 +30,15 @@ router.post('/add-employee-schedule',employeeValidator.addEmployeeSchedule, empl
 router.post('/add-employee-vacation',employeeValidator.addEmployeeVacation, employeeControllers.addEmployeeVacation);
 router.post('/timeInAttendance', employeeControllers.addTimeInAttendance);
 router.post('/timeOutAttendance', employeeControllers.addTimeOutAttendance);
+router.post('/employeeTransfer', employeeControllers.employeeTransfer);
+router.post('/employeeStatusChange', employeeControllers.employeeStatusChange);
+
 
 
 
 router.patch('/change-position', employeeControllers.changePosition);
 router.patch("/change-salary", employeeControllers.changeSalary);
+router.patch("/updateEmployeeSalaryPosition",employeeValidator.updateEmployeeSalaryPosition, employeeControllers.updateEmployeeSalaryPosition);
 router.patch("/update-employee-address",employeeValidator.updateEmployeeAddress, employeeControllers.updateEmployeeAddress);
 router.patch("/update-employee-phone",employeeValidator.updateEmployeePhone, employeeControllers.updateEmployeePhone);
 
