@@ -48,7 +48,7 @@ const getFriendRequests = async (req, res) => {
 const getFriendsList = async (req, res) => {  
     const accountId  = req.params.accountId
       try{
-         const query = `SELECT * FROM fn_get_friends_list($1)`;
+         const query = `SELECT fn_get_friends_list($1)`;
          const values =  [accountId];
          const result = await client.query(query, values)
          res.status(200).json({status: httpStatusText.SUCCESS, data: {attendance: result.rows}});
