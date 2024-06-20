@@ -165,7 +165,7 @@ const getStock = async (req, res) => {
        }catch(err) {
        res.status(500).json({status: httpStatusText.ERROR, message: err.message});
        }
-}
+}   
 
 const getBookings = async (req, res) => {
   const branchId = req.params.branchId;
@@ -194,6 +194,17 @@ const getBookingsByStatus = async (req, res) => {
   }
 };
 
+const getBranchMenu = async (req, res) => {
+    const branchId = req.params.branchId
+    try{
+      const query = `SELECT fn_get_branch_menu($1)`;
+      const values = [ branchId ];
+      const result = await client.query(query, values);
+      res.status(200).json({ status: httpStatusText.SUCCESS, data: result.rows });
+    }catch(err) {
+      res.status(500).json({status: httpStatusText.ERROR, message:err.message});
+    }
+  };
 
 // const updateStock = async(req,res)=>{
 //     try{
@@ -471,6 +482,7 @@ const addItemBranchMenu = async (req, res) => {
   }
 };
 
+
 module.exports = {
     addNew,
     addStorage,
@@ -498,6 +510,7 @@ module.exports = {
     getStock,
     getBookings,
     getBookingsByStatus,
+    getBranchMenu,
 
     updateStock,
     addIngredientToStock,
