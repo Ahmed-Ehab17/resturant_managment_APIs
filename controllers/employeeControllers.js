@@ -221,28 +221,15 @@ const employeeStatusChange = async(req, res) => {
 
 
 const changePosition = async(req,res)=>{
-    try{
-        const { employee_id, position_changer_id, new_position, position_change_type } = req.body || {};
-        if (!employee_id || !position_changer_id || !new_position || !position_change_type ) {
-            return res.status(400).json({ message: 'Error: Missing required fields, please enter all the data' });
-        }
-
-        const query = `SELECT fn_change_employee_position($1, $2, $3, $4)`;
+     try{
+        const { employee_id, position_changer_id, new_position, position_change_type } = req.body;
+        const query = `call pr_change_employee_position($1, $2, $3, $4)`;
         const values = [employee_id, position_changer_id, new_position, position_change_type];
         await client.query(query, values);
-        res.status(201).json({ message: 'position changed successfully' });
-
-        // Check if employee exists
-    const employeeExistsQuery = 'SELECT 1 FROM employees WHERE employee_id = $1';
-    const employeeExistsValues = [employee_id];
-    const employeeExistsResult = await client.query(employeeExistsQuery, employeeExistsValues);
-    if (employeeExistsResult.rows.length === 0) {
-      client.release();
-      return res.status(404).json({ error: 'Employee not found' });
-    }
-    }catch (error){
-        console.error('Error changing position:', error);
-        return res.status(500).json({ message: "Server Error" });    }
+        res.status(201).json({ status: httpStatusText.SUCCESS, data: values });
+  } catch (err) {
+    res.status(500).json({ status: httpStatusText.ERROR, message: err.message });
+  }
 }
 
 const changeSalary = async (req, res) => {
@@ -252,10 +239,9 @@ const changeSalary = async (req, res) => {
     const values = [employeeId, changerId, newSalary, changeReason];
     await client.query(query, values);
 
-    res.status(201).json({ status: httpStatusText.SUCCESS, data: values});
-  } catch (error) {
-    console.log(error);
-    res.status(500).json({ status:httpStatusText.ERROR, message: "Server Error" });
+    res.status(201).json({ status: httpStatusText.SUCCESS, data: values });
+  } catch (err) {
+    res.status(500).json({ status: httpStatusText.ERROR, message: err.message });
   }
 };
 
@@ -283,13 +269,10 @@ const updateEmployeeAddress = async(req,res)=>{
       const query = `SELECT fn_update_employee_address($1, $2)`;
       const values = [employeeId, newAddress];
       const result = await client.query(query, values);
-      res.status(200).json({status:httpStatusText.SUCCESS, message: Object.values(result.rows[0])[0], data:values})
-
-  }catch (error){
-      console.error('Error updating address:', error);
-      console.log(error);
-      return res.status(500).json({ status:httpStatusText.ERROR, message: "Server Error" });    
-    }
+      res.status(201).json({ status: httpStatusText.SUCCESS, data: values });
+  } catch (err) {
+    res.status(500).json({ status: httpStatusText.ERROR, message: err.message });
+  }
 }
 
 
