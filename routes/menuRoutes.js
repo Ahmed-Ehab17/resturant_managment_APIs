@@ -6,6 +6,7 @@ const menuValidator = require("../utils/validators/menuValidator");
 
 router.get('/seasonsList', menuControllers.seasonList);
 router.get('/sectionsList', menuControllers.sectionList);
+router.get('/orderItemsList', menuControllers.orderItemSectionList);
 
 
 router.get('/itemPriceChanges/:itemId', menuControllers.getItemPriceChanges);
@@ -25,6 +26,7 @@ router.post('/addRating', menuControllers.addRating);
 
 
 router.patch('/change-item-price', menuControllers.changeItemPrice );
+router.patch('/changeOrderItemStatus', menuControllers.changeOrderItemStatus );
 
 
 
