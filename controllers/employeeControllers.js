@@ -1,5 +1,7 @@
 const { client } = require("../config/dbConfig");
 const httpStatusText = require("../utils/httpStatusText");
+const bcrypt = require('bcrypt');
+
 
 const managerEmployeesList= async(req,res)=> {
     try {
@@ -297,41 +299,21 @@ const updateEmployeePhone = async(req,res)=>{
 
 
 const addEmployeeAccount = async(req, res) => {
-    const { id, email, password } = req.body;   
-
-    if (!email || !password) {
-        return res.status(400).json({ message: "Missing email or password" });
-    }
-
-    // Check if email already exists
-    try {
-        const user = await client.query(
-            "SELECT * FROM employees_accounts WHERE employee_email = $1",
-            [email]
-        );
-        if (user.rows.length > 0) {
-            return res.status(409).json({ message: "Email already exists" });
-        }
-    } catch (error) {
-        console.error(error);
-        return res.status(500).json({ message: "Server Error" });
-    }
+    const { employeeId, email, password,picturePath } = req.body;   
 
     const salt = await bcrypt.genSalt(10);
     const hashedPassword = await bcrypt.hash(password, salt);
 
     // Insert new user into database
     try {
-        await client.query("SELECT fn_insert_employee_account($1, $2, $3)", [
-            id,
-            email,
-            hashedPassword,
-        ]);
-        res.status(201).json({ message: "User registered successfully" });
-    } catch (error) {
-        console.error(error);
-        return res.status(500).json({ message: "Server Error" });
-    }
+      const query = `call pr_insert_employee_account($1, $2, $3, $4)`;
+      const values = [employeeId, email, hashedPassword,picturePath ];
+      await client.query(query, values);
+
+        res.status(201).json({ status: httpStatusText.SUCCESS, data: values });
+  } catch (err) {
+    res.status(500).json({ status: httpStatusText.ERROR, message: err.message });
+  }
 };
 
 const addEmployee = async (req, res) => {
@@ -438,6 +420,7 @@ module.exports = {
     addIngredientSupplier,
     addTimeInAttendance,
     addTimeOutAttendance,
+    addEmployeeAccount,
     employeeTransfer,
     employeeStatusChange,
   
