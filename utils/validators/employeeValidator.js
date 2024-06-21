@@ -1,7 +1,24 @@
 const { body } = require("express-validator");
 const validatorMiddleware = require('../../middlewares/validatorMiddleware');
 
+const addEmployeeAccount = [
+    body('employeeId')
+    .trim()
+    .isInt()
+    .notEmpty()
+    .withMessage('employee id is required'),
+    
+    body('email')
+    .trim()
+    .notEmpty()
+    .withMessage('email is required'),
 
+    body('password')
+    .trim()
+    .notEmpty()
+    .withMessage('password is required'),
+    validatorMiddleware,
+]
 
 const addPosition = [
     body('position_name')
@@ -233,6 +250,7 @@ const updateEmployeeSalaryPosition = [
 
 
 module.exports = {
+    addEmployeeAccount,
     addPosition,
     addEmployee,
     addEmployeePhone,
