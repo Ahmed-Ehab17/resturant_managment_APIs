@@ -21,6 +21,16 @@ const sectionList = async (req, res) => {
      }
 }
 
+const orderItemSectionList = async (req, res) => {  
+  try{
+     const query = `SELECT * FROM order_items_sections`;
+     const result = await client.query(query)
+     res.status(200).json({status: httpStatusText.SUCCESS, data: result.rows});
+     }catch(err) {
+     res.status(500).json({status: httpStatusText.ERROR, message: err.message});
+     }
+}
+
 const getItemPriceChanges = async (req, res) => {  
     const itemId  = req.params.itemId
       try{
@@ -197,6 +207,18 @@ const changeItemPrice = async(req, res) =>{
       res.status(400).json({ status: httpStatusText.ERROR, message: err.message });
     } 
 }
+const changeOrderItemStatus = async(req, res) =>{
+  const {orderId, customerId, itemId, newStatus } = req.body;
+    try {
+      const query = 'call pr_change_order_item_status($1, $2, $3, $4)';
+      const values = [orderId, customerId, itemId, newStatus ];
+      await client.query(query, values);
+
+      res.status(200).json({ status: httpStatusText.SUCCESS, data:values });
+    } catch (err) {
+      res.status(400).json({ status: httpStatusText.ERROR, message: err.message });
+    } 
+}
 
 const addRating = async (req, res) => {
   const { customerId, itemId, rating } = req.body;
@@ -233,6 +255,7 @@ const addRating = async (req, res) => {
 module.exports = {
     seasonList,
     sectionList,
+    orderItemSectionList,
     getItemPriceChanges,
     getItemPriceRecipes,
     getItemRecipes,
@@ -243,5 +266,6 @@ module.exports = {
     addSeason,
     addCategory,
     changeItemPrice,
+    changeOrderItemStatus,
     addRating,
 }
