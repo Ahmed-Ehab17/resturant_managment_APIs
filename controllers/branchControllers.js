@@ -217,6 +217,120 @@ const getBranchMenu = async (req, res) => {
       res.status(500).json({status: httpStatusText.ERROR, message:err.message});
     }
   };
+const getBranchLocation = async (req, res) => {
+    const branchId = req.params.branchId
+    try{
+      const query = `SELECT get_branch_location_coordinates($1)`;
+      const values = [ branchId ];
+      const result = await client.query(query, values);
+      res.status(200).json({ status: httpStatusText.SUCCESS, data: result.rows });
+    }catch(err) {
+      res.status(500).json({status: httpStatusText.ERROR, message:err.message});
+    }
+  };
+const getSectionOverView = async (req, res) => {
+    const { sectionId, daysInput } = req.params;
+  
+    try {
+        let query = `SELECT * FROM get_section_overview(`;
+        let values = [];
+        let valueCounter = 1; 
+  
+        if (sectionId) {
+            query += `$${valueCounter++}`;
+            values.push(sectionId);
+        } else {
+            query += `NULL`;
+        }
+  
+        query += `, `;
+  
+        if (daysInput) {
+            query += `$${valueCounter++}`;
+            values.push(daysInput);
+        } else {
+            query += `NULL`;
+        }
+  
+        query += `)`;
+  
+  
+      const result = await client.query(query, values);
+      res.status(200).json({ status: httpStatusText.SUCCESS, data: result.rows });
+    }catch(err) {
+      res.status(500).json({status: httpStatusText.ERROR, message:err.message});
+    }
+  };
+const getOverAllPerformance = async (req, res) => {
+    const {daysInput} = req.params;
+  
+    try {
+        let query = `SELECT * FROM get_section_overview(`;
+        let values = [];
+        let valueCounter = 1; 
+  
+        if (daysInput) {
+            query += `$${valueCounter++}`;
+            values.push(daysInput);
+        } else {
+            query += `NULL`;
+        }
+        query += `)`;
+  
+  
+      const result = await client.query(query, values);
+      res.status(200).json({ status: httpStatusText.SUCCESS, data: result.rows });
+    }catch(err) {
+      res.status(500).json({status: httpStatusText.ERROR, message:err.message});
+    }
+  };
+const getBranchPerformance = async (req, res) => {
+    const {branchId, daysInput} = req.params;
+  
+    try {
+        let query = `SELECT * FROM get_branch_performance(`;
+        let values = [branchId];
+        let valueCounter = 2; 
+  
+        if (daysInput) {
+            query += `$${valueCounter++}`;
+            values.push(daysInput);
+        } else {
+            query += `NULL`;
+        }
+        query += `)`;
+  
+  
+      const result = await client.query(query, values);
+      res.status(200).json({ status: httpStatusText.SUCCESS, data: result.rows });
+    }catch(err) {
+      res.status(500).json({status: httpStatusText.ERROR, message:err.message});
+    }
+  };
+const getBranchesCompare = async (req, res) => {
+    const {daysInput } = req.params;
+  
+    try {
+        let query = `SELECT * FROM compare_branches(`;
+        let values = [];
+        let valueCounter = 1; 
+  
+        if (daysInput) {
+            query += `$${valueCounter++}`;
+            values.push(daysInput);
+        } else {
+            query += `NULL`;
+        }
+  
+        query += `)`;
+  
+  
+      const result = await client.query(query, values);
+      res.status(200).json({ status: httpStatusText.SUCCESS, data: result.rows });
+    }catch(err) {
+      res.status(500).json({status: httpStatusText.ERROR, message:err.message});
+    }
+  };
 
 // const updateStock = async(req,res)=>{
 //     try{
@@ -589,6 +703,11 @@ module.exports = {
     getBookings,
     getBookingsByStatus,
     getBranchMenu,
+    getBranchLocation,
+    getSectionOverView,
+    getOverAllPerformance,
+    getBranchPerformance,
+    getBranchesCompare,
 
     updateStock,
     updateBookingStatus,

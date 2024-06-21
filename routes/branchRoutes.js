@@ -32,6 +32,11 @@ router.get("/stock/:branchId", branchControllers.getStock);
 router.get("/bookings/:branchId", branchControllers.getBookings);
 router.get("/bookingsByStatus/:branchId/:bookingStatus", branchControllers.getBookingsByStatus);
 router.get('/branchMenu/:branchId', branchControllers.getBranchMenu);
+router.get('/branchLocation/:branchId', branchControllers.getBranchLocation);
+router.get('/sectionOverview/:sectionId?/:daysInput?',branchControllers.getSectionOverView);
+router.get('/overAllPerformance/:daysInput?', branchControllers.getOverAllPerformance);
+router.get('/branchPerformance/:branchId/:daysInput?', branchControllers.getOverAllPerformance);
+router.get('/branchesCompare/:daysInput?', branchControllers.getBranchesCompare);
 
 
 router.patch("/updateStock", branchControllers.updateStock);

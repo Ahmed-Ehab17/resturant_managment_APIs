@@ -145,6 +145,56 @@ const getItemPriceChanges = async (req, res) => {
   }
 }
 
+const getEmployeeTransfer = async (req, res) => {
+  const { employeeId, transferMadeBy, oldBranchId, newBranchId } = req.params;
+
+  try {
+      let query = `SELECT * FROM fn_get_employees_transfers(`;
+      let values = [];
+      let valueCounter = 1; 
+
+      if (employeeId) {
+          query += `$${valueCounter++}`;
+          values.push(employeeId);
+      } else {
+          query += `NULL`;
+      }
+
+      query += `, `;
+
+      if (transferMadeBy) {
+          query += `$${valueCounter++}`;
+          values.push(transferMadeBy);
+      } else {
+          query += `NULL`;
+      }
+      query += `, `;
+
+      if (oldBranchId) {
+          query += `$${valueCounter++}`;
+          values.push(oldBranchId);
+      } else {
+          query += `NULL`;
+      }
+      query += `, `;
+
+      if (newBranchId) {
+          query += `$${valueCounter++}`;
+          values.push(newBranchId);
+      } else {
+          query += `NULL`;
+      }
+
+      query += `)`;
+
+
+    const result = await client.query(query, values);
+    res.status(200).json({ status: httpStatusText.SUCCESS, data: result.rows });
+  }catch(err) {
+    res.status(500).json({status: httpStatusText.ERROR, message:err.message});
+  }
+};
+
 const addPosition = async(req,res)=>{
     try{
         const {position_name, employeeRole, jop_description} = req.body || {};
@@ -440,6 +490,7 @@ module.exports = {
     getSchedule,
     getItemPriceChanges,
     getEmployeeSignInInfo,
+    getEmployeeTransfer,
   
     updateEmployeeAddress,
     updateEmployeePhone,

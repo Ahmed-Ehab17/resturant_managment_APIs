@@ -15,7 +15,8 @@ router.get('/attendance/:employeeId', employeeControllers.getEmployeesAttendance
 router.get('/phones/:employeeId', employeeControllers.getEmployeesPhones);
 router.get('/PositionsChanges/:employeeId', employeeControllers.getPositionsChanges);
 router.get('/schedule/:employeeId', employeeControllers.getSchedule);
-router.get('/EmployeeSignInInfo/:employeeEmail', employeeControllers.getEmployeeSignInInfo);
+router.get('/employeeSignInInfo/:employeeEmail', employeeControllers.getEmployeeSignInInfo);
+router.get('/employeeTransfer/:employeeId?/:transferMadeBy?/:oldBranchId?/:newBranchId?', employeeControllers.getEmployeeTransfer);
 
 
 router.post('/employeeAccount',employeeValidator.addEmployeeAccount, employeeControllers.addEmployeeAccount);
