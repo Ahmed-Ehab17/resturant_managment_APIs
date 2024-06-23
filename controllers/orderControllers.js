@@ -27,12 +27,12 @@ const getNonVirtualOrderDetails = async (req, res) => {
   }
 };
 const getOrderItemsBySection = async (req, res) => {
-  const {sectionId, Status} = req.params;
+  const {sectionId, branchId, Status} = req.params;
   
   try {
-    let query = `SELECT * FROM fn_get_order_items_by_section($1`;
-    let values = [sectionId];
-    let valueCounter = 2; 
+    let query = `SELECT * FROM fn_get_order_items_by_section($1, $2`;
+    let values = [sectionId, branchId];
+    let valueCounter = 3; 
 
     if (Status) {
       query += `, $${valueCounter++}`;

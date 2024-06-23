@@ -5,7 +5,7 @@ const orderValidator = require("../utils/validators/orderValidator");
 
 router.get("/virtualOrderDetails/:orderId", orderControllers.getVirtualOrderDetails);
 router.get("/nonVirtualOrderDetails/:orderId", orderControllers.getNonVirtualOrderDetails);
-router.get("/orderItemsBySection/:sectionId/:Status?", orderControllers.getOrderItemsBySection);
+router.get("/orderItemsBySection/:sectionId/:branchId/:Status?", orderControllers.getOrderItemsBySection);
 
 
 router.post("/VirtualOrder", orderControllers.addVirtualOrder);
