@@ -17,6 +17,7 @@ router.get('/PositionsChanges/:employeeId', employeeControllers.getPositionsChan
 router.get('/schedule/:employeeId', employeeControllers.getSchedule);
 router.get('/employeeSignInInfo/:employeeEmail', employeeControllers.getEmployeeSignInInfo);
 router.get('/employeeTransfer/:employeeId?/:transferMadeBy?/:oldBranchId?/:newBranchId?', employeeControllers.getEmployeeTransfer);
+router.get('/employeeData/:employeeId?/:status?', employeeControllers.getEmployeeData);
 
 
 router.post('/employeeAccount',employeeValidator.addEmployeeAccount, employeeControllers.addEmployeeAccount);

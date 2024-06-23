@@ -37,10 +37,15 @@ router.get('/sectionOverview/:sectionId?/:daysInput?',branchControllers.getSecti
 router.get('/overAllPerformance/:daysInput?', branchControllers.getOverAllPerformance);
 router.get('/branchPerformance/:branchId/:daysInput?', branchControllers.getOverAllPerformance);
 router.get('/branchesCompare/:daysInput?', branchControllers.getBranchesCompare);
+router.get('/branches/:branchId?', branchControllers.getBranches);
+router.get('/branchSales/:branchId?/:itemId?/:startDate?/:endDate?', branchControllers.getSales);
 
 
 router.patch("/updateStock", branchControllers.updateStock);
-router.patch("/updateBookingStatus",branchValidator.updateBookingStatus, branchControllers.updateBookingStatus)
+router.patch("/updateBookingStatus",branchValidator.updateBookingStatus, branchControllers.updateBookingStatus);
+
+router.patch("/changeSectionManager", branchControllers.changeSectionManager);
+router.patch("/changeBranchManager", branchControllers.changeBranchManager);
 
 
 
