@@ -10,10 +10,8 @@ router.get('/orderItemsList', menuControllers.orderItemSectionList);
 
 
 router.get('/itemPriceChanges/:itemId', menuControllers.getItemPriceChanges);
-router.get('/itemPriceRecipes/:itemId', menuControllers.getItemPriceRecipes);
-router.get('/itemRecipes/:itemId', menuControllers.getItemPriceRecipes);
+router.get('/itemRecipes/:itemId', menuControllers.getItemRecipes);
 router.get('/branchMenuFilter/:branchId/:seasonId?/:itemType?/:categoryId?/:itemStatus?/:vegetarian?/:healthy?', menuControllers.branchMenuFilter);
-router.get('/getBranchMenuByTimeAndSeason/:branchId/:timeType/:seasonId', menuControllers.getItemPriceRecipes);
 
 
 

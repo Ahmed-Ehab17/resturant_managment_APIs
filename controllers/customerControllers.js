@@ -18,7 +18,7 @@ const getCustomerInformation = async (req, res) => {
          const query = `SELECT * FROM fn_get_customer_info($1)`;
          const values =  [customerId];
          const result = await client.query(query, values)
-         res.status(200).json({status: httpStatusText.SUCCESS, data: {attendance: result.rows}});
+         res.status(200).json({status: httpStatusText.SUCCESS, data: {information: result.rows}});
          }catch(err) {
          res.status(500).json({status: httpStatusText.ERROR, message: err.message});
          }
@@ -29,7 +29,7 @@ const getCustomerPhones = async (req, res) => {
          const query = `SELECT * FROM fn_get_customer_phones($1)`;
          const values =  [customerId];
          const result = await client.query(query, values)
-         res.status(200).json({status: httpStatusText.SUCCESS, data: {attendance: result.rows}});
+         res.status(200).json({status: httpStatusText.SUCCESS, data: {phones: result.rows}});
          }catch(err) {
          res.status(500).json({status: httpStatusText.ERROR, message: err.message});
          }
@@ -40,7 +40,7 @@ const getFriendRequests = async (req, res) => {
          const query = `SELECT * FROM fn_get_friend_requests($1)`;
          const values =  [accountId];
          const result = await client.query(query, values)
-         res.status(200).json({status: httpStatusText.SUCCESS, data: {attendance: result.rows}});
+         res.status(200).json({status: httpStatusText.SUCCESS, data: {requests: result.rows}});
          }catch(err) {
          res.status(500).json({status: httpStatusText.ERROR, message: err.message});
          }
@@ -51,7 +51,7 @@ const getFriendsList = async (req, res) => {
          const query = `SELECT fn_get_friends_list($1)`;
          const values =  [accountId];
          const result = await client.query(query, values)
-         res.status(200).json({status: httpStatusText.SUCCESS, data: {attendance: result.rows}});
+         res.status(200).json({status: httpStatusText.SUCCESS, data: {friendList: result.rows}});
          }catch(err) {
          res.status(500).json({status: httpStatusText.ERROR, message: err.message});
          }
@@ -92,7 +92,7 @@ const getCustomerSignInInfo = async (req, res) => {
       const query = `SELECT * FROM fn_get_customer_sign_in_info($1)`;
       const values = [customerPhone];
       const result = await client.query(query, values);
-      res.status(200).json({ status: httpStatusText.SUCCESS, data: { customer: result.rows } });
+      res.status(200).json({ status: httpStatusText.SUCCESS, data: { customerInfo: result.rows } });
     } catch (err) {
     res.status(500).json({ status: httpStatusText.ERROR, message: err.message });
   }

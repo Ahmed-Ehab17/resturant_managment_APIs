@@ -58,37 +58,73 @@ const getOrderItemsBySection = async (req, res) => {
 };
 
 const addVirtualOrder = async (req, res) => {
-    const {
+  const {
+    customerId,
+    branchId,
+    orderType,
+    orderStatus,
+    totalPrice,
+    paymentMethod,
+    orderItems,
+    creditDetails,
+    additionalDiscount,
+    tableId,
+    addressId,
+    customerPhoneId
+  } = req.body;
+
+  try {
+    let query = "CALL add_virtual_order($1, $2, $3, $4, $5, $6, $7";
+    let values = [
       customerId,
       branchId,
       orderType,
       orderStatus,
       totalPrice,
       paymentMethod,
-      orderItems,
-      additionalDiscount,
-      tableId,
-      addressId,
-      customerPhoneId,
-    } = req.body;
-  
-    try {
-      const query = `call add_virtual_order($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11)`;
-      const values = [
-      customerId,
-      branchId,
-      orderType,
-      orderStatus,
-      totalPrice,
-      paymentMethod,
-      orderItems,
-      additionalDiscount,
-      tableId,
-      addressId,
-      customerPhoneId,
-      ];
-      await client.query(query, values);
-      res.status(201).json({ status: httpStatusText.SUCCESS, data: values });
+      orderItems
+    ];
+    let valueCounter = 8;
+
+    if (creditDetails) {
+      query += `, $${valueCounter++}`;
+      values.push(creditDetails);
+    } else {
+      query += `, NULL`;
+    }
+
+    if (additionalDiscount) {
+      query += `, $${valueCounter++}`;
+      values.push(additionalDiscount);
+    } else {
+      query += `, 0`;
+    }
+
+    if (tableId) {
+      query += `, $${valueCounter++}`;
+      values.push(tableId);
+    } else {
+      query += `, NULL`;
+    }
+
+    if (addressId) {
+      query += `, $${valueCounter++}`;
+      values.push(addressId);
+    } else {
+      query += `, NULL`;
+    }
+
+    if (customerPhoneId) {
+      query += `, $${valueCounter++}`;
+      values.push(customerPhoneId);
+    } else {
+      query += `, NULL`;
+    }
+
+    query += `)`;
+
+    await client.query(query, values);
+    res.status(201).json({ status: httpStatusText.SUCCESS, data: values });
   } catch (err) {
     res.status(500).json({ status: httpStatusText.ERROR, message: err.message });
   }
