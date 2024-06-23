@@ -332,6 +332,79 @@ const getBranchesCompare = async (req, res) => {
     }
   };
 
+const getBranches = async (req, res) => {
+    const {branchId} = req.params;
+  
+    try {
+        let query = `SELECT * FROM fn_get_branches(`;
+        let values = [];
+        let valueCounter = 1; 
+  
+        if (branchId) {
+            query += `$${valueCounter++}`;
+            values.push(branchId);
+        } else {
+            query += `NULL`;
+        }
+        query += `)`;
+  
+      const result = await client.query(query, values);
+      res.status(200).json({ status: httpStatusText.SUCCESS, data: result.rows });
+    }catch(err) {
+      res.status(500).json({status: httpStatusText.ERROR, message:err.message});
+    }
+  };
+
+const getSales = async (req, res) => {
+    const { branchId, itemId, startDate, endDate } = req.params;
+  
+    try {
+        let query = `SELECT * FROM fn_get_sales(`;
+        let values = [];
+        let valueCounter = 1; 
+  
+        if (branchId) {
+            query += `$${valueCounter++}`;
+            values.push(branchId);
+        } else {
+            query += `NULL`;
+        }
+  
+        query += `, `;
+  
+        if (itemId) {
+            query += `$${valueCounter++}`;
+            values.push(itemId);
+        } else {
+            query += `NULL`;
+        }
+        query += `, `;
+  
+        if (startDate) {
+            query += `$${valueCounter++}`;
+            values.push(startDate);
+        } else {
+            query += `NULL`;
+        }
+        query += `, `;
+  
+        if (endDate) {
+            query += `$${valueCounter++}`;
+            values.push(endDate);
+        } else {
+            query += `NULL`;
+        }
+  
+        query += `)`;
+  
+  
+      const result = await client.query(query, values);
+      res.status(200).json({ status: httpStatusText.SUCCESS, data: result.rows });
+    }catch(err) {
+      res.status(500).json({status: httpStatusText.ERROR, message:err.message});
+    }
+  };
+
 // const updateStock = async(req,res)=>{
 //     try{
 //         const { branchId , ingredientId , quantity} = req.body || {};
@@ -369,6 +442,31 @@ const updateBookingStatus = async (req, res) => {
     try {
       const query = `call pr_update_booking_status($1, $2)`;
       const values = [bookingId,bookingStatus];
+      await client.query(query, values);
+      res.status(201).json({ status: httpStatusText.SUCCESS, data: values });
+  } catch (err) {
+    res.status(500).json({ status: httpStatusText.ERROR, message: err.message });
+  }
+  };
+
+const changeSectionManager = async (req, res) => {
+    const {branchId,sectionId,newManagerId,positionChanger} = req.body;
+  
+    try {
+      const query = `call pr_change_section_manager($1, $2, $3, $4)`;
+      const values = [branchId,sectionId,newManagerId,positionChanger];
+      await client.query(query, values);
+      res.status(201).json({ status: httpStatusText.SUCCESS, data: values });
+  } catch (err) {
+    res.status(500).json({ status: httpStatusText.ERROR, message: err.message });
+  }
+  };
+const changeBranchManager = async (req, res) => {
+    const {branchId,newManagerId,positionChanger} = req.body;
+  
+    try {
+      const query = `call pr_change_branch_manager($1, $2, $3)`;
+      const values = [branchId, newManagerId, positionChanger];
       await client.query(query, values);
       res.status(201).json({ status: httpStatusText.SUCCESS, data: values });
   } catch (err) {
@@ -636,7 +734,7 @@ const addBooking = async (req, res) => {
   }
   };
   
-  const addOrderToBooking = async (req, res) => {
+const addOrderToBooking = async (req, res) => {
     const {bookingId,orderId} = req.body;
   
     try {
@@ -689,8 +787,13 @@ module.exports = {
     getOverAllPerformance,
     getBranchPerformance,
     getBranchesCompare,
+    getBranches,
+    getSales,
 
     updateStock,
     updateBookingStatus,
+
+    changeSectionManager,
+    changeBranchManager,
     
 };

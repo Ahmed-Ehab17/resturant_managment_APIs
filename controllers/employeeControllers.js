@@ -195,6 +195,39 @@ const getEmployeeTransfer = async (req, res) => {
   }
 };
 
+const getEmployeeData = async (req, res) => {
+  const { branchId, status } = req.params;
+
+  try {
+      let query = `SELECT * FROM fn_get_employees_data(`;
+      let values = [];
+      let valueCounter = 1; 
+
+      if (branchId) {
+          query += `$${valueCounter++}`;
+          values.push(branchId);
+      } else {
+          query += `NULL`;
+      }
+
+      query += `, `;
+
+      if (status) {
+          query += `$${valueCounter++}`;
+          values.push(status);
+      } else {
+          query += `NULL`;
+      }
+      
+      query += `)`;
+
+
+    const result = await client.query(query, values);
+    res.status(200).json({ status: httpStatusText.SUCCESS, data: result.rows });
+  }catch(err) {
+    res.status(500).json({status: httpStatusText.ERROR, message:err.message});
+  }
+};
 const addPosition = async(req,res)=>{
     try{
         const {position_name, employeeRole, jop_description} = req.body || {};
@@ -287,7 +320,7 @@ const changePosition = async(req,res)=>{
 const changeSalary = async (req, res) => {
     const { employeeId, changerId, newSalary, changeReason } = req.body;
     try{
-    const query = `SELECT fn_change_salary($1, $2, $3, $4)`;
+    const query = `call pr_change_salary($1, $2, $3, $4)`;
     const values = [employeeId, changerId, newSalary, changeReason];
     await client.query(query, values);
 
@@ -365,6 +398,9 @@ const addEmployeeAccount = async(req, res) => {
     res.status(500).json({ status: httpStatusText.ERROR, message: err.message });
   }
 };
+
+
+
 
 const addEmployee = async (req, res) => {
   const {
@@ -473,6 +509,7 @@ module.exports = {
     addEmployeeAccount,
     employeeTransfer,
     employeeStatusChange,
+    
   
     changePosition,
     changeSalary,
@@ -491,6 +528,7 @@ module.exports = {
     getItemPriceChanges,
     getEmployeeSignInInfo,
     getEmployeeTransfer,
+    getEmployeeData,
   
     updateEmployeeAddress,
     updateEmployeePhone,
