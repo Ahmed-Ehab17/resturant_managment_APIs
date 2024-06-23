@@ -285,9 +285,9 @@ const employeeTransfer = async(req, res) => {
   const {employeeId, branchId, transferMadeBy, transferDate, transferReason} = req.body
   try{
     query = `call pr_employee_transfer($1, $2, $3, $4, $5)`
-    values = [employeeId, branchId, transferMadeBy, transferDate, transferReason]
+    const values = [employeeId, branchId, transferMadeBy, transferDate || null, transferReason || null];
     const result = await client.query(query, values)
-    res.status(200).json({status: httpStatusText.SUCCESS, data: result})
+    res.status(200).json({status: httpStatusText.SUCCESS, data: values})
   }catch(err){
     res.status(500).json({status: httpStatusText.ERROR, message: err.message});
   }
@@ -295,10 +295,10 @@ const employeeTransfer = async(req, res) => {
 const employeeStatusChange = async(req, res) => {
   const {employeeId, employeeStatus} = req.body
   try{
-    query = `select fn_employee_status_change($1, $2)`
+    query = `call pr_employee_status_change($1, $2)`
     values = [employeeId, employeeStatus]
     const result = await client.query(query, values)
-    res.status(200).json({status: httpStatusText.SUCCESS, data: result})
+    res.status(200).json({status: httpStatusText.SUCCESS, data: values})
   }catch(err){
     res.status(500).json({status: httpStatusText.ERROR, message: err.message});
   }

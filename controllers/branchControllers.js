@@ -405,19 +405,6 @@ const getSales = async (req, res) => {
     }
   };
 
-// const updateStock = async(req,res)=>{
-//     try{
-//         const { branchId , ingredientId , quantity} = req.body || {};
-        
-//         const query = `SELECT fn_update_stock($1, $2, $3)`;
-//         const values = [branchId , ingredientId , quantity];
-//         const result = await client.query(query, values);
-//         res.status(200).json({ status: httpStatusText.SUCCESS, data: { stock: result.rows } });
-//     } catch (err) {
-//         res.status(500).json({ status: httpStatusText.ERROR, message: err.message });
-//     }
-// };
-
 const updateStock = async (req, res) => {
     try {
         const { branchId, ingredientId, quantity } = req.body || {};
@@ -427,12 +414,10 @@ const updateStock = async (req, res) => {
         const result = await client.query(query, values);
         res.status(200).json({
             status: httpStatusText.SUCCESS,
-            message: Object.values(result.rows[0])[0],
             data: values
         });
     } catch (error) {
-        console.error("Error updating address:", error);
-        res.status(500).json({ status: httpStatusText.ERROR, message: "server error" });
+        res.status(500).json({ status: httpStatusText.ERROR, message: error.message });
     }
 };
 
@@ -657,9 +642,9 @@ const addMenuItem = async (req, res) => {
         const values = [itemName, itemDesc, categoryID, prepTime, picPath, vegetarian, healthy];
         await client.query(query, values);
 
-        res.status(201).json({ message: "Menu Item Added Successfully", data: values });
+        res.status(201).json({status: httpStatusText.SUCCESS, data: values });
     } catch (error) {
-        res.status(500).send("message:" + error.message);
+        res.status(500).send({status:httpStatusText.ERROR, message: error.message});
     }
 };
 
