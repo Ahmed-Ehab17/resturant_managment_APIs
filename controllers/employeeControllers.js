@@ -21,7 +21,7 @@ const resizeImage = async (req, res, next) => {
 
 		next();
 	} catch (err) {
-		res.status(500).json({ status: httpStatusText.ERROR, message: "Error proccessing image" });
+		res.status(500).json({ status: httpStatusText.ERROR, message: "Error processing image" });
 	}
 };
 
@@ -312,11 +312,11 @@ const employeeTransfer = async (req, res) => {
 		  query += `, $${valueCounter++}`;
 		  values.push(transferReason);
 		} else {
-		  query += `, 0`;
+		  query += `, null`;
 		}
 		query += `)`;
 		const result = await client.query(query, values);
-		res.status(200).json({ status: httpStatusText.SUCCESS, data: result });
+		res.status(200).json({ status: httpStatusText.SUCCESS, data: values });
 	} catch (err) {
 		res.status(500).json({ status: httpStatusText.ERROR, message: err.message });
 	}
@@ -408,10 +408,9 @@ const addEmployeeAccount = async (req, res) => {
 
 	const salt = await bcrypt.genSalt(10);
 	const hashedPassword = await bcrypt.hash(password, salt);
-
-	const isExist = await client.query(`SELECT EXISTS(SELECT 1 FROM employees_accounts WHERE employee_id = ${employeeId}) `);
+	// const isExist = await client.query(`SELECT EXISTS(SELECT 1 FROM employees_accounts WHERE employee_id = ${employeeId}) `);
     
-	if (isExist.rows[0].exists) return res.status(500).json({ status: httpStatusText.ERROR, message: "Account existed" });
+	// if (isExist.rows[0].exists) return res.status(500).json({ status: httpStatusText.ERROR, message: "Account existed" });
 	try {
 		const query = `call pr_insert_employee_account($1, $2, $3, $4)`;
 		const values = [employeeId, email, hashedPassword, profileImg];
