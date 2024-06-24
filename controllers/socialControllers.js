@@ -31,7 +31,7 @@ const addFriendRequests = async (req, res) => {
     }
 };
 
-const updatFriendRequest = async (req, res) => {
+const updateFriendRequest = async (req, res) => {
     const { requestId, requestStatus } = req.params
     try {
         const query = `CALL pr_update_friend_request($1, $2)`;
@@ -61,7 +61,7 @@ const getFriendsList = async(req, res) => {
 module.exports = {
     getFriendRequests,
     addFriendRequests,
-    updatFriendRequest,
+    updateFriendRequest,
     getFriendsList,
 
 };

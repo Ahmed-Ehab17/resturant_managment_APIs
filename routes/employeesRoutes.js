@@ -16,7 +16,7 @@ router.get('/PositionsChanges/:employeeId', employeeControllers.getPositionsChan
 router.get('/schedule/:employeeId', employeeControllers.getSchedule);
 router.get('/employeeSignInInfo/:employeeEmail', employeeControllers.getEmployeeSignInInfo);
 router.get('/employeeTransfer/:employeeId?/:transferMadeBy?/:oldBranchId?/:newBranchId?', employeeControllers.getEmployeeTransfer);
-// router.get('/employeeData/:employeeId?/:status?', employeeControllers.getEmployeeData);
+router.get('/employeeData/:branchId?/:status?', employeeControllers.getEmployeeData);
 
 router.post(
 	"/employeeAccount",
@@ -39,22 +39,7 @@ router.post("/timeInAttendance", employeeControllers.addTimeInAttendance);
 router.post("/timeOutAttendance", employeeControllers.addTimeOutAttendance);
 router.post("/employeeTransfer", employeeControllers.employeeTransfer);
 router.post("/employeeStatusChange", employeeControllers.employeeStatusChange);
-
 router.post('/employeeAccount',employeeValidator.addEmployeeAccount, employeeControllers.addEmployeeAccount);
-router.post('/add-position',employeeValidator.addPosition, employeeControllers.addPosition);
-router.post('/employee',employeeValidator.addEmployee, employeeControllers.addEmployee);
-router.post('/employee-phone',employeeValidator.addEmployeePhone, employeeControllers.addEmployeePhone);
-router.post('/employee-schedule',employeeValidator.addEmployeeSchedule, employeeControllers.addEmployeeSchedule);
-router.post('/employee-vacation',employeeValidator.addEmployeeVacation, employeeControllers.addEmployeeVacation);
-router.post('/ingredient-supplier',employeeValidator.addIngredientSupplier, employeeControllers.addIngredientSupplier);
-router.post('/add-employee',employeeValidator.addEmployee, employeeControllers.addEmployee);
-router.post('/add-employee-phone',employeeValidator.addEmployeePhone, employeeControllers.addEmployeePhone);
-router.post('/add-employee-schedule',employeeValidator.addEmployeeSchedule, employeeControllers.addEmployeeSchedule);
-router.post('/add-employee-vacation',employeeValidator.addEmployeeVacation, employeeControllers.addEmployeeVacation);
-router.post('/timeInAttendance', employeeControllers.addTimeInAttendance);
-router.post('/timeOutAttendance', employeeControllers.addTimeOutAttendance);
-router.post('/employeeTransfer', employeeControllers.employeeTransfer);
-router.post('/employeeStatusChange', employeeControllers.employeeStatusChange);
 
 
 

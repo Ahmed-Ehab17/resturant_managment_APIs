@@ -210,6 +210,39 @@ const getEmployeeTransfer = async (req, res) => {
 		res.status(500).json({ status: httpStatusText.ERROR, message: err.message });
 	}
 };
+const getEmployeeData = async (req, res) => {
+	const { branchId, status } = req.params;
+  
+	try {
+		let query = `SELECT * FROM fn_get_employees_data(`;
+		let values = [];
+		let valueCounter = 1; 
+  
+		if (branchId) {
+			query += `$${valueCounter++}`;
+			values.push(branchId);
+		} else {
+			query += `NULL`;
+		}
+  
+		query += `, `;
+  
+		if (status) {
+			query += `$${valueCounter++}`;
+			values.push(status);
+		} else {
+			query += `NULL`;
+		}
+		
+		query += `)`;
+  
+  
+	  const result = await client.query(query, values);
+	  res.status(200).json({ status: httpStatusText.SUCCESS, data: result.rows });
+	}catch(err) {
+	  res.status(500).json({status: httpStatusText.ERROR, message:err.message});
+	}
+  };
 
 const addPosition = async (req, res) => {
 	try {
@@ -264,8 +297,24 @@ const addTimeOutAttendance = async (req, res) => {
 const employeeTransfer = async (req, res) => {
 	const { employeeId, branchId, transferMadeBy, transferDate, transferReason } = req.body;
 	try {
-		query = `call pr_employee_transfer($1, $2, $3, $4, $5)`;
-		values = [employeeId, branchId, transferMadeBy, transferDate, transferReason];
+		let query = "CALL pr_employee_transfer($1, $2, $3";
+		let values = [employeeId, branchId, transferMadeBy];
+		let valueCounter = 4;
+	
+		if (transferDate) {
+		  query += `, $${valueCounter++}`;
+		  values.push(transferDate);
+		} else {
+		  query += `, current_timestamp`;
+		}
+	
+		if ( transferReason) {
+		  query += `, $${valueCounter++}`;
+		  values.push(transferReason);
+		} else {
+		  query += `, 0`;
+		}
+		query += `)`;
 		const result = await client.query(query, values);
 		res.status(200).json({ status: httpStatusText.SUCCESS, data: result });
 	} catch (err) {
@@ -275,10 +324,10 @@ const employeeTransfer = async (req, res) => {
 const employeeStatusChange = async (req, res) => {
 	const { employeeId, employeeStatus } = req.body;
 	try {
-		query = `select fn_employee_status_change($1, $2)`;
+		query = `call pr_employee_status_change($1, $2)`;
 		values = [employeeId, employeeStatus];
 		const result = await client.query(query, values);
-		res.status(200).json({ status: httpStatusText.SUCCESS, data: result });
+		res.status(200).json({ status: httpStatusText.SUCCESS, data: values });
 	} catch (err) {
 		res.status(500).json({ status: httpStatusText.ERROR, message: err.message });
 	}
@@ -299,7 +348,7 @@ const changePosition = async (req, res) => {
 const changeSalary = async (req, res) => {
 	const { employeeId, changerId, newSalary, changeReason } = req.body;
 	try {
-		const query = `SELECT fn_change_salary($1, $2, $3, $4)`;
+		const query = `call pr_change_salary($1, $2, $3, $4)`;
 		const values = [employeeId, changerId, newSalary, changeReason];
 		await client.query(query, values);
 
@@ -312,14 +361,14 @@ const changeSalary = async (req, res) => {
 const updateEmployeeSalaryPosition = async (req, res) => {
 	const { employeeId, changerId, newSalary, newPosition, positionChangeType, changeReason } = req.body;
 	try {
-		const query = `SELECT fn_update_employee_salary_position($1, $2, $3, $4, $5, $6)`;
+		const query = `call pr_update_employee_salary_position($1, $2, $3, $4, $5, $6)`;
 		const values = [employeeId, changerId, newSalary, newPosition, positionChangeType, changeReason];
 		const result = await client.query(query, values);
 
 		res.status(201).json({ status: httpStatusText.SUCCESS, data: values });
 	} catch (error) {
 		console.log(error);
-		res.status(500).json({ status: httpStatusText.ERROR, message: "Server Error" });
+		res.status(500).json({ status: httpStatusText.ERROR, message: error.message });
 	}
 };
 
@@ -514,6 +563,7 @@ module.exports = {
 	getItemPriceChanges,
 	getEmployeeSignInInfo,
 	getEmployeeTransfer,
+	getEmployeeData,
 
 	updateEmployeeAddress,
 	updateEmployeePhone,

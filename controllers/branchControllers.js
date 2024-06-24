@@ -354,13 +354,19 @@ const getOverAllPerformance = async (req, res) => {
 	}
 };
 const getBranchPerformance = async (req, res) => {
-	const { branchId, daysInput } = req.params;
+	const { branchId,performance, daysInput } = req.params;
 
 	try {
 		let query = `SELECT * FROM get_branch_performance(`;
 		let values = [branchId];
 		let valueCounter = 2;
 
+		if (performance) {
+			query += `$${valueCounter++}`;
+			values.push(performance);
+		} else {
+			query += `NULL`;
+		}
 		if (daysInput) {
 			query += `$${valueCounter++}`;
 			values.push(daysInput);

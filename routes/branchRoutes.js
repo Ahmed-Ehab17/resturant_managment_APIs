@@ -22,7 +22,7 @@ router.get("/branch-price-changes-list", branchControllers.branchPriceChangesLis
 router.get("/ingredients", branchControllers.ingredientList);
 router.get("/activeEmployees/:branchId", branchControllers.getActiveEmployees);
 router.get("/employeesAttendance/:branchId", branchControllers.getEmployeesAttendance);
-router.get("/employeesSchedule/:branchId", branchControllers.getEmployeesAttendance);
+router.get("/employeesSchedule/:branchId", branchControllers.getEmployeesSchedule);
 router.get("/itemPriceChanges/:branchId", branchControllers.getItemPriceChanges);
 router.get("/menu/:branchId", branchControllers.getMenu);
 router.get("/menuByTime/:branchId", branchControllers.getMenuByTime);
@@ -35,7 +35,7 @@ router.get('/branchMenu/:branchId', branchControllers.getBranchMenu);
 router.get('/branchLocation/:branchId', branchControllers.getBranchLocation);
 router.get('/sectionOverview/:sectionId?/:daysInput?',branchControllers.getSectionOverView);
 router.get('/overAllPerformance/:daysInput?', branchControllers.getOverAllPerformance);
-router.get('/branchPerformance/:branchId/:daysInput?', branchControllers.getOverAllPerformance);
+router.get('/branchPerformance/:branchId/:performance?/:daysInput?', branchControllers.getBranchPerformance);
 router.get('/branchesCompare/:daysInput?', branchControllers.getBranchesCompare);
 router.get('/branches/:branchId?', branchControllers.getBranches);
 router.get('/branchSales/:branchId?/:itemId?/:startDate?/:endDate?', branchControllers.getSales);

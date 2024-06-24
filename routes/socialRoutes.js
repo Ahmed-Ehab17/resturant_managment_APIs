@@ -8,7 +8,7 @@ router.get('/friendsList/:accountId', socialControllers.getFriendsList);
 
 router.post('/friend-request', socialValidators.addFriendRequest, socialControllers.addFriendRequests);
 
-router.patch('/updateFriendRequest', socialControllers.updatFriendRequest);
+router.patch('/updateFriendRequest', socialControllers.updateFriendRequest);
 
 
 module.exports = router;
