@@ -1,13 +1,8 @@
 const { client } = require("../config/dbConfig");
 const httpStatusText = require("../utils/httpStatusText");
-<<<<<<< HEAD
 const bcrypt = require("bcrypt");
 const { uploadSingleImage } = require("../middlewares/uploadImageMiddleware");
 const sharp = require("sharp");
-=======
-const bcrypt = require('bcrypt');
-
->>>>>>> 904be0effa7ae20bc1adfe8fb66fb3565d248a4b
 
 const uploadEmployeeImage = uploadSingleImage("profileImg");
 
@@ -67,7 +62,6 @@ const positionsList = async (req, res) => {
 		const query = `SELECT * FROM vw_positions`;
 		const result = await client.query(query);
 
-<<<<<<< HEAD
 		res.status(200).json({ status: httpStatusText.SUCCESS, data: result.rows });
 	} catch (error) {
 		res.status(500).json({ status: httpStatusText.ERROR, message: "server error", error });
@@ -77,19 +71,6 @@ const positionsChangesList = async (req, res) => {
 	try {
 		const query = `SELECT * FROM vw_positions_changes`;
 		const result = await client.query(query);
-=======
- const getEmployeesPhones = async (req, res) => {  
-  const employeeId  = req.params.employeeId
-    try{
-       const query = `SELECT * FROM fn_get_employee_phones($1)`;
-       const values =  [employeeId];
-       const result = await client.query(query, values)
-       res.status(200).json({status: httpStatusText.SUCCESS, data: {phones: result.rows}});
-       }catch(err) {
-       res.status(500).json({status: httpStatusText.ERROR, message: err.message});
-       }
-      }
->>>>>>> 904be0effa7ae20bc1adfe8fb66fb3565d248a4b
 
 		res.status(200).json({ status: httpStatusText.SUCCESS, data: result.rows });
 	} catch (error) {
@@ -182,98 +163,7 @@ const getItemPriceChanges = async (req, res) => {
 };
 
 const getEmployeeTransfer = async (req, res) => {
-<<<<<<< HEAD
 	const { employeeId, transferMadeBy, oldBranchId, newBranchId } = req.params;
-=======
-  const { employeeId, transferMadeBy, oldBranchId, newBranchId } = req.params;
-
-  try {
-      let query = `SELECT * FROM fn_get_employees_transfers(`;
-      let values = [];
-      let valueCounter = 1; 
-
-      if (employeeId) {
-          query += `$${valueCounter++}`;
-          values.push(employeeId);
-      } else {
-          query += `NULL`;
-      }
-
-      query += `, `;
-
-      if (transferMadeBy) {
-          query += `$${valueCounter++}`;
-          values.push(transferMadeBy);
-      } else {
-          query += `NULL`;
-      }
-      query += `, `;
-
-      if (oldBranchId) {
-          query += `$${valueCounter++}`;
-          values.push(oldBranchId);
-      } else {
-          query += `NULL`;
-      }
-      query += `, `;
-
-      if (newBranchId) {
-          query += `$${valueCounter++}`;
-          values.push(newBranchId);
-      } else {
-          query += `NULL`;
-      }
-
-      query += `)`;
-
-
-    const result = await client.query(query, values);
-    res.status(200).json({ status: httpStatusText.SUCCESS, data: result.rows });
-  }catch(err) {
-    res.status(500).json({status: httpStatusText.ERROR, message:err.message});
-  }
-};
-
-const getEmployeeData = async (req, res) => {
-  const { branchId, status } = req.params;
-
-  try {
-      let query = `SELECT * FROM fn_get_employees_data(`;
-      let values = [];
-      let valueCounter = 1; 
-
-      if (branchId) {
-          query += `$${valueCounter++}`;
-          values.push(branchId);
-      } else {
-          query += `NULL`;
-      }
-
-      query += `, `;
-
-      if (status) {
-          query += `$${valueCounter++}`;
-          values.push(status);
-      } else {
-          query += `NULL`;
-      }
-      
-      query += `)`;
-
-
-    const result = await client.query(query, values);
-    res.status(200).json({ status: httpStatusText.SUCCESS, data: result.rows });
-  }catch(err) {
-    res.status(500).json({status: httpStatusText.ERROR, message:err.message});
-  }
-};
-const addPosition = async(req,res)=>{
-    try{
-        const {position_name, employeeRole, jop_description} = req.body || {};
-        
-        const positionCheckQuery = 'SELECT EXISTS(SELECT 1 FROM positions WHERE position_name = $1)';
-        const positionCheckValues = [position_name];
->>>>>>> 904be0effa7ae20bc1adfe8fb66fb3565d248a4b
 
 	try {
 		let query = `SELECT * FROM fn_get_employees_transfers(`;
@@ -346,7 +236,6 @@ const addPosition = async (req, res) => {
 };
 
 const addTimeInAttendance = async (req, res) => {
-<<<<<<< HEAD
 	const { employeeId } = req.body;
 	try {
 		query = `call check_in_employee($1)`;
@@ -433,111 +322,6 @@ const updateEmployeeSalaryPosition = async (req, res) => {
 		res.status(500).json({ status: httpStatusText.ERROR, message: "Server Error" });
 	}
 };
-=======
-  const {employeeId} = req.body
-  try{
-    query = `call check_in_employee($1)`
-    values = [employeeId]
-    const result = await client.query(query, values)
-    res.status(200).json({status: httpStatusText.SUCCESS, data: result})
-    console.log(result);
-  }catch(err){
-    res.status(500).json({status: httpStatusText.ERROR, message: err.message});
-  }
-};
-
-const addTimeOutAttendance = async(req, res) => {
-  const {employeeId} = req.body
-  try{
-    query = `call check_out_employee($1)`
-    values = [employeeId]
-    const result = await client.query(query, values)
-    res.status(200).json({status: httpStatusText.SUCCESS, data: result})
-    console.log(result);
-  }catch(err){
-    res.status(500).json({status: httpStatusText.ERROR, message: err.message});
-  }
-};
-
-const employeeTransfer = async(req, res) => {
-  const {employeeId, branchId, transferMadeBy, transferDate, transferReason} = req.body
-  try{
-    query = `call pr_employee_transfer($1, $2, $3, $4, $5)`
-    const values = [employeeId, branchId, transferMadeBy, transferDate || null, transferReason || null];
-    const result = await client.query(query, values)
-    res.status(200).json({status: httpStatusText.SUCCESS, data: values})
-  }catch(err){
-    res.status(500).json({status: httpStatusText.ERROR, message: err.message});
-  }
-};
-const employeeStatusChange = async(req, res) => {
-  const {employeeId, employeeStatus} = req.body
-  try{
-    query = `call pr_employee_status_change($1, $2)`
-    values = [employeeId, employeeStatus]
-    const result = await client.query(query, values)
-    res.status(200).json({status: httpStatusText.SUCCESS, data: values})
-  }catch(err){
-    res.status(500).json({status: httpStatusText.ERROR, message: err.message});
-  }
-};
-
-
-const changePosition = async(req,res)=>{
-     try{
-        const { employee_id, position_changer_id, new_position, position_change_type } = req.body;
-        const query = `call pr_change_employee_position($1, $2, $3, $4)`;
-        const values = [employee_id, position_changer_id, new_position, position_change_type];
-        await client.query(query, values);
-        res.status(201).json({ status: httpStatusText.SUCCESS, data: values });
-  } catch (err) {
-    res.status(500).json({ status: httpStatusText.ERROR, message: err.message });
-  }
-}
-
-const changeSalary = async (req, res) => {
-    const { employeeId, changerId, newSalary, changeReason } = req.body;
-    try{
-    const query = `call pr_change_salary($1, $2, $3, $4)`;
-    const values = [employeeId, changerId, newSalary, changeReason];
-    await client.query(query, values);
-
-    res.status(201).json({ status: httpStatusText.SUCCESS, data: values });
-  } catch (err) {
-    res.status(500).json({ status: httpStatusText.ERROR, message: err.message });
-  }
-};
-
-const updateEmployeeSalaryPosition = async (req, res) => {
-  const { employeeId, changerId, newSalary, newPosition, positionChangeType, changeReason } = req.body;
-  try{
-  const query = `SELECT fn_update_employee_salary_position($1, $2, $3, $4, $5, $6)`;
-  const values = [employeeId, changerId, newSalary, newPosition, positionChangeType, changeReason];
-  const result = await client.query(query, values);
-
-  res.status(201).json({ status: httpStatusText.SUCCESS, data: values});
-  } catch (error) {
-    console.log(error);
-    res.status(500).json({ status:httpStatusText.ERROR, message: "Server Error" });
-  }
-
-};
-
-
-
-const updateEmployeeAddress = async(req,res)=>{
-  try{
-      const { employeeId, newAddress } = req.body || {};
-      
-      const query = `SELECT fn_update_employee_address($1, $2)`;
-      const values = [employeeId, newAddress];
-      const result = await client.query(query, values);
-      res.status(201).json({ status: httpStatusText.SUCCESS, data: values });
-  } catch (err) {
-    res.status(500).json({ status: httpStatusText.ERROR, message: err.message });
-  }
-}
->>>>>>> 904be0effa7ae20bc1adfe8fb66fb3565d248a4b
 
 const updateEmployeeAddress = async (req, res) => {
 	try {
@@ -556,7 +340,6 @@ const updateEmployeePhone = async (req, res) => {
 	try {
 		const { employeeId, oldPhone, newPhone } = req.body;
 
-<<<<<<< HEAD
 		const query = `call pr_update_employee_phone($1, $2, $3)`;
 		const values = [employeeId, oldPhone, newPhone];
 		await client.query(query, values);
@@ -573,15 +356,10 @@ const updateEmployeePhone = async (req, res) => {
 
 const addEmployeeAccount = async (req, res) => {
 	const { employeeId, email, password, profileImg } = req.body;
-=======
-const addEmployeeAccount = async(req, res) => {
-    const { employeeId, email, password,picturePath } = req.body;   
->>>>>>> 904be0effa7ae20bc1adfe8fb66fb3565d248a4b
 
 	const salt = await bcrypt.genSalt(10);
 	const hashedPassword = await bcrypt.hash(password, salt);
 
-<<<<<<< HEAD
 	const isExist = await client.query(`SELECT EXISTS(SELECT 1 FROM employees_accounts WHERE employee_id = ${employeeId}) `);
     
 	if (isExist.rows[0].exists) return res.status(500).json({ status: httpStatusText.ERROR, message: "Account existed" });
@@ -595,18 +373,6 @@ const addEmployeeAccount = async(req, res) => {
 
 		res.status(500).json({ status: httpStatusText.ERROR, message: err.message });
 	}
-=======
-    // Insert new user into database
-    try {
-      const query = `call pr_insert_employee_account($1, $2, $3, $4)`;
-      const values = [employeeId, email, hashedPassword,picturePath ];
-      await client.query(query, values);
-
-        res.status(201).json({ status: httpStatusText.SUCCESS, data: values });
-  } catch (err) {
-    res.status(500).json({ status: httpStatusText.ERROR, message: err.message });
-  }
->>>>>>> 904be0effa7ae20bc1adfe8fb66fb3565d248a4b
 };
 
 
@@ -717,7 +483,6 @@ const addIngredientSupplier = async (req, res) => {
 };
 
 module.exports = {
-<<<<<<< HEAD
 	uploadEmployeeImage,
 	resizeImage,
 	addPosition,
@@ -754,41 +519,3 @@ module.exports = {
 	updateEmployeePhone,
 	updateEmployeeSalaryPosition,
 };
-=======
-    addPosition,
-    addEmployee,
-    addEmployeePhone,
-    addEmployeeSchedule,
-    addEmployeeVacation,
-    addIngredientSupplier,
-    addTimeInAttendance,
-    addTimeOutAttendance,
-    addEmployeeAccount,
-    employeeTransfer,
-    employeeStatusChange,
-    
-  
-    changePosition,
-    changeSalary,
-  
-    activeEmployeesList,
-    inactiveEmployeesList,
-    positionsList,
-    positionsChangesList,
-    supplyEmployeesList,
-    managerEmployeesList,
-  
-    getEmployeesAttendance,
-    getEmployeesPhones,
-    getPositionsChanges,
-    getSchedule,
-    getItemPriceChanges,
-    getEmployeeSignInInfo,
-    getEmployeeTransfer,
-    getEmployeeData,
-  
-    updateEmployeeAddress,
-    updateEmployeePhone,
-    updateEmployeeSalaryPosition,
-}
->>>>>>> 904be0effa7ae20bc1adfe8fb66fb3565d248a4b

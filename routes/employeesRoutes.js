@@ -10,22 +10,13 @@ router.get("/inactive-employees-list", employeeControllers.inactiveEmployeesList
 router.get("/positions-list", employeeControllers.positionsList);
 router.get("/positions-changes-list", employeeControllers.positionsChangesList);
 router.get("/supply-employees-list", employeeControllers.supplyEmployeesList);
-<<<<<<< HEAD
-router.get("/attendance/:employeeId", employeeControllers.getEmployeesAttendance);
-router.get("/phones/:employeeId", employeeControllers.getEmployeesPhones);
-router.get("/PositionsChanges/:employeeId", employeeControllers.getPositionsChanges);
-router.get("/schedule/:employeeId", employeeControllers.getSchedule);
-router.get("/employeeSignInInfo/:employeeEmail", employeeControllers.getEmployeeSignInInfo);
-router.get("/employeeTransfer/:employeeId?/:transferMadeBy?/:oldBranchId?/:newBranchId?", employeeControllers.getEmployeeTransfer);
-=======
 router.get('/attendance/:employeeId', employeeControllers.getEmployeesAttendance);
 router.get('/phones/:employeeId', employeeControllers.getEmployeesPhones);
 router.get('/PositionsChanges/:employeeId', employeeControllers.getPositionsChanges);
 router.get('/schedule/:employeeId', employeeControllers.getSchedule);
 router.get('/employeeSignInInfo/:employeeEmail', employeeControllers.getEmployeeSignInInfo);
 router.get('/employeeTransfer/:employeeId?/:transferMadeBy?/:oldBranchId?/:newBranchId?', employeeControllers.getEmployeeTransfer);
-router.get('/employeeData/:employeeId?/:status?', employeeControllers.getEmployeeData);
->>>>>>> 904be0effa7ae20bc1adfe8fb66fb3565d248a4b
+// router.get('/employeeData/:employeeId?/:status?', employeeControllers.getEmployeeData);
 
 router.post(
 	"/employeeAccount",
@@ -49,17 +40,6 @@ router.post("/timeOutAttendance", employeeControllers.addTimeOutAttendance);
 router.post("/employeeTransfer", employeeControllers.employeeTransfer);
 router.post("/employeeStatusChange", employeeControllers.employeeStatusChange);
 
-<<<<<<< HEAD
-router.patch("/change-position", employeeControllers.changePosition);
-router.patch("/change-salary", employeeControllers.changeSalary);
-router.patch(
-	"/updateEmployeeSalaryPosition",
-	employeeValidator.updateEmployeeSalaryPosition,
-	employeeControllers.updateEmployeeSalaryPosition
-);
-router.patch("/update-employee-address", employeeValidator.updateEmployeeAddress, employeeControllers.updateEmployeeAddress);
-router.patch("/update-employee-phone", employeeValidator.updateEmployeePhone, employeeControllers.updateEmployeePhone);
-=======
 router.post('/employeeAccount',employeeValidator.addEmployeeAccount, employeeControllers.addEmployeeAccount);
 router.post('/add-position',employeeValidator.addPosition, employeeControllers.addPosition);
 router.post('/employee',employeeValidator.addEmployee, employeeControllers.addEmployee);
@@ -86,6 +66,5 @@ router.patch("/update-employee-address",employeeValidator.updateEmployeeAddress,
 router.patch("/update-employee-phone",employeeValidator.updateEmployeePhone, employeeControllers.updateEmployeePhone);
 
 
->>>>>>> 904be0effa7ae20bc1adfe8fb66fb3565d248a4b
 
 module.exports = router;
