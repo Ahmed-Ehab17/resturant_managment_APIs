@@ -1,8 +1,10 @@
+require("dotenv").config();
 const { client } = require("../config/dbConfig");
 const httpStatusText = require("../utils/httpStatusText");
 const bcrypt = require("bcrypt");
 const { uploadSingleImage } = require("../middlewares/uploadImageMiddleware");
 const sharp = require("sharp");
+const jwt = require('jsonwebtoken');
 
 const uploadEmployeeImage = uploadSingleImage("profileImg");
 
@@ -440,7 +442,42 @@ const addEmployeeAccount = async (req, res, next) => {
   }
 };
 
-
+const employeeLogin = async (req, res) => {
+	const { email, password } = req.body;
+  
+	try {
+	  //Get the hashed password from the database
+	  const getPasswordQuery = `SELECT fn_get_employee_hash($1) AS hashed_password`;
+	  const passwordResult = await client.query(getPasswordQuery, [email]);
+	  const hashedPassword = passwordResult.rows[0]?.hashed_password;
+  
+	  if (!hashedPassword) {
+		return res.status(404).json({ status: httpStatusText.FAIL, message: 'Email not found' });
+	  }
+  
+	  //Compare the provided password with the hashed password
+	  const isPasswordMatch = await bcrypt.compare(password, hashedPassword);
+  
+	  if (!isPasswordMatch) {
+		return res.status(401).json({ status: httpStatusText.FAIL, message: 'Incorrect password' });
+	  }
+  
+	  //Get the employee's information from the database
+	  const getInfoQuery = `SELECT * FROM fn_get_employee_sign_in_info($1)`;
+	  const infoResult = await client.query(getInfoQuery, [email]);
+	  const employeeInfo = infoResult.rows[0];
+  
+	  // Generate a JWT token
+	  const token = jwt.sign({ data: employeeInfo }, process.env.JWT_SECRET_KEY, { expiresIn: '1h' });
+  
+	  //Send the token to the frontend
+	  res.status(200).json({ status: httpStatusText.SUCCESS, token });
+	} catch (err) {
+	  res.status(500).json({ status: httpStatusText.ERROR, message: err.message });
+	}
+  };
+  
+  
 
 
 const addEmployee = async (req, res) => {
@@ -561,6 +598,8 @@ module.exports = {
 	addEmployeeAccount,
 	employeeTransfer,
 	employeeStatusChange,
+
+	employeeLogin,
 
 	changePosition,
 	changeSalary,

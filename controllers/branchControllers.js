@@ -335,7 +335,7 @@ const getOverAllPerformance = async (req, res) => {
 	const { daysInput } = req.params;
 
 	try {
-		let query = `SELECT * FROM get_section_overview(`;
+		let query = `SELECT * FROM get_overall_performance(`;
 		let values = [];
 		let valueCounter = 1;
 
