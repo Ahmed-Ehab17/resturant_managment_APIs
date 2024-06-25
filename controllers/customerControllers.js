@@ -295,7 +295,17 @@ const login = async (req, res) => {
     res.status(500).json({ status: httpStatusText.ERROR, message: err.message });
   }
 };
-
+const verifyPhone = async (req, res) => {
+  const { phone } = req.body;
+  try {
+    const query = `select fn_verify_phone($1)`;
+    const values = [ phone ];
+    await client.query(query, values);
+    res.status(200).json({ status: httpStatusText.SUCCESS, values });
+  } catch (err) {
+    res.status(500).json({ status: httpStatusText.ERROR, message: err.message });
+  }
+};
 
 module.exports = {
   getCustomerAddresses,
@@ -319,4 +329,7 @@ module.exports = {
   addCustomerAccount,
 
   login,
+
+
+  verifyPhone,
 };
