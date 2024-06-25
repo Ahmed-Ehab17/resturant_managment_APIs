@@ -27,6 +27,7 @@ router.post("/customer-phone",customerValidator.addCustomerPhone, customerContro
 router.post('/addFavorite', customerControllers.addFavorite);
 router.post('/addCustomerAccount', customerControllers.addCustomerAccount);
 router.post('/login',customerValidator.login, customerControllers.login);
+router.post('/verifyPhone',customerValidator.verifyPhone, customerControllers.verifyPhone);
 
 
 
