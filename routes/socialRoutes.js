@@ -5,6 +5,7 @@ const socialValidators = require('../utils/validators/socialValidator');
 
 router.get('/friend-requests/:accountId', socialControllers.getFriendRequests);
 router.get('/friendsList/:accountId', socialControllers.getFriendsList);
+router.get('/friendsFavoriteItems/:customerId', socialControllers.getFriendsFavoriteItem);
 
 router.post('/friend-request', socialValidators.addFriendRequest, socialControllers.addFriendRequests);
 

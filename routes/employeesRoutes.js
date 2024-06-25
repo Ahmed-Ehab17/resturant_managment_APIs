@@ -3,6 +3,7 @@ const router = express.Router();
 const employeeControllers = require("../controllers/employeeControllers");
 const employeeValidator = require("../utils/validators/employeeValidator");
 const auth = require("../middlewares/auth");
+const checkAccountExists = require("../middlewares/employeeExistenceMiddleware")
 
 router.get("/manager-employees-list", employeeControllers.managerEmployeesList);
 router.get("/active-employees-list", employeeControllers.activeEmployeesList);
@@ -20,6 +21,7 @@ router.get('/employeeData/:branchId?/:status?', employeeControllers.getEmployeeD
 
 router.post(
 	"/employeeAccount",
+	checkAccountExists,
 	employeeControllers.uploadEmployeeImage,
 	employeeControllers.resizeImage,
 	employeeValidator.addEmployeeAccount,
@@ -49,6 +51,7 @@ router.patch("/change-salary", employeeControllers.changeSalary);
 router.patch("/updateEmployeeSalaryPosition",employeeValidator.updateEmployeeSalaryPosition, employeeControllers.updateEmployeeSalaryPosition);
 router.patch("/update-employee-address",employeeValidator.updateEmployeeAddress, employeeControllers.updateEmployeeAddress);
 router.patch("/update-employee-phone",employeeValidator.updateEmployeePhone, employeeControllers.updateEmployeePhone);
+router.patch("/changeEmployeePass", employeeControllers.changeEmployeePass);
 
 
 
