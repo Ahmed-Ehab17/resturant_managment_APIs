@@ -105,6 +105,19 @@ const changeCustomerPass = [
 
     validatorMiddleware
  ]
+ const login = [
+    body('phone')
+    .trim()
+    .notEmpty()
+    .withMessage('Phone number is required')
+    .matches(/^(010|011|012|015)\d{8}$/)
+    .withMessage('Must be a valid Egyptian phone number'),
+    body('password')
+    .notEmpty()
+    .withMessage('Password is required'),
+
+    validatorMiddleware
+ ]
 
 
 module.exports = {
@@ -114,5 +127,6 @@ module.exports = {
     addCustomer,
     addCustomerAddress,
     addCustomerPhone,
+    login,
 
 }

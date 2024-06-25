@@ -16,7 +16,17 @@ const addEmployeeAccount = [
     body('password')
     .trim()
     .notEmpty()
-    .withMessage('password is required'),
+    .withMessage('password is required')
+    .isLength({ min: 8 })
+    .withMessage('Password must be at least 8 characters long')
+    .matches(/[a-z]/)
+    .withMessage('Password must contain at least one lowercase letter')
+    .matches(/[A-Z]/)
+    .withMessage('Password must contain at least one uppercase letter')
+    .matches(/\d/)
+    .withMessage('Password must contain at least one number')
+    .matches(/[!@#$%^&*(),.?":{}|<>]/)
+    .withMessage('Password must contain at least one special character'),
     validatorMiddleware,
 ]
 
@@ -247,6 +257,21 @@ const updateEmployeeSalaryPosition = [
     validatorMiddleware
 ]
 
+const login = [
+    body('email')
+      .trim()
+      .notEmpty()
+      .withMessage('Email is required')
+      .isEmail()
+      .withMessage('Must be a valid email'),
+    body('password')
+      .notEmpty()
+      .withMessage('Password is required'),
+      
+    validatorMiddleware
+  ];
+  
+
 
 
 module.exports = {
@@ -261,5 +286,7 @@ module.exports = {
     updateEmployeePhone,
     updateEmployeeSalaryPosition,
     addIngredientSupplier,
+
+    login,
 
 }

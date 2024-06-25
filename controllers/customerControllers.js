@@ -1,6 +1,9 @@
 const { client } = require("../config/dbConfig");
 const httpStatusText = require("../utils/httpStatusText");
 const bcrypt = require('bcrypt')
+const jwt = require('jsonwebtoken');
+require("dotenv").config();
+
 
 const getCustomerAddresses = async (req, res) => {
   const customerId = req.params.customerId;
@@ -258,6 +261,42 @@ const addCustomerAccount = async (req, res) => {
   }
 };
 
+const login = async (req, res) => {
+  const { phone, password } = req.body;
+
+  try {
+    // Get the hashed password from the database
+    const getPasswordQuery = `SELECT fn_get_customer_hash($1) AS hashed_password`;
+    const passwordResult = await client.query(getPasswordQuery, [phone]);
+    const hashedPassword = passwordResult.rows[0]?.hashed_password;
+
+    if (!hashedPassword) {
+      return res.status(404).json({ status: httpStatusText.FAIL, message: 'Phone number not found' });
+    }
+
+    // Compare the provided password with the hashed password
+    const isPasswordMatch = await bcrypt.compare(password, hashedPassword);
+
+    if (!isPasswordMatch) {
+      return res.status(401).json({ status: httpStatusText.FAIL, message: 'Incorrect password' });
+    }
+
+    // Get the customer's information from the database
+    const getInfoQuery = `SELECT * FROM fn_get_customer_sign_in_info($1)`;
+    const infoResult = await client.query(getInfoQuery, [phone]);
+    const customerInfo = infoResult.rows[0];
+
+    // Generate a JWT token
+    const token = jwt.sign({ data: customerInfo }, process.env.JWT_SECRET_KEY, { expiresIn: '1h' });
+
+    // Send the token to the frontend
+    res.status(200).json({ status: httpStatusText.SUCCESS, token });
+  } catch (err) {
+    res.status(500).json({ status: httpStatusText.ERROR, message: err.message });
+  }
+};
+
+
 module.exports = {
   getCustomerAddresses,
   getCustomerInformation,
@@ -278,4 +317,6 @@ module.exports = {
   addCustomerPhone,
   addFavorite,
   addCustomerAccount,
+
+  login,
 };
