@@ -358,6 +358,22 @@ const changeSalary = async (req, res) => {
 	}
 };
 
+const changeEmployeePass = async(req, res) =>{
+	const {employeeId, newPass} = req.body
+	try{
+		const salt = await bcrypt.genSalt(10);
+    	const hashedPassword = await bcrypt.hash(newPass, salt);
+
+		const query = 'CALL change_employee_password($1, $2)';
+		const values = [employeeId, hashedPassword];
+		await client.query(query, values);
+
+		res.status(201).json({ status: httpStatusText.SUCCESS, data: values });
+	}catch (error) {
+		res.status(500).json({ status: httpStatusText.ERROR, message: error.message });
+	}
+}
+
 const updateEmployeeSalaryPosition = async (req, res) => {
 	const { employeeId, changerId, newSalary, newPosition, positionChangeType, changeReason } = req.body;
 	try {
@@ -403,24 +419,25 @@ const updateEmployeePhone = async (req, res) => {
 	}
 };
 
-const addEmployeeAccount = async (req, res) => {
-	const { employeeId, email, password, profileImg } = req.body;
+const addEmployeeAccount = async (req, res, next) => {
+	const { employeeId, email, password } = req.body;
+	const profileImg = req.file ? req.file.path : null;
 
-	const salt = await bcrypt.genSalt(10);
-	const hashedPassword = await bcrypt.hash(password, salt);
-	// const isExist = await client.query(`SELECT EXISTS(SELECT 1 FROM employees_accounts WHERE employee_id = ${employeeId}) `);
-    
-	// if (isExist.rows[0].exists) return res.status(500).json({ status: httpStatusText.ERROR, message: "Account existed" });
-	try {
-		const query = `call pr_insert_employee_account($1, $2, $3, $4)`;
-		const values = [employeeId, email, hashedPassword, profileImg];
-		await client.query(query, values);
+	 try {
+    const salt = await bcrypt.genSalt(10);
+    const hashedPassword = await bcrypt.hash(password, salt);
 
-		res.status(201).json({ status: httpStatusText.SUCCESS, data: values });
-	} catch (err) {
+    const query = 'CALL pr_insert_employee_account($1, $2, $3, $4)';
+    const values = [employeeId, email, hashedPassword, profileImg];
+    await client.query(query, values);
 
-		res.status(500).json({ status: httpStatusText.ERROR, message: err.message });
-	}
+    res.status(201).json({ status: httpStatusText.SUCCESS, data: values });
+  } catch (err) {
+    if (profileImg) {
+      fs.unlinkSync(profileImg); 
+    }
+    res.status(500).json({ status: httpStatusText.ERROR, message: err.message });
+  }
 };
 
 
@@ -547,6 +564,7 @@ module.exports = {
 
 	changePosition,
 	changeSalary,
+	changeEmployeePass,
 
 	activeEmployeesList,
 	inactiveEmployeesList,

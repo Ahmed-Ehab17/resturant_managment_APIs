@@ -28,6 +28,18 @@ const updateCustomerAddress = [
 
     validatorMiddleware
 ]
+const changeCustomerPass = [
+    body('customerId')
+    .trim()
+    .toInt()
+    .notEmpty()
+    .withMessage('customer id is required'),
+    body('newPass')
+    .notEmpty()
+    .withMessage('new password is required'),
+    
+    validatorMiddleware
+]
  const addCustomer = [
     body('firstName')
     .trim()
@@ -97,6 +109,8 @@ const updateCustomerAddress = [
 
 module.exports = {
     updateCustomerAddress,
+    changeCustomerPass,
+
     addCustomer,
     addCustomerAddress,
     addCustomerPhone,

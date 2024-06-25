@@ -55,6 +55,18 @@ const getItemRecipes = async (req, res) => {
          }
   }
 
+  const getItemRecommendations = async(req, res) => {
+    const { itemId } = req.params
+    try{
+        const query = `SELECT get_item_recommendations($1)`;
+        const values = [itemId];
+        const result = await client.query(query, values);
+        res.status(200).json({ status: httpStatusText.SUCCESS, data: { favoriteItems : result.rows } });
+    }catch(err){
+        res.status(500).json({ status: httpStatusText.ERROR, message: err.message });
+    }
+};
+
 
 const branchMenuFilter = async (req, res) => {
     const { branchId, seasonId, itemType, categoryId, itemStatus, vegetarian, healthy } = req.params;
@@ -247,6 +259,7 @@ module.exports = {
     orderItemSectionList,
     getItemPriceChanges,
     getItemRecipes,
+    getItemRecommendations,
     branchMenuFilter,
     addItemTimeBySeason,
     addItemTimeByTime,

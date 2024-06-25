@@ -1,5 +1,6 @@
 const { client } = require("../config/dbConfig");
 const httpStatusText = require("../utils/httpStatusText");
+const bcrypt = require('bcrypt')
 
 const getCustomerAddresses = async (req, res) => {
   const customerId = req.params.customerId;
@@ -135,22 +136,38 @@ const getCustomerMenuRatings = async (req, res) => {
 const updateCustomerAddress = async (req, res) => {
   const { customerId, addressId, customerAddress, customerCity, locationCoordinates } = req.body;
 
-  try {
-    const query = `call pr_update_customer_address($1, $2, $3, $4, $5)`;
-    const values = [customerId, addressId, customerAddress, customerCity, locationCoordinates];
-    await client.query(query, values);
+    try {
+      const query = `call pr_update_customer_address($1, $2, $3, $4, $5)`;
+      const values = [customerId, addressId, customerAddress, customerCity, locationCoordinates];
+      await client.query(query, values);
+  
+      res.status(200).json({
+        status: httpStatusText.SUCCESS,
+        message: res.locals.notice,
+        data: values
+      });
+    } catch (error) {
+      console.log(error);
+      res.status(500).json({ status: httpStatusText.ERROR, message: "Server Error" }); 
+    }
+  };
 
-    res.status(200).json({
-      status: httpStatusText.SUCCESS,
-      message: res.locals.notice,
-      data: values,
-    });
-  } catch (error) {
-    console.log(error);
-    res.status(500).json({ status: httpStatusText.ERROR, message: "Server Error" });
+  const changeCustomerPass = async(req, res) =>{
+    const {customerId, newPass} = req.body
+    try{
+      const salt = await bcrypt.genSalt(10);
+        const hashedPassword = await bcrypt.hash(newPass, salt);
+  
+      const query = 'CALL change_customer_password($1, $2)';
+      const values = [customerId, hashedPassword];
+      await client.query(query, values);
+  
+      res.status(201).json({ status: httpStatusText.SUCCESS, data: values });
+    }catch (error) {
+      res.status(500).json({ status: httpStatusText.ERROR, message: error.message });
+    }
   }
-};
-
+  
 const addCustomer = async (req, res) => {
   const { firstName, lastName, gender, phone, address, city = null, locationCoordinates = null, birthDate = null } = req.body;
 
@@ -254,6 +271,7 @@ module.exports = {
   getFriendsList,
 
   updateCustomerAddress,
+  changeCustomerPass,
 
   addCustomer,
   addCustomerAddress,

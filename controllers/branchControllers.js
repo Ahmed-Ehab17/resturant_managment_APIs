@@ -354,33 +354,27 @@ const getOverAllPerformance = async (req, res) => {
 	}
 };
 const getBranchPerformance = async (req, res) => {
-	const { branchId,performance, daysInput } = req.params;
-
+	const { branchId, daysInput } = req.params;
+  
 	try {
-		let query = `SELECT * FROM get_branch_performance(`;
-		let values = [branchId];
-		let valueCounter = 2;
-
-		if (performance) {
-			query += `$${valueCounter++}`;
-			values.push(performance);
-		} else {
-			query += `NULL`;
-		}
-		if (daysInput) {
-			query += `$${valueCounter++}`;
-			values.push(daysInput);
-		} else {
-			query += `NULL`;
-		}
-		query += `)`;
-
-		const result = await client.query(query, values);
-		res.status(200).json({ status: httpStatusText.SUCCESS, data: result.rows });
+	  let query = `SELECT * FROM get_branch_performance($1`;
+	  let values = [branchId];
+	  let valueCounter = 2;
+  
+	  if (daysInput) {
+		query += `, $${valueCounter++}`;
+		values.push(daysInput);
+	  } else {
+		query += `, 0`;
+	  }
+	  query += `)`;
+  
+	  const result = await client.query(query, values);
+	  res.status(200).json({ status: httpStatusText.SUCCESS, data: result.rows });
 	} catch (err) {
-		res.status(500).json({ status: httpStatusText.ERROR, message: err.message });
+	  res.status(500).json({ status: httpStatusText.ERROR, message: err.message });
 	}
-};
+  };
 const getBranchesCompare = async (req, res) => {
 	const { daysInput } = req.params;
 

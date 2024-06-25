@@ -58,10 +58,23 @@ const getFriendsList = async(req, res) => {
     }
 };
 
+const getFriendsFavoriteItem = async(req, res) => {
+    const { customerId } = req.params
+    try{
+        const query = `SELECT get_friends_favorite_items($1)`;
+        const values = [customerId];
+        const result = await client.query(query, values);
+        res.status(200).json({ status: httpStatusText.SUCCESS, data: { favoriteItems : result.rows } });
+    }catch(err){
+        res.status(500).json({ status: httpStatusText.ERROR, message: err.message });
+    }
+};
+
 module.exports = {
     getFriendRequests,
     addFriendRequests,
     updateFriendRequest,
     getFriendsList,
+    getFriendsFavoriteItem
 
 };

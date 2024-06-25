@@ -19,6 +19,7 @@ router.get('/customerMenuRatings/:customerId', customerControllers.getCustomerMe
 
 
 router.patch('/update-customer-address', customerValidator.updateCustomerAddress, customerControllers.updateCustomerAddress);
+router.patch('/changeCustomerPass', customerValidator.changeCustomerPass, customerControllers.changeCustomerPass);
 
 router.post("/customer",customerValidator.addCustomer, customerControllers.addCustomer);
 router.post("/customer-address",customerValidator.addCustomerAddress, customerControllers.addCustomerAddress);

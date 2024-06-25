@@ -35,7 +35,7 @@ router.get('/branchMenu/:branchId', branchControllers.getBranchMenu);
 router.get('/branchLocation/:branchId', branchControllers.getBranchLocation);
 router.get('/sectionOverview/:sectionId?/:daysInput?',branchControllers.getSectionOverView);
 router.get('/overAllPerformance/:daysInput?', branchControllers.getOverAllPerformance);
-router.get('/branchPerformance/:branchId/:performance?/:daysInput?', branchControllers.getBranchPerformance);
+router.get('/branchPerformance/:branchId/:daysInput?', branchControllers.getBranchPerformance);
 router.get('/branchesCompare/:daysInput?', branchControllers.getBranchesCompare);
 router.get('/branches/:branchId?', branchControllers.getBranches);
 router.get('/branchSales/:branchId?/:itemId?/:startDate?/:endDate?', branchControllers.getSales);
