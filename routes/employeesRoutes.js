@@ -3,7 +3,6 @@ const router = express.Router();
 const employeeControllers = require("../controllers/employeeControllers");
 const employeeValidator = require("../utils/validators/employeeValidator");
 const auth = require("../middlewares/auth");
-const checkAccountExists = require("../middlewares/employeeExistenceMiddleware")
 
 router.get("/manager-employees-list", employeeControllers.managerEmployeesList);
 router.get("/active-employees-list", employeeControllers.activeEmployeesList);
@@ -21,7 +20,6 @@ router.get('/employeeData/:branchId?/:status?', employeeControllers.getEmployeeD
 
 router.post(
 	"/employeeAccount",
-	checkAccountExists,
 	employeeControllers.uploadEmployeeImage,
 	employeeControllers.resizeImage,
 	employeeValidator.addEmployeeAccount,

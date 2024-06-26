@@ -99,7 +99,7 @@ const changeCustomerPass = [
 
     body('phone')
     .trim()
-    .isMobilePhone()
+    .isMobilePhone('ar-EG')
     .notEmpty()
     .withMessage('phone is required'),
 

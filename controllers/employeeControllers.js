@@ -5,6 +5,7 @@ const bcrypt = require("bcrypt");
 const { uploadSingleImage } = require("../middlewares/uploadImageMiddleware");
 const sharp = require("sharp");
 const jwt = require('jsonwebtoken');
+const createToken = require("../utils/createToken");
 
 const uploadEmployeeImage = uploadSingleImage("profileImg");
 
@@ -452,14 +453,14 @@ const employeeLogin = async (req, res) => {
 	  const hashedPassword = passwordResult.rows[0]?.hashed_password;
   
 	  if (!hashedPassword) {
-		return res.status(404).json({ status: httpStatusText.FAIL, message: 'Email not found' });
+		return res.status(404).json({ status: httpStatusText.FAIL, message: 'Incorrect Email or password' });
 	  }
   
 	  //Compare the provided password with the hashed password
 	  const isPasswordMatch = await bcrypt.compare(password, hashedPassword);
   
 	  if (!isPasswordMatch) {
-		return res.status(401).json({ status: httpStatusText.FAIL, message: 'Incorrect password' });
+		return res.status(401).json({ status: httpStatusText.FAIL, message: 'Incorrect Email or password' });
 	  }
   
 	  //Get the employee's information from the database
@@ -468,7 +469,7 @@ const employeeLogin = async (req, res) => {
 	  const employeeInfo = infoResult.rows[0];
   
 	  // Generate a JWT token
-	  const token = jwt.sign({ data: employeeInfo }, process.env.JWT_SECRET_KEY, { expiresIn: '1h' });
+	  const token = await createToken (employeeInfo);
   
 	  //Send the token to the frontend
 	  res.status(200).json({ status: httpStatusText.SUCCESS, token });
