@@ -129,6 +129,51 @@ const changeCustomerPass = [
     validatorMiddleware
  ]
 
+ const addCustomerAccount = [
+   body('customerId')
+      .trim()
+      .isInt()
+      .notEmpty()
+      .withMessage('ID is required'),
+
+   body('firstName')
+      .trim()
+      .isString()
+      .notEmpty()
+      .withMessage('First name is required'),
+   
+   body('lastName')
+      .trim()
+      .isString()
+      .notEmpty()
+      .withMessage('First name is required'),
+
+   body('gender')
+      .trim()
+      .notEmpty()
+      .withMessage('Gender is required')
+      .isIn(['m', 'f'])
+      .withMessage('Invalid Gender Must be "f" or "m"'),
+
+   body('phone')
+      .trim()
+      .isMobilePhone('ar-EG')
+      .withMessage('Invalid phone number format'),
+
+   body('password')
+      .trim()
+      .notEmpty()
+      .withMessage('password is required'),
+
+   body('address')
+      .trim()
+      .notEmpty()
+      .withMessage('address is required'),
+
+
+   validatorMiddleware
+ ]
+
 
 module.exports = {
     updateCustomerAddress,
@@ -141,5 +186,6 @@ module.exports = {
 
 
     verifyPhone,
+    addCustomerAccount,
 
 }
