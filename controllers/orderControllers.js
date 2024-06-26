@@ -27,7 +27,8 @@ const getNonVirtualOrderDetails = async (req, res) => {
   }
 };
 const getOrderItemsBySection = async (req, res) => {
-  const {sectionId, branchId, Status} = req.params;
+  const {sectionId, branchId} = req.params;
+  const {Status} = req.query;
   
   try {
     let query = `SELECT * FROM fn_get_order_items_by_section($1, $2`;
@@ -48,7 +49,8 @@ const getOrderItemsBySection = async (req, res) => {
   }
 };
 const getOrderItemsStatus = async (req, res) => {
-  const {orderId, Status} = req.params;
+  const {orderId} = req.params;
+  const {Status} = req.query;
   
   try {
     let query = `SELECT * FROM fn_get_order_items_status($1`;

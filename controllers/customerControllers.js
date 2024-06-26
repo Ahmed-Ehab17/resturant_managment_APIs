@@ -3,6 +3,7 @@ const httpStatusText = require("../utils/httpStatusText");
 const bcrypt = require('bcrypt')
 const jwt = require('jsonwebtoken');
 require("dotenv").config();
+const createToken = require("../utils/createToken");
 
 
 const getCustomerAddresses = async (req, res) => {
@@ -155,21 +156,38 @@ const updateCustomerAddress = async (req, res) => {
     }
   };
 
-  const changeCustomerPass = async(req, res) =>{
-    const {customerId, newPass} = req.body
-    try{
-      const salt = await bcrypt.genSalt(10);
+  const changeCustomerPass = async (req, res) => {
+    const { customerId, oldPass, newPass } = req.body;
+
+    try {
+        // Retrieve the current password hash from the database
+        const getPasswordQuery = `SELECT customer_password FROM customers_accounts WHERE customer_id = $1`;
+        const passwordResult = await client.query(getPasswordQuery, [customerId]);
+        const currentPasswordHash = passwordResult.rows[0]?.customer_password;
+
+        if (!currentPasswordHash) {
+            return res.status(400).json({ status: httpStatusText.FAIL, message: 'Customer not found' });
+        }
+
+        // Compare the provided old password with the stored password hash
+        const isPasswordMatch = await bcrypt.compare(oldPass, currentPasswordHash);
+        if (!isPasswordMatch) {
+            return res.status(400).json({ status: httpStatusText.FAIL, message: 'Incorrect old password' });
+        }
+
+        const salt = await bcrypt.genSalt(10);
         const hashedPassword = await bcrypt.hash(newPass, salt);
-  
-      const query = 'CALL change_customer_password($1, $2)';
-      const values = [customerId, hashedPassword];
-      await client.query(query, values);
-  
-      res.status(201).json({ status: httpStatusText.SUCCESS, data: values });
-    }catch (error) {
-      res.status(500).json({ status: httpStatusText.ERROR, message: error.message });
+
+        const query = 'CALL change_customer_password($1, $2)';
+        const values = [customerId, hashedPassword];
+        await client.query(query, values);
+
+        res.status(200).json({ status: httpStatusText.SUCCESS, data: { customerId, hashedPassword } });
+    } catch (error) {
+        res.status(500).json({ status: httpStatusText.ERROR, message: error.message });
     }
-  }
+};
+
   
 const addCustomer = async (req, res) => {
   const { firstName, lastName, gender, phone, address, city = null, locationCoordinates = null, birthDate = null } = req.body;
@@ -181,8 +199,7 @@ const addCustomer = async (req, res) => {
 
     res.status(201).json({ status: httpStatusText.SUCCESS, data: values });
   } catch (error) {
-    console.log(error);
-    res.status(500).json({ status: httpStatusText.ERROR, message: "Server Error" });
+    res.status(500).json({ status: httpStatusText.ERROR, message: error.message });
   }
 };
 
@@ -211,8 +228,7 @@ const addCustomerPhone = async (req, res) => {
 
     res.status(201).json({ status: httpStatusText.SUCCESS, data: values });
   } catch (error) {
-    console.log(error);
-    res.status(500).json({ status: httpStatusText.ERROR, message: "Server Error" });
+    res.status(500).json({ status: httpStatusText.ERROR, message: error.message });
   }
 };
 
@@ -251,8 +267,10 @@ const addCustomerAccount = async (req, res) => {
   } = req.body;
   console.log(req.body);  
   try {
+    const salt = await bcrypt.genSalt(10);
+    const hashedPassword = await bcrypt.hash(password, salt);
     const query = `CALL pr_add_account_to_customer ( $1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11)`;
-    const values = [customerId, firstName, lastName, gender, phone, password, address, city, locationCoordinates, birthDate, profileImg];
+    const values = [customerId, firstName, lastName, gender, phone, hashedPassword, address, city, locationCoordinates, birthDate, profileImg];
     await client.query(query, values);
     console.log();
     res.status(200).json({ status: httpStatusText.SUCCESS, data: { customerId }})

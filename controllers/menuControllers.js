@@ -80,7 +80,8 @@ const getItemRecommendations2 = async(req, res) => {
 
 
 const branchMenuFilter = async (req, res) => {
-    const { branchId, seasonId, itemType, categoryId, itemStatus, vegetarian, healthy } = req.params;
+    const { branchId } = req.params;
+    const {seasonId, itemType, categoryId, itemStatus, vegetarian, healthy} = req.query;
   
     try {
       // Base query to call the PostgreSQL function

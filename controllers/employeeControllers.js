@@ -95,7 +95,7 @@ const supplyEmployeesList = async (req, res) => {
 const getEmployeesAttendance = async (req, res) => {
 	const employeeId = req.params.employeeId;
 	const { fromDate, toDate } = req.query;
-	try {
+		try {
 		const query = `SELECT * FROM fn_get_employee_attendance($1, $2, $3)`;
 		const values = [employeeId, fromDate, toDate];
 		const result = await client.query(query, values);
@@ -129,17 +129,39 @@ const getPositionsChanges = async (req, res) => {
 	}
 };
 const getSchedule = async (req, res) => {
-	const employeeId = req.params.employeeId;
-	const { fromDate, toDate } = req.query;
+	const { employeeId } = req.params; 
+	const { fromDate, toDate } = req.params;
+  
 	try {
-		const query = `SELECT * FROM fn_get_employee_schedule($1, $2, $3)`;
-		const values = [employeeId, fromDate, toDate];
-		const result = await client.query(query, values);
-		res.status(200).json({ status: httpStatusText.SUCCESS, data: { attendance: result.rows } });
+	  // Initialize query and values array
+	  let query = `SELECT * FROM fn_get_employee_schedule($1, `;
+	  let values = [employeeId];
+	  let valueCounter = 2;
+  
+	  // Handle fromDate
+	  if (fromDate) {
+		query += `$${valueCounter++}, `;
+		values.push(fromDate);
+	  } else {
+		query += `NULL, `;
+	  }
+  
+	  // Handle toDate
+	  if (toDate) {
+		query += `$${valueCounter++}`;
+		values.push(toDate);
+	  } else {
+		query += `NULL`;
+	  }
+  
+	  query += `)`;
+  
+	  const result = await client.query(query, values);
+	  res.status(200).json({ status: httpStatusText.SUCCESS, data: { attendance: result.rows } });
 	} catch (err) {
-		res.status(500).json({ status: httpStatusText.ERROR, message: err.message });
+	  res.status(500).json({ status: httpStatusText.ERROR, message: err.message });
 	}
-};
+  };
 
 const getEmployeeSignInInfo = async (req, res) => {
 	const employeeEmail = req.params.employeeEmail;
@@ -213,37 +235,37 @@ const getEmployeeTransfer = async (req, res) => {
 		res.status(500).json({ status: httpStatusText.ERROR, message: err.message });
 	}
 };
+
 const getEmployeeData = async (req, res) => {
-	const { branchId, status } = req.params;
+	const { branchId, status } = req.query;
   
 	try {
-		let query = `SELECT * FROM fn_get_employees_data(`;
-		let values = [];
-		let valueCounter = 1; 
+	  let query = `SELECT * FROM fn_get_employees_data(`;
+	  let values = [];
+	  let valueCounter = 1; 
   
-		if (branchId) {
-			query += `$${valueCounter++}`;
-			values.push(branchId);
-		} else {
-			query += `NULL`;
-		}
+	  if (branchId) {
+		query += `$${valueCounter++}`;
+		values.push(branchId);
+	  } else {
+		query += `NULL`;
+	  }
   
-		query += `, `;
+	  query += `, `;
   
-		if (status) {
-			query += `$${valueCounter++}`;
-			values.push(status);
-		} else {
-			query += `NULL`;
-		}
-		
-		query += `)`;
-  
+	  if (status) {
+		query += `$${valueCounter++}`;
+		values.push(status);
+	  } else {
+		query += `NULL`;
+	  }
+	  
+	  query += `)`;
   
 	  const result = await client.query(query, values);
 	  res.status(200).json({ status: httpStatusText.SUCCESS, data: result.rows });
-	}catch(err) {
-	  res.status(500).json({status: httpStatusText.ERROR, message:err.message});
+	} catch (err) {
+	  res.status(500).json({ status: httpStatusText.ERROR, message: err.message });
 	}
   };
 
@@ -362,19 +384,34 @@ const changeSalary = async (req, res) => {
 };
 
 const changeEmployeePass = async(req, res) =>{
-	const {employeeId, newPass} = req.body
-	try{
-		const salt = await bcrypt.genSalt(10);
-    	const hashedPassword = await bcrypt.hash(newPass, salt);
+	const {employeeId,oldPass, newPass} = req.body
+	try {
+        // Retrieve the current password hash from the database
+        const getPasswordQuery = `SELECT employee_password from employees_accounts where employee_id = $1`;
+        const passwordResult = await client.query(getPasswordQuery, [employeeId]);
+        const currentPasswordHash = passwordResult.rows[0]?.employee_password;
 
-		const query = 'CALL change_employee_password($1, $2)';
-		const values = [employeeId, hashedPassword];
-		await client.query(query, values);
+        if (!currentPasswordHash) {
+            return res.status(400).json({ status: httpStatusText.FAIL, message: 'employee not found' });
+        }
 
-		res.status(201).json({ status: httpStatusText.SUCCESS, data: values });
-	}catch (error) {
-		res.status(500).json({ status: httpStatusText.ERROR, message: error.message });
-	}
+        // Compare the provided old password with the stored password hash
+        const isPasswordMatch = await bcrypt.compare(oldPass, currentPasswordHash);
+        if (!isPasswordMatch) {
+            return res.status(400).json({ status: httpStatusText.FAIL, message: 'Incorrect old password' });
+        }
+
+        const salt = await bcrypt.genSalt(10);
+        const hashedPassword = await bcrypt.hash(newPass, salt);
+
+        const query = 'CALL change_employee_password($1, $2)';
+        const values = [employeeId, hashedPassword];
+        await client.query(query, values);
+
+        res.status(200).json({ status: httpStatusText.SUCCESS, data: { employeeId, hashedPassword } });
+    } catch (error) {
+        res.status(500).json({ status: httpStatusText.ERROR, message: error.message });
+    }
 }
 
 const updateEmployeeSalaryPosition = async (req, res) => {
