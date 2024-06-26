@@ -250,12 +250,16 @@ const addCustomerAccount = async (req, res) => {
     profileImg = null,
   } = req.body;
   console.log(req.body);  
+
+  const saltRounds = 10;
+  const hashedPassword = await bcrypt.hash(password, saltRounds);
+  console.log(hashedPassword);
   try {
     const query = `CALL pr_add_account_to_customer ( $1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11)`;
-    const values = [customerId, firstName, lastName, gender, phone, password, address, city, locationCoordinates, birthDate, profileImg];
+    const values = [customerId, firstName, lastName, gender, phone, hashedPassword, address, city, locationCoordinates, birthDate, profileImg];
     await client.query(query, values);
     console.log();
-    res.status(200).json({ status: httpStatusText.SUCCESS, data: { customerId }})
+    res.status(200).json({ status: httpStatusText.SUCCESS, data: { customerId, firstName, lastName, gender, phone, address }})
   } catch (error) {
     res.status(500).json({ status: httpStatusText.ERROR, message: error.message });
   }
