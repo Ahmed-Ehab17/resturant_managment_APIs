@@ -287,7 +287,7 @@ const login = async (req, res) => {
     const customerInfo = infoResult.rows[0];
 
     // Generate a JWT token
-    const token = jwt.sign({ data: customerInfo }, process.env.JWT_SECRET_KEY, { expiresIn: '1h' });
+	  const token = await createToken (customerInfo);
 
     // Send the token to the frontend
     res.status(200).json({ status: httpStatusText.SUCCESS, token });

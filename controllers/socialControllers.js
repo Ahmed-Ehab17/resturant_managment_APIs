@@ -24,7 +24,7 @@ const addFriendRequests = async (req, res) => {
         const values = [senderId, receiverId];
         await client.query(query, values);
 
-        res.status(200).json({ status: httpStatusText.SUCCESS, data: values });
+        res.status(200).json({ status: httpStatusText.SUCCESS, data: {senderId, receiverId} });
     } catch (err) {
         console.log(err);
         res.status(500).json({ status: httpStatusText.ERROR, message: err.message });
