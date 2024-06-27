@@ -218,7 +218,7 @@ const getBranchMenu = async (req, res) => {
 
 
 const getBranches = async (req, res) => {
-	const { branchId } = req.params;
+	const { branchId } = req.query;
 
 	try {
 		let query = `SELECT * FROM fn_get_branches(`;
@@ -241,53 +241,55 @@ const getBranches = async (req, res) => {
 };
 
 const getSales = async (req, res) => {
-	const { branchId, itemId, startDate, endDate } = req.params;
-
+	const { branchId, itemId, startDate, endDate } = req.query;
+  
 	try {
-		let query = `SELECT * FROM fn_get_sales(`;
-		let values = [];
-		let valueCounter = 1;
-
-		if (branchId) {
-			query += `$${valueCounter++}`;
-			values.push(branchId);
-		} else {
-			query += `NULL`;
-		}
-
-		query += `, `;
-
-		if (itemId) {
-			query += `$${valueCounter++}`;
-			values.push(itemId);
-		} else {
-			query += `NULL`;
-		}
-		query += `, `;
-
-		if (startDate) {
-			query += `$${valueCounter++}`;
-			values.push(startDate);
-		} else {
-			query += `NULL`;
-		}
-		query += `, `;
-
-		if (endDate) {
-			query += `$${valueCounter++}`;
-			values.push(endDate);
-		} else {
-			query += `NULL`;
-		}
-
-		query += `)`;
-
-		const result = await client.query(query, values);
-		res.status(200).json({ status: httpStatusText.SUCCESS, data: result.rows });
+	  let query = `SELECT * FROM fn_get_sales(`;
+	  let values = [];
+	  let valueCounter = 1;
+  
+	  if (branchId) {
+		query += `$${valueCounter++}`;
+		values.push(branchId);
+	  } else {
+		query += `NULL`;
+	  }
+  
+	  query += `, `;
+  
+	  if (itemId) {
+		query += `$${valueCounter++}`;
+		values.push(itemId);
+	  } else {
+		query += `NULL`;
+	  }
+  
+	  query += `, `;
+  
+	  if (startDate) {
+		query += `$${valueCounter++}`;
+		values.push(startDate);
+	  } else {
+		query += `NULL`;
+	  }
+  
+	  query += `, `;
+  
+	  if (endDate) {
+		query += `$${valueCounter++}`;
+		values.push(endDate);
+	  } else {
+		query += `NULL`;
+	  }
+  
+	  query += `)`;
+  
+	  const result = await client.query(query, values);
+	  res.status(200).json({ status: httpStatusText.SUCCESS, data: result.rows });
 	} catch (err) {
-		res.status(500).json({ status: httpStatusText.ERROR, message: err.message });
+	  res.status(500).json({ status: httpStatusText.ERROR, message: err.message });
 	}
-};
+  };
 const getBranchLocation = async (req, res) => {
 	const branchId = req.params.branchId;
 	try {
@@ -300,7 +302,7 @@ const getBranchLocation = async (req, res) => {
 	}
 };
 const getSectionOverView = async (req, res) => {
-	const { sectionId, daysInput } = req.params;
+	const { sectionId, daysInput } = req.query;
 
 	try {
 		let query = `SELECT * FROM get_section_overview(`;
@@ -354,7 +356,8 @@ const getOverAllPerformance = async (req, res) => {
 	}
 };
 const getBranchPerformance = async (req, res) => {
-	const { branchId, daysInput } = req.params;
+	const { branchId } = req.params;
+	const{daysInput} = req.query;
   
 	try {
 	  let query = `SELECT * FROM get_branch_performance($1`;
@@ -376,7 +379,7 @@ const getBranchPerformance = async (req, res) => {
 	}
   };
 const getBranchesCompare = async (req, res) => {
-	const { daysInput } = req.params;
+	const { daysInput } = req.query;
 
 	try {
 		let query = `SELECT * FROM compare_branches(`;
