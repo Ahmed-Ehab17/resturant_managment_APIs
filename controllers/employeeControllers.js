@@ -1,4 +1,5 @@
 require("dotenv").config();
+const fs = require("fs");
 const { client } = require("../config/dbConfig");
 const httpStatusText = require("../utils/httpStatusText");
 const bcrypt = require("bcrypt");
@@ -17,9 +18,10 @@ const resizeImage = async (req, res, next) => {
             .resize(600, 600)
             .toFormat("jpeg")
             .jpeg({ quality: 95 })
-            .toFile(`uploads/employees/${filename}`);
+            .toBuffer();
 
 			req.body.profileImg = filename;
+			req.file.path = filename;
 		}
 
 		next();
@@ -463,6 +465,7 @@ const addEmployeeAccount = async (req, res, next) => {
 	const { employeeId, email, password } = req.body;
 	const profileImg = req.file ? req.file.path : null;
 
+
 	 try {
     const salt = await bcrypt.genSalt(10);
     const hashedPassword = await bcrypt.hash(password, salt);
@@ -471,11 +474,10 @@ const addEmployeeAccount = async (req, res, next) => {
     const values = [employeeId, email, hashedPassword, profileImg];
     await client.query(query, values);
 
+	fs.writeFileSync(`uploads/employees/${profileImg}`,req.file.buffer)
+
     res.status(201).json({ status: httpStatusText.SUCCESS, data: values });
   } catch (err) {
-    if (profileImg) {
-      fs.unlinkSync(profileImg); 
-    }
     res.status(500).json({ status: httpStatusText.ERROR, message: err.message });
   }
 };
