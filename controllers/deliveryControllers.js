@@ -2,7 +2,7 @@ const { client } = require("../config/dbConfig");
 const httpStatusText = require("../utils/httpStatusText");
 
 const getDeliveringOrders = async (req, res) => {
-  const { employeeId, orderStatus } = req.query;
+  const { employeeId, orderStatus, branchId } = req.query;
 
   try {
       let query = `SELECT * FROM get_delivering_orders(`;
@@ -21,6 +21,15 @@ const getDeliveringOrders = async (req, res) => {
       if (orderStatus) {
           query += `$${valueCounter++}`;
           values.push(orderStatus);
+      } else {
+          query += `NULL`;
+      }
+      
+      query += `, `;
+
+      if (branchId) {
+          query += `$${valueCounter++}`;
+          values.push(branchId);
       } else {
           query += `NULL`;
       }

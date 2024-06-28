@@ -71,6 +71,39 @@ const getOrderItemsStatus = async (req, res) => {
   }
 };
 
+const getOrders = async (req, res) => {
+  const { branchId, orderType } = req.query;
+  
+  try {
+    let query = `SELECT * FROM fn_get_orders(`;
+    let values = [];
+    let valueCounter = 1; 
+
+    if (branchId) {
+      query += `$${valueCounter++}`;
+      values.push(branchId);
+    } else {
+      query += `NULL`;
+    }
+
+    query += `, `;
+
+    if (orderType) {
+      query += `$${valueCounter++}`;
+      values.push(orderType);
+    } else {
+      query += `NULL`;
+    }
+
+    query += `)`;
+    
+    const result = await client.query(query, values);
+    res.status(200).json({ status: httpStatusText.SUCCESS, data: result.rows });
+  } catch (err) {
+    res.status(500).json({ status: httpStatusText.ERROR, message: err.message });
+  }
+};
+
 const addVirtualOrder = async (req, res) => {
   const {
     customerId,
@@ -222,6 +255,7 @@ module.exports = {
     getNonVirtualOrderDetails,
     getOrderItemsBySection,
     getOrderItemsStatus,
+    getOrders,
 
     addVirtualOrder,
     addNonVirtualOrder,

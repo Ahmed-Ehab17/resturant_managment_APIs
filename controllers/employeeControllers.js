@@ -239,7 +239,7 @@ const getEmployeeTransfer = async (req, res) => {
 };
 
 const getEmployeeData = async (req, res) => {
-	const { branchId, status } = req.query;
+	const { branchId, status, employeeRole } = req.query;
   
 	try {
 	  let query = `SELECT * FROM fn_get_employees_data(`;
@@ -261,7 +261,16 @@ const getEmployeeData = async (req, res) => {
 	  } else {
 		query += `NULL`;
 	  }
-	  
+  
+	  query += `, `;
+  
+	  if (employeeRole) {
+		query += `$${valueCounter++}`;
+		values.push(employeeRole);
+	  } else {
+		query += `NULL`;
+	  }
+  
 	  query += `)`;
   
 	  const result = await client.query(query, values);

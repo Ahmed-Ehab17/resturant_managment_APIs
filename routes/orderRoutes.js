@@ -7,6 +7,7 @@ router.get("/virtualOrderDetails/:orderId", orderControllers.getVirtualOrderDeta
 router.get("/nonVirtualOrderDetails/:orderId", orderControllers.getNonVirtualOrderDetails);
 router.get("/orderItemsBySection/:sectionId/:branchId/:Status?", orderControllers.getOrderItemsBySection);
 router.get("/orderItemsStatus/:orderId/:status?", orderControllers.getOrderItemsStatus);
+router.get("/orders/:branchId?/:orderType?", orderControllers.getOrders);
 
 
 router.post("/VirtualOrder", orderControllers.addVirtualOrder);
