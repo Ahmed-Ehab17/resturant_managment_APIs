@@ -188,7 +188,7 @@ const getItemPriceChanges = async (req, res) => {
 };
 
 const getEmployeeTransfer = async (req, res) => {
-	const { employeeId, transferMadeBy, oldBranchId, newBranchId } = req.params;
+	const { employeeId, transferMadeBy, oldBranchId, newBranchId } = req.query;
 
 	try {
 		let query = `SELECT * FROM fn_get_employees_transfers(`;
@@ -268,6 +268,33 @@ const getEmployeeData = async (req, res) => {
 	  res.status(500).json({ status: httpStatusText.ERROR, message: err.message });
 	}
   };
+
+
+  const getEmployeeOrders = async (req, res) => {
+	const { employeeId } = req.params;
+	const { deliveryStatus } = req.query;
+
+	try {
+		let query = `SELECT * FROM get_employee_orders($1`;
+		let values = [employeeId];
+		let valueCounter = 2;
+
+		if (deliveryStatus) {
+			query += `, $${valueCounter++}`;
+			values.push(deliveryStatus);
+		} else {
+			query += `, NULL`;
+		}
+
+		query += `)`;
+
+		const result = await client.query(query, values);
+		res.status(200).json({ status: httpStatusText.SUCCESS, data: result.rows });
+	} catch (err) {
+		res.status(500).json({ status: httpStatusText.ERROR, message: err.message });
+	}
+};
+
 
 const addPosition = async (req, res) => {
 	try {
@@ -658,6 +685,7 @@ module.exports = {
 	getEmployeeSignInInfo,
 	getEmployeeTransfer,
 	getEmployeeData,
+	getEmployeeOrders,
 
 	updateEmployeeAddress,
 	updateEmployeePhone,

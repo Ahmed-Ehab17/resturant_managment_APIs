@@ -13,8 +13,6 @@ router.get('/itemPriceChanges/:itemId', menuControllers.getItemPriceChanges);
 router.get('/itemRecipes/:itemId', menuControllers.getItemRecipes);
 router.get('/branchMenuFilter/:branchId/:seasonId?/:itemType?/:categoryId?/:itemStatus?/:vegetarian?/:healthy?', menuControllers.branchMenuFilter);
 router.get('/itemRecommendations/:itemId', menuControllers.getItemRecommendations);
-router.get('/itemRecommendations2/:itemId', menuControllers.getItemRecommendations2);
-
 
 
 router.post('/itemBySeason', menuControllers.addItemTimeBySeason);
