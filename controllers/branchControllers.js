@@ -378,6 +378,47 @@ const getBranchPerformance = async (req, res) => {
 	  res.status(500).json({ status: httpStatusText.ERROR, message: err.message });
 	}
   };
+const getBestSeller = async (req, res) => {
+	const { branchId, startDate, endDate } = req.query;
+
+	try {
+		let query = `SELECT * FROM fn_get_best_seller_in_each_category(`;
+		let values = [];
+		let valueCounter = 1;
+
+		if (branchId) {
+			query += `$${valueCounter++}`;
+			values.push(branchId);
+		} else {
+			query += `NULL`;
+		}
+
+		query += `,`;
+
+		if (startDate) {
+			query += `$${valueCounter++}`;
+			values.push(startDate);
+		} else {
+			query += `NULL`;
+		}
+
+		query += `,`;
+
+		if (endDate) {
+			query += `$${valueCounter++}`;
+			values.push(endDate);
+		} else {
+			query += `NULL`;
+		}
+
+		query += `)`;
+
+		const result = await client.query(query, values);
+		res.status(200).json({ status: httpStatusText.SUCCESS, data: result.rows });
+	} catch (err) {
+		res.status(500).json({ status: httpStatusText.ERROR, message: err.message });
+	}
+};
 const getBranchesCompare = async (req, res) => {
 	const { daysInput } = req.query;
 
@@ -401,6 +442,8 @@ const getBranchesCompare = async (req, res) => {
 		res.status(500).json({ status: httpStatusText.ERROR, message: err.message });
 	}
 };
+
+
 
 const updateStock = async (req, res) => {
 	try {
@@ -755,6 +798,7 @@ module.exports = {
 	getBranchesCompare,
 	getBranches,
 	getSales,
+	getBestSeller,
 
 	updateStock,
 	updateBookingStatus,

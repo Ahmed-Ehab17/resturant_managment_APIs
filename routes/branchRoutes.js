@@ -39,6 +39,7 @@ router.get('/branchPerformance/:branchId/:daysInput?', branchControllers.getBran
 router.get('/branchesCompare/:daysInput?', branchControllers.getBranchesCompare);
 router.get('/branches/:branchId?', branchControllers.getBranches);
 router.get('/branchSales/:branchId?/:itemId?/:startDate?/:endDate?', branchControllers.getSales);
+router.get('/bestSeller/:branchId?/:startDate?/:endDate?', branchControllers.getBestSeller);
 
 
 router.patch("/updateStock", branchControllers.updateStock);
