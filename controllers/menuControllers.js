@@ -66,17 +66,6 @@ const getItemRecipes = async (req, res) => {
         res.status(500).json({ status: httpStatusText.ERROR, message: err.message });
     }
 };
-const getItemRecommendations2 = async(req, res) => {
-  const { itemId } = req.params
-  try{
-      const query = `SELECT get_item_recommendations_2($1)`;
-      const values = [itemId];
-      const result = await client.query(query, values);
-      res.status(200).json({ status: httpStatusText.SUCCESS, data: { favoriteItems : result.rows } });
-  }catch(err){
-      res.status(500).json({ status: httpStatusText.ERROR, message: err.message });
-  }
-};
 
 
 const branchMenuFilter = async (req, res) => {
@@ -273,7 +262,6 @@ module.exports = {
     getItemPriceChanges,
     getItemRecipes,
     getItemRecommendations,
-    getItemRecommendations2,
 
     branchMenuFilter,
     
