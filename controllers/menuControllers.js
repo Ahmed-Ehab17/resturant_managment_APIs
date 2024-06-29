@@ -1,5 +1,35 @@
 const { client } = require("../config/dbConfig");
 const httpStatusText = require("../utils/httpStatusText");
+const fs = require("fs");
+const { uploadSingleImage } = require("../middlewares/uploadImageMiddleware");
+const sharp = require('sharp');
+const path = require('path');
+
+
+const uploadItemImage = uploadSingleImage("itemImg");
+
+const resizeImage = async (req, res, next) => {
+  try {
+    if (req.file) {
+      const filename = `menu-${Date.now()}.jpeg`;
+
+      await sharp(req.file.buffer)
+        .resize(600, 600)
+        .toFormat('jpeg')
+        .jpeg({ quality: 95 })
+        .toBuffer();
+
+      req.file.filename = filename; // Update the filename in the request
+
+      next();
+    } else {
+      throw new Error('File not provided');
+    }
+  } catch (err) {
+    res.status(500).json({ status: httpStatusText.ERROR, message: `Error processing image: ${err.message}` });
+  }
+};
+
 
 const seasonList = async (req, res) => {  
     try{
@@ -55,7 +85,7 @@ const getItemRecipes = async (req, res) => {
          }
   }
 
-  const getItemRecommendations = async(req, res) => {
+const getItemRecommendations = async(req, res) => {
     const { itemId } = req.params
     try{
         const query = `SELECT get_item_recommendations($1)`;
@@ -164,7 +194,7 @@ const addRecipes = async (req, res) => {
     const values = [itemId, ingredientId, quantity, recipeStatus];
     await client.query(query, values);
 
-    res.status(200).json({ status: "SUCCESS", data: values });
+    res.status(200).json({ status: httpStatusText.SUCCESS, data: values });
   } catch (err) {
     res.status(500).json({ status: httpStatusText.ERROR, message: err.message });
   }
@@ -222,6 +252,33 @@ const changeOrderItemStatus = async(req, res) =>{
     } 
 }
 
+const changeItemPicture = async (req, res) => {
+  const { itemId } = req.body;
+  const itemImg = req.file ? req.file.filename : null;
+  const oldItemImg = (await client.query(`SELECT picture_path FROM menu_items WHERE item_id = ${itemId}`)).rows[0].picture_path;
+
+  try {
+    const query = 'CALL change_item_picture($1, $2)';
+    const values = [itemId, itemImg];
+    await client.query(query, values);
+
+    fs.writeFileSync(`uploads/menu/${itemImg}`,req.file.buffer)
+    if (oldItemImg !== itemImg) {
+      const oldFilePath = path.join('uploads/menu', oldItemImg);
+      if (fs.existsSync(oldFilePath)) {
+        fs.unlinkSync(oldFilePath);
+      }
+    }
+    
+    res.status(200).json({ status: httpStatusText.SUCCESS, data: { itemId, itemImg } });
+  } catch (err) {
+    res.status(500).json({ status: httpStatusText.ERROR, message: err.message });
+  }
+};
+
+
+
+
 const addRating = async (req, res) => {
   const { customerId, itemId, rating } = req.body;
   try {
@@ -255,6 +312,10 @@ const addRating = async (req, res) => {
 
 
 module.exports = {
+
+    uploadItemImage,
+    resizeImage,
+
     seasonList,
     sectionList,
     orderItemSectionList,
@@ -273,5 +334,8 @@ module.exports = {
 
     changeItemPrice,
     changeOrderItemStatus,
+    changeItemPicture,
+
+
     addRating,
 }
