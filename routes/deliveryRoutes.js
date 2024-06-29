@@ -3,7 +3,7 @@ const router = express.Router();
 const deliveryControllers = require('../controllers/deliveryControllers');
 const deliveryValidator = require("../utils/validators/deliveryValidator");
 
-router.get('/deliveryOrders/:employeeId?/:orderType?/:branchId?/:inDeliveredOrders?', deliveryControllers.getDeliveringOrders);
+router.get('/deliveryOrders/:employeeId?/:orderType?/:branchId?/:inDeliveredOrders?/:deliveryStatus?', deliveryControllers.getDeliveringOrders);
 
 
 router.patch('/changeDeliveryOrderStatus', deliveryValidator.changeDeliveryOrderStatus, deliveryControllers.changeDeliveryOrderStatus);
