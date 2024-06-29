@@ -2,7 +2,6 @@ const express = require("express");
 const router = express.Router();
 const menuControllers = require('../controllers/menuControllers');
 const menuValidator = require("../utils/validators/menuValidator");
-const { uploadSingleImage } = require('../middlewares/uploadImageMiddleware');
 
 
 
@@ -27,7 +26,7 @@ router.post('/addRating', menuControllers.addRating);
 
 router.patch('/change-item-price', menuControllers.changeItemPrice );
 router.patch('/changeOrderItemStatus', menuControllers.changeOrderItemStatus );
-router.patch('/changeItemPicture',uploadSingleImage('itemImg'),menuControllers.resizeImage, menuControllers.changeItemPicture );
+router.patch('/changeItemPicture',menuControllers.uploadItemImage,menuControllers.resizeItemImage, menuControllers.changeItemPicture );
 router.patch('/changeCategoryPicture', menuControllers.uploadCategoryImage, menuControllers.resizeImage, menuControllers.changeCategoryPicture );
 
 
