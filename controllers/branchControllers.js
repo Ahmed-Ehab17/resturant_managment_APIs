@@ -566,14 +566,9 @@ const addGeneralSection = async (req, res) => {
 		const values = [section_name, section_description];
 		await client.query(query, values);
 
-		res.status(200).json({
-			status: httpStatusText.SUCCESS,
-			message: "Section added successfully",
-			data: values,
-		});
-	} catch (error) {
-		console.error("Error adding general section:", error);
-		res.status(409).json({ status: httpStatusText.ERROR, message: "server error, " + error });
+		res.status(201).json({ status: httpStatusText.SUCCESS, data: values });
+	} catch (err) {
+		res.status(500).json({ status: httpStatusText.ERROR, message: err.message });
 	}
 };
 
@@ -637,14 +632,9 @@ const addBranchSection = async (req, res) => {
 
 		await client.query(query, values);
 
-		return res.status(200).json({
-			status: httpStatusText.SUCCESS,
-			message: "Branch Section added successfully",
-			data: values,
-		});
-	} catch (error) {
-		console.error("Error adding branch section:", error);
-		return res.status(500).json({ status: httpStatusText.ERROR, message: "Internal server error, " + error });
+		res.status(201).json({ status: httpStatusText.SUCCESS, data: values });
+	} catch (err) {
+		res.status(500).json({ status: httpStatusText.ERROR, message: err.message });
 	}
 };
 
@@ -655,12 +645,9 @@ const addStorage = async (req, res) => {
 		const values = [storageName, storageAddress, managerId];
 		await client.query(query, values);
 
-		res.status(201).json({
-			message: "Storage created successfully",
-			data: { storageName, storageAddress, managerId },
-		});
-	} catch (error) {
-		res.status(500).send("message:" + error.message);
+		res.status(201).json({ status: httpStatusText.SUCCESS, data: values });
+	} catch (err) {
+		res.status(500).json({ status: httpStatusText.ERROR, message: err.message });
 	}
 };
 
@@ -671,9 +658,9 @@ const addMenuItem = async (req, res) => {
 		const values = [itemName, itemDesc, categoryID, prepTime, picPath, vegetarian, healthy];
 		await client.query(query, values);
 
-		res.status(201).json({ message: "Menu Item Added Successfully", data: values });
-	} catch (error) {
-		res.status(500).send("message:" + error.message);
+		res.status(201).json({ status: httpStatusText.SUCCESS, data: values });
+	} catch (err) {
+		res.status(500).json({ status: httpStatusText.ERROR, message: err.message });
 	}
 };
 
@@ -692,12 +679,9 @@ const addIngredient = async (req, res) => {
 		const values = [name, recipeUnit, shipmentUnit];
 		await client.query(query, values);
 
-		res.status(201).json({
-			status: httpStatusText.SUCCESS,
-			data: { name, recipeUnit, shipmentUnit },
-		});
-	} catch (error) {
-		res.status(500).json({ status: httpStatusText.ERROR, message: "Internal Server Error" });
+		res.status(201).json({ status: httpStatusText.SUCCESS, data: values });
+	} catch (err) {
+		res.status(500).json({ status: httpStatusText.ERROR, message: err.message });
 	}
 };
 
@@ -708,7 +692,7 @@ const addIngredientToStock = async (req, res) => {
 		values = [branchId, ingredientId, ingredientQuantity];
 		await client.query(query, values);
 
-		res.status(200).json({ status: httpStatusText.SUCCESS, data: values });
+		res.status(201).json({ status: httpStatusText.SUCCESS, data: values });
 	} catch (err) {
 		res.status(500).json({ status: httpStatusText.ERROR, message: err.message });
 	}
@@ -725,7 +709,7 @@ const addItemBranchMenu = async (req, res) => {
 
 		await client.query(query, values);
 
-		res.status(200).json({ status: httpStatusText.SUCCESS, data: values });
+		res.status(201).json({ status: httpStatusText.SUCCESS, data: values });
 	} catch (err) {
 		console.log(err);
 		res.status(500).json({ status: httpStatusText.ERROR, message: err.message });

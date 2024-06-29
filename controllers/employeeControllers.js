@@ -5,7 +5,6 @@ const httpStatusText = require("../utils/httpStatusText");
 const bcrypt = require("bcrypt");
 const { uploadSingleImage } = require("../middlewares/uploadImageMiddleware");
 const sharp = require("sharp");
-const jwt = require('jsonwebtoken');
 const createToken = require("../utils/createToken");
 
 const uploadEmployeeImage = uploadSingleImage("profileImg");
@@ -578,7 +577,6 @@ const addEmployee = async (req, res) => {
 
 		res.status(201).json({
 			status: httpStatusText.SUCCESS,
-			message: result.rows[0].fn_add_employee,
 			data: values,
 		});
 	} catch (error) {
