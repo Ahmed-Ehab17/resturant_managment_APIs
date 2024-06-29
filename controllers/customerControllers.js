@@ -4,6 +4,30 @@ const bcrypt = require('bcrypt')
 const jwt = require('jsonwebtoken');
 require("dotenv").config();
 const createToken = require("../utils/createToken");
+const fs = require("fs");
+const { uploadSingleImage } = require("../middlewares/uploadImageMiddleware");
+const sharp = require("sharp");
+
+const uploadCustomerImage = uploadSingleImage("profileImg");
+
+const resizeImage = async (req, res, next) => {
+	try {
+		const filename = `customer-${Date.now()}.jpeg`;
+		if (req.file) {
+			await sharp(req.file.buffer)
+            .resize(600, 600)
+            .toFormat("jpeg")
+            .jpeg({ quality: 95 })
+            .toBuffer();
+
+			req.file.path = filename;
+		}
+
+		next();
+	} catch (err) {
+		res.status(500).json({ status: httpStatusText.ERROR, message: "Error processing image" });
+	}
+};
 
 
 const getCustomerAddresses = async (req, res) => {
@@ -329,7 +353,29 @@ const verifyPhone = async (req, res) => {
   }
 };
 
+const changeCustomerImage = async (req, res) => {
+  const customerId = req.body.customerId;
+	const profileImg = req.file ? req.file.path : null;
+	const oldProfileImg = (await client.query(`SELECT picture_path FROM customers_accounts WHERE customer_id = ${customerId}`)).rows[0].picture_path;
+
+	try{
+		const query = `CALL change_customer_picture( $1, $2)`
+		const values = [customerId, profileImg];
+		await client.query(query, values);
+
+		fs.writeFileSync(`uploads/customers/${profileImg}`, req.file.buffer)
+		fs.unlinkSync(`uploads/customers/${oldProfileImg}`);
+		res.status(200).json({ status: httpStatusText.SUCCESS, data: {customerId} });
+	}catch(err){
+		res.status(500).json({ status: httpStatusText.ERROR, message: err.message });
+	}
+};
+
+
 module.exports = {
+  uploadCustomerImage,
+  resizeImage,
+
   getCustomerAddresses,
   getCustomerInformation,
   getCustomerPhones,
@@ -343,6 +389,7 @@ module.exports = {
 
   updateCustomerAddress,
   changeCustomerPass,
+  changeCustomerImage,
 
   addCustomer,
   addCustomerAddress,
