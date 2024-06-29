@@ -183,13 +183,13 @@ const addSeason = async (req, res) => {
 }
 
 const addCategory = async (req, res) => {
-  const { sectionId, categoryName, categoryDescription } = req.body;
+  const { sectionId, categoryName, categoryDescription, picture } = req.body;
     try {
-      const query = 'CALL pr_add_category($1, $2, $3)';
-      const values = [sectionId, categoryName, categoryDescription];
+      const query = 'CALL pr_add_category($1, $2, $3, $4)';
+      const values = [sectionId, categoryName, categoryDescription, picture];
       await client.query(query, values);
 
-      res.status(200).json({status: httpStatusText.SUCCESS, message: 'Category added successfully', data:values});
+      res.status(200).json({status: httpStatusText.SUCCESS, data:values});
     } catch (err) {
       console.log(err);
       res.status(400).json({status: httpStatusText.ERROR, message: err.message });
