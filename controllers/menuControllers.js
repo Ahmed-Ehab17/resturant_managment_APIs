@@ -19,12 +19,10 @@ const resizeItemImage = async (req, res, next) => {
         .jpeg({ quality: 95 })
         .toBuffer();
 
-      req.file.filename = filename; // Update the filename in the request
+      req.file.filename = filename;
 
       next();
-    } else {
-      throw new Error('File not provided');
-    }
+    } 
   } catch (err) {
     res.status(500).json({ status: httpStatusText.ERROR, message: `Error processing image: ${err.message}` });
   }
@@ -246,6 +244,22 @@ const addCategory = async (req, res) => {
     }    
 };
 
+const addRating = async (req, res) => {
+  const { customerId, itemId, rating } = req.body;
+  try {
+    const query = `CALL p_add_rating($1, $2, $3)`;
+    const values = [ customerId, itemId, rating ];
+    await client.query(query, values);
+    res.status(200).json({ status: httpStatusText.SUCCESS, data: {
+      "customerId": customerId,
+      "itemId": itemId,
+      "rating": rating
+    }});
+  }catch (err) {
+    res.status(500).json({ status: httpStatusText.ERROR, message: err.message });
+  }
+};
+
 
 const changeItemPrice = async(req, res) =>{
   const {itemId, branchId, changer, changeType, newValue } = req.body;
@@ -276,41 +290,17 @@ const changeItemPicture = async (req, res) => {
   const { itemId } = req.body;
   const itemImg = req.file ? req.file.filename : null;
   const oldItemImg = (await client.query(`SELECT picture_path FROM menu_items WHERE item_id = ${itemId}`)).rows[0].picture_path;
-
+  
   try {
     const query = 'CALL change_item_picture($1, $2)';
     const values = [itemId, itemImg];
     await client.query(query, values);
 
     fs.writeFileSync(`uploads/menu/${itemImg}`,req.file.buffer)
-    if (oldItemImg !== itemImg) {
-      const oldFilePath = path.join('uploads/menu', oldItemImg);
-      if (fs.existsSync(oldFilePath)) {
-        fs.unlinkSync(oldFilePath);
-      }
-    }
-    
+    fs.unlinkSync(`uploads/menu/${oldItemImg}`);
+      
     res.status(200).json({ status: httpStatusText.SUCCESS, data: { itemId, itemImg } });
   } catch (err) {
-    res.status(500).json({ status: httpStatusText.ERROR, message: err.message });
-  }
-};
-
-
-
-
-const addRating = async (req, res) => {
-  const { customerId, itemId, rating } = req.body;
-  try {
-    const query = `CALL p_add_rating($1, $2, $3)`;
-    const values = [ customerId, itemId, rating ];
-    await client.query(query, values);
-    res.status(200).json({ status: httpStatusText.SUCCESS, data: {
-      "customerId": customerId,
-      "itemId": itemId,
-      "rating": rating
-    }});
-  }catch (err) {
     res.status(500).json({ status: httpStatusText.ERROR, message: err.message });
   }
 };
