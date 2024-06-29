@@ -8,7 +8,7 @@ const path = require('path');
 
 const uploadItemImage = uploadSingleImage("itemImg");
 
-const resizeImage = async (req, res, next) => {
+const resizeItemImage = async (req, res, next) => {
   try {
     if (req.file) {
       const filename = `menu-${Date.now()}.jpeg`;
@@ -30,6 +30,26 @@ const resizeImage = async (req, res, next) => {
   }
 };
 
+const uploadCategoryImage = uploadSingleImage("categoryImg");
+
+const resizeImage = async (req, res, next) => {
+	try {
+		const filename = `category-${Date.now()}.jpeg`;
+		if (req.file) {
+			await sharp(req.file.buffer)
+            .resize(600, 600)
+            .toFormat("jpeg")
+            .jpeg({ quality: 95 })
+            .toBuffer();
+
+			req.file.path = filename;
+		}
+
+		next();
+	} catch (err) {
+		res.status(500).json({ status: httpStatusText.ERROR, message: "Error processing image" });
+	}
+};
 
 const seasonList = async (req, res) => {  
     try{
@@ -295,7 +315,24 @@ const addRating = async (req, res) => {
   }
 };
 
+const changeCategoryPicture = async (req, res) => {
+  const categoryId = req.body.categoryId;
+	const categoryImg = req.file ? req.file.path : null;
+	const oldCategoryImg = (await client.query(`SELECT picture_path FROM categories WHERE category_id = ${categoryId}`)).rows[0].picture_path;
 
+  console.log(categoryImg);
+	try{
+		const query = `CALL change_category_picture( $1, $2)`
+		const values = [categoryId, categoryImg];
+		await client.query(query, values);
+
+		fs.writeFileSync(`uploads/categories/${categoryImg}`, req.file.buffer)
+		fs.unlinkSync(`uploads/categories/${oldCategoryImg}`);
+		res.status(200).json({ status: httpStatusText.SUCCESS, data: {categoryId} });
+	}catch(err){
+		res.status(500).json({ status: httpStatusText.ERROR, message: err.message });
+	} 
+};
 
 
 
@@ -314,6 +351,8 @@ const addRating = async (req, res) => {
 module.exports = {
 
     uploadItemImage,
+    uploadCategoryImage,
+    resizeItemImage,
     resizeImage,
 
     seasonList,
@@ -338,4 +377,5 @@ module.exports = {
 
 
     addRating,
+    changeCategoryPicture,
 }

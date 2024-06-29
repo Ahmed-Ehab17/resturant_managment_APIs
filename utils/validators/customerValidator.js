@@ -174,6 +174,16 @@ const changeCustomerPass = [
    validatorMiddleware
  ]
 
+ const changeCustomerImage = [
+   body('customerId')
+      .trim()
+      .isInt()
+      .notEmpty()
+      .withMessage('ID is required'),
+
+   validatorMiddleware
+ ]
+
 
 module.exports = {
     updateCustomerAddress,
@@ -187,5 +197,6 @@ module.exports = {
 
     verifyPhone,
     addCustomerAccount,
+    changeCustomerImage,
 
 }

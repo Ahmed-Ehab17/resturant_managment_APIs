@@ -19,7 +19,6 @@ const resizeImage = async (req, res, next) => {
             .jpeg({ quality: 95 })
             .toBuffer();
 
-			req.body.profileImg = filename;
 			req.file.path = filename;
 		}
 
@@ -658,6 +657,24 @@ const addIngredientSupplier = async (req, res) => {
 	}
 };
 
+const changeEmployeePicture = async (req, res) => {
+	const employeeId = req.body.employeeId;
+	const profileImg = req.file ? req.file.path : null;
+	const oldProfileImg = (await client.query(`SELECT picture_path FROM employees_accounts WHERE employee_id = ${employeeId}`)).rows[0].picture_path;
+
+	try{
+		const query = `CALL change_employee_picture( $1, $2)`
+		const values = [employeeId, profileImg];
+		await client.query(query, values);
+
+		fs.writeFileSync(`uploads/employees/${profileImg}`, req.file.buffer)
+		fs.unlinkSync(`uploads/employees/${oldProfileImg}`);
+		res.status(200).json({ status: httpStatusText.SUCCESS, data: {employeeId} });
+	}catch(err){
+		res.status(500).json({ status: httpStatusText.ERROR, message: err.message });
+	}
+};
+
 module.exports = {
 	uploadEmployeeImage,
 	resizeImage,
@@ -699,4 +716,5 @@ module.exports = {
 	updateEmployeeAddress,
 	updateEmployeePhone,
 	updateEmployeeSalaryPosition,
+	changeEmployeePicture,
 };
