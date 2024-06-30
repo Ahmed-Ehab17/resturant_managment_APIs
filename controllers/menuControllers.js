@@ -328,18 +328,19 @@ const changeItemPicture = async (req, res) => {
 const changeCategoryPicture = async (req, res) => {
   const categoryId = req.body.categoryId;
 	const categoryImg = req.file ? req.file.path : null;
-	const oldCategoryImg = (await client.query(`SELECT picture_path FROM categories WHERE category_id = ${categoryId}`)).rows[0].picture_path;
-
-  console.log(categoryImg);
+  
 	try{
-		const query = `CALL change_category_picture( $1, $2)`
+    const query = `CALL change_category_picture( $1, $2)`
 		const values = [categoryId, categoryImg];
 		await client.query(query, values);
-
+    
+    const oldCategoryImg = (await client.query(`SELECT picture_path FROM categories WHERE category_id = ${categoryId}`)).rows[0].picture_path;
+    
 		fs.writeFileSync(`uploads/categories/${categoryImg}`, req.file.buffer)
 		fs.unlinkSync(`uploads/categories/${oldCategoryImg}`);
 		res.status(200).json({ status: httpStatusText.SUCCESS, data: {categoryId} });
 	}catch(err){
+    console.log(err);
 		res.status(500).json({ status: httpStatusText.ERROR, message: err.message });
 	} 
 };

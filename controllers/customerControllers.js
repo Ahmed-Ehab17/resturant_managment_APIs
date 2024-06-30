@@ -356,12 +356,13 @@ const verifyPhone = async (req, res) => {
 const changeCustomerImage = async (req, res) => {
   const customerId = req.body.customerId;
 	const profileImg = req.file ? req.file.path : null;
-	const oldProfileImg = (await client.query(`SELECT picture_path FROM customers_accounts WHERE customer_id = ${customerId}`)).rows[0].picture_path;
 
 	try{
 		const query = `CALL change_customer_picture( $1, $2)`
 		const values = [customerId, profileImg];
 		await client.query(query, values);
+
+    const oldProfileImg = (await client.query(`SELECT picture_path FROM customers_accounts WHERE customer_id = ${customerId}`)).rows[0].picture_path;
 
 		fs.writeFileSync(`uploads/customers/${profileImg}`, req.file.buffer)
 		fs.unlinkSync(`uploads/customers/${oldProfileImg}`);
