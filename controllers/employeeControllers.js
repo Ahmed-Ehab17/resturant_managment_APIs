@@ -661,13 +661,14 @@ const addIngredientSupplier = async (req, res) => {
 const changeEmployeePicture = async (req, res) => {
 	const employeeId = req.body.employeeId;
 	const profileImg = req.file ? req.file.path : null;
-	const oldProfileImg = (await client.query(`SELECT picture_path FROM employees_accounts WHERE employee_id = ${employeeId}`)).rows[0].picture_path;
-
+	
 	try{
 		const query = `CALL change_employee_picture( $1, $2)`
 		const values = [employeeId, profileImg];
 		await client.query(query, values);
-
+		
+		const oldProfileImg = (await client.query(`SELECT picture_path FROM employees_accounts WHERE employee_id = ${employeeId}`)).rows[0].picture_path;
+		
 		fs.writeFileSync(`uploads/employees/${profileImg}`, req.file.buffer)
 		fs.unlinkSync(`uploads/employees/${oldProfileImg}`);
 		res.status(200).json({ status: httpStatusText.SUCCESS, data: {employeeId} });

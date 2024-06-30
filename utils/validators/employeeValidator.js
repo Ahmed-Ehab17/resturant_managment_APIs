@@ -271,6 +271,15 @@ const login = [
     validatorMiddleware
   ];
   
+  const changeEmployeeImage = [
+    body('employeeId')
+       .trim()
+       .isInt()
+       .notEmpty()
+       .withMessage('ID is required'),
+ 
+    validatorMiddleware
+  ]
 
 
 
@@ -286,6 +295,7 @@ module.exports = {
     updateEmployeePhone,
     updateEmployeeSalaryPosition,
     addIngredientSupplier,
+    changeEmployeeImage,
 
     login,
 

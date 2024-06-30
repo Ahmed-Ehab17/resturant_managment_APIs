@@ -47,8 +47,19 @@ const addRecipes = [
     validatorMiddleware
  ]
 
+ const changeCategoryImage = [
+    body('categoryId')
+       .trim()
+       .isInt()
+       .notEmpty()
+       .withMessage('ID is required'),
+ 
+    validatorMiddleware
+  ]
+
 
 module.exports = {
     addRecipes,
-    addCategory
+    addCategory,
+    changeCategoryImage,
 }
