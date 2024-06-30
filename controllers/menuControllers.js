@@ -1,9 +1,7 @@
 const { client } = require("../config/dbConfig");
 const httpStatusText = require("../utils/httpStatusText");
-const fs = require("fs");
 const { uploadSingleImage } = require("../middlewares/uploadImageMiddleware");
 const sharp = require('sharp');
-const path = require('path');
 const cloudinary = require('../config/cloudinaryConfig');
 
 
@@ -34,8 +32,9 @@ const uploadCategoryImage = uploadSingleImage("categoryImg");
 
 const resizeImage = async (req, res, next) => {
 	try {
+    if (req.file) {
 		const filename = `category-${Date.now()}.jpeg`;
-		if (req.file) {
+
 			await sharp(req.file.buffer)
             .resize(600, 600)
             .toFormat("jpeg")
@@ -43,9 +42,9 @@ const resizeImage = async (req, res, next) => {
             .toBuffer();
 
 			req.file.path = filename;
-		}
 
-		next();
+      next();
+		}
 	} catch (err) {
 		res.status(500).json({ status: httpStatusText.ERROR, message: "Error processing image" });
 	}
@@ -290,32 +289,32 @@ const changeOrderItemStatus = async(req, res) =>{
 
 const changeItemPicture = async (req, res) => {
   const { itemId } = req.body;
-  const itemImg = req.file ? req.file.filename : null;
 
   try {
-    const oldItemImgResult = await client.query(`SELECT picture_path FROM menu_items WHERE item_id = $1`, [itemId]);
+    // Fetch old item image path
+    const oldItemImgResult = await client.query('SELECT picture_path FROM menu_items WHERE item_id = $1', [itemId]);
     const oldItemImg = oldItemImgResult.rows[0]?.picture_path;
 
     // Upload new image to Cloudinary
-    const uploadPath = path.join(__dirname, '..', 'uploads', 'menu', req.file.filename);
-    fs.writeFileSync(uploadPath, req.file.buffer);
-    const result = await cloudinary.uploader.upload(uploadPath, {
-      folder: 'menu_items'
+    const result = await new Promise((resolve, reject) => {
+      const stream = cloudinary.uploader.upload_stream({ folder: 'menu_items' }, (error, result) => {
+        if (error) reject(error);
+        else resolve(result);
+      });
+      stream.end(req.file.buffer);
     });
 
     const newImagePath = result.secure_url;
     console.log(newImagePath);
 
+    // Update the database with the new image path
     const query = 'CALL change_item_picture($1, $2)';
     const values = [itemId, newImagePath];
     await client.query(query, values);
 
-    // Delete the temporary file
-    fs.unlinkSync(uploadPath);
-
     // Delete the old image from Cloudinary, if it exists
     if (oldItemImg) {
-      const publicId = oldItemImg.split('/').pop().split('.')[0];
+      const publicId = oldItemImg.split('/').slice(-2).join('/').split('.')[0];
       await cloudinary.uploader.destroy(publicId);
     }
 
@@ -326,24 +325,42 @@ const changeItemPicture = async (req, res) => {
 };
 
 const changeCategoryPicture = async (req, res) => {
-  const categoryId = req.body.categoryId;
-	const categoryImg = req.file ? req.file.path : null;
-  
-	try{
-    const query = `CALL change_category_picture( $1, $2)`
-		const values = [categoryId, categoryImg];
-		await client.query(query, values);
-    
-    const oldCategoryImg = (await client.query(`SELECT picture_path FROM categories WHERE category_id = ${categoryId}`)).rows[0].picture_path;
-    
-		fs.writeFileSync(`uploads/categories/${categoryImg}`, req.file.buffer)
-		fs.unlinkSync(`uploads/categories/${oldCategoryImg}`);
-		res.status(200).json({ status: httpStatusText.SUCCESS, data: {categoryId} });
-	}catch(err){
-    console.log(err);
-		res.status(500).json({ status: httpStatusText.ERROR, message: err.message });
-	} 
+  const { categoryId } = req.body;
+
+  try {
+    // Fetch old category image path
+    const oldCategoryImgResult = await client.query('SELECT picture_path FROM categories WHERE category_id = $1', [categoryId]);
+    const oldCategoryImg = oldCategoryImgResult.rows[0]?.picture_path;
+
+    // Upload new image to Cloudinary
+    const result = await new Promise((resolve, reject) => {
+      const stream = cloudinary.uploader.upload_stream({ folder: 'categories' }, (error, result) => {
+        if (error) reject(error);
+        else resolve(result);
+      });
+      stream.end(req.file.buffer);
+    });
+
+    const newImagePath = result.secure_url;
+    console.log(newImagePath);
+
+    // Update the database with the new image path
+    const query = 'CALL change_category_picture($1, $2)';
+    const values = [categoryId, newImagePath];
+    await client.query(query, values);
+
+    // Delete the old image from Cloudinary, if it exists
+    if (oldCategoryImg) {
+      const publicId = oldCategoryImg.split('/').slice(-2).join('/').split('.')[0];
+      await cloudinary.uploader.destroy(publicId);
+    }
+
+    res.status(200).json({ status: httpStatusText.SUCCESS, data: { categoryId, newImagePath } });
+  } catch (err) {
+    res.status(500).json({ status: httpStatusText.ERROR, message: err.message });
+  }
 };
+
 
 
 

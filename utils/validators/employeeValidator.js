@@ -290,11 +290,11 @@ module.exports = {
     addEmployeePhone,
     addEmployeeSchedule,
     addEmployeeVacation,
-    changePosition,
     updateEmployeeAddress,
     updateEmployeePhone,
     updateEmployeeSalaryPosition,
     addIngredientSupplier,
+    changePosition,
     changeEmployeeImage,
 
     login,

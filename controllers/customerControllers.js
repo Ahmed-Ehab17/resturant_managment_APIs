@@ -1,12 +1,12 @@
 const { client } = require("../config/dbConfig");
 const httpStatusText = require("../utils/httpStatusText");
 const bcrypt = require('bcrypt')
-const jwt = require('jsonwebtoken');
 require("dotenv").config();
 const createToken = require("../utils/createToken");
-const fs = require("fs");
 const { uploadSingleImage } = require("../middlewares/uploadImageMiddleware");
 const sharp = require("sharp");
+const cloudinary = require('../config/cloudinaryConfig');
+
 
 const uploadCustomerImage = uploadSingleImage("profileImg");
 
@@ -354,22 +354,40 @@ const verifyPhone = async (req, res) => {
 };
 
 const changeCustomerImage = async (req, res) => {
-  const customerId = req.body.customerId;
-	const profileImg = req.file ? req.file.path : null;
+  const { customerId } = req.body;
 
-	try{
-		const query = `CALL change_customer_picture( $1, $2)`
-		const values = [customerId, profileImg];
-		await client.query(query, values);
+  try {
+    // Fetch old profile image path
+    const oldProfileImgResult = await client.query('SELECT picture_path FROM customers_accounts WHERE customer_id = $1', [customerId]);
+    const oldProfileImg = oldProfileImgResult.rows[0]?.picture_path;
 
-    const oldProfileImg = (await client.query(`SELECT picture_path FROM customers_accounts WHERE customer_id = ${customerId}`)).rows[0].picture_path;
+    // Upload new image to Cloudinary
+    const result = await new Promise((resolve, reject) => {
+      const stream = cloudinary.uploader.upload_stream({ folder: 'customers' }, (error, result) => {
+        if (error) reject(error);
+        else resolve(result);
+      });
+      stream.end(req.file.buffer);
+    });
 
-		fs.writeFileSync(`uploads/customers/${profileImg}`, req.file.buffer)
-		fs.unlinkSync(`uploads/customers/${oldProfileImg}`);
-		res.status(200).json({ status: httpStatusText.SUCCESS, data: {customerId} });
-	}catch(err){
-		res.status(500).json({ status: httpStatusText.ERROR, message: err.message });
-	}
+    const newImagePath = result.secure_url;
+    console.log(newImagePath);
+
+    // Update the database with the new image path
+    const query = 'CALL change_customer_picture($1, $2)';
+    const values = [customerId, newImagePath];
+    await client.query(query, values);
+
+    // Delete the old image from Cloudinary, if it exists
+    if (oldProfileImg) {
+      const publicId = oldProfileImg.split('/').slice(-2).join('/').split('.')[0];
+      await cloudinary.uploader.destroy(publicId);
+    }
+
+    res.status(200).json({ status: httpStatusText.SUCCESS, data: { customerId, newImagePath } });
+  } catch (err) {
+    res.status(500).json({ status: httpStatusText.ERROR, message: err.message });
+  }
 };
 
 

@@ -7,6 +7,7 @@ const { uploadSingleImage } = require("../middlewares/uploadImageMiddleware");
 const sharp = require("sharp");
 const createToken = require("../utils/createToken");
 const jwt = require('jsonwebtoken');
+const cloudinary = require('../config/cloudinaryConfig');
 
 const uploadEmployeeImage = uploadSingleImage("profileImg");
 
@@ -677,23 +678,42 @@ const addIngredientSupplier = async (req, res) => {
 };
 
 const changeEmployeePicture = async (req, res) => {
-	const employeeId = req.body.employeeId;
-	const profileImg = req.file ? req.file.path : null;
-	
-	try{
-		const query = `CALL change_employee_picture( $1, $2)`
-		const values = [employeeId, profileImg];
-		await client.query(query, values);
-		
-		const oldProfileImg = (await client.query(`SELECT picture_path FROM employees_accounts WHERE employee_id = ${employeeId}`)).rows[0].picture_path;
-		
-		fs.writeFileSync(`uploads/employees/${profileImg}`, req.file.buffer)
-		fs.unlinkSync(`uploads/employees/${oldProfileImg}`);
-		res.status(200).json({ status: httpStatusText.SUCCESS, data: {employeeId} });
-	}catch(err){
-		res.status(500).json({ status: httpStatusText.ERROR, message: err.message });
+	const { employeeId } = req.body;
+  
+	try {
+	  // Fetch old profile image path
+	  const oldProfileImgResult = await client.query('SELECT picture_path FROM employees_accounts WHERE employee_id = $1', [employeeId]);
+	  const oldProfileImg = oldProfileImgResult.rows[0]?.picture_path;
+  
+	  // Upload new image to Cloudinary
+	  const result = await new Promise((resolve, reject) => {
+		const stream = cloudinary.uploader.upload_stream({ folder: 'employees' }, (error, result) => {
+		  if (error) reject(error);
+		  else resolve(result);
+		});
+		stream.end(req.file.buffer);
+	  });
+  
+	  const newImagePath = result.secure_url;
+	  console.log(newImagePath);
+  
+	  // Update the database with the new image path
+	  const query = 'CALL change_employee_picture($1, $2)';
+	  const values = [employeeId, newImagePath];
+	  await client.query(query, values);
+  
+	  // Delete the old image from Cloudinary, if it exists
+	  if (oldProfileImg) {
+		const publicId = oldProfileImg.split('/').slice(-2).join('/').split('.')[0];
+		await cloudinary.uploader.destroy(publicId);
+	  }
+  
+	  res.status(200).json({ status: httpStatusText.SUCCESS, data: { employeeId, newImagePath } });
+	} catch (err) {
+	  res.status(500).json({ status: httpStatusText.ERROR, message: err.message });
 	}
-};
+  };
+  
 
 module.exports = {
 	uploadEmployeeImage,
