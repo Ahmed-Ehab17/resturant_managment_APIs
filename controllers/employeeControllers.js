@@ -6,6 +6,7 @@ const bcrypt = require("bcrypt");
 const { uploadSingleImage } = require("../middlewares/uploadImageMiddleware");
 const sharp = require("sharp");
 const createToken = require("../utils/createToken");
+const jwt = require('jsonwebtoken');
 
 const uploadEmployeeImage = uploadSingleImage("profileImg");
 
@@ -304,6 +305,23 @@ const getEmployeeOrders = async (req, res) => {
 	}
 };
 
+const getTokenData = (req, res) => {
+    try {
+        const token = req.headers['authorization'];
+        if (!token) {
+            return res.status(401).json({ status: 'UNAUTHORIZED', message: 'Token is missing' });
+        }
+
+        jwt.verify(token, process.env.JWT_SECRET_KEY, (err, data) => {
+            if (err) {
+                return res.status(401).json({ status: 'UNAUTHORIZED', message: 'Invalid Token', error: err.message });
+            }
+            res.status(200).json({ status: 'SUCCESS', data });
+        });
+    } catch (error) {
+        res.status(500).json({ status: 'ERROR', message: 'Internal Server Error', error: error.message });
+    }
+};
 
 const addPosition = async (req, res) => {
 	try {
@@ -714,6 +732,7 @@ module.exports = {
 	getEmployeeTransfer,
 	getEmployeeData,
 	getEmployeeOrders,
+	getTokenData,
 
 	updateEmployeeAddress,
 	updateEmployeePhone,
