@@ -18,6 +18,7 @@ router.get('/employeeSignInInfo/:employeeEmail', employeeControllers.getEmployee
 router.get('/employeeTransfer/:employeeId?/:transferMadeBy?/:oldBranchId?/:newBranchId?', employeeControllers.getEmployeeTransfer);
 router.get('/employeeData/:branchId?/:status?', employeeControllers.getEmployeeData);
 router.get('/employeeOrders/:employeeId/:deliveryStatus?', employeeControllers.getEmployeeOrders);
+router.get('/tokenData', employeeControllers.getTokenData);
 
 router.post(
 	"/employeeAccount",
