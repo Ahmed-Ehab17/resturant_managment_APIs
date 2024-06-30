@@ -130,7 +130,7 @@ const getPositionsChanges = async (req, res) => {
 };
 const getSchedule = async (req, res) => {
 	const { employeeId } = req.params; 
-	const { fromDate, toDate } = req.params;
+	const { fromDate, toDate } = req.query;
   
 	try {
 	  // Initialize query and values array
@@ -279,7 +279,7 @@ const getEmployeeData = async (req, res) => {
   };
 
 
-  const getEmployeeOrders = async (req, res) => {
+const getEmployeeOrders = async (req, res) => {
 	const { employeeId } = req.params;
 	const { deliveryStatus } = req.query;
 
@@ -324,8 +324,7 @@ const addPosition = async (req, res) => {
 		await client.query(query, values);
 		res.status(201).json({ status: httpStatusText.SUCCESS, data: values });
 	} catch (error) {
-		console.error("Error adding position:", error);
-		return res.status(500).json({ status: httpStatusText.ERROR, message: "Server Error, " + error });
+		return res.status(500).json({ status: httpStatusText.ERROR, message: "Server Error, " + error.message});
 	}
 };
 
@@ -551,7 +550,7 @@ const employeeLogin = async (req, res) => {
 	}
   };
   
-  
+
 
 
 const addEmployee = async (req, res) => {
@@ -587,22 +586,24 @@ const addEmployee = async (req, res) => {
 
 const addEmployeePhone = async (req, res) => {
 	const { employeeId, employeePhone } = req.body;
-
 	try {
-		const query = `SELECT fn_add_employee_phone($1, $2)`;
-		const values = [employeeId, employeePhone];
-		const result = await client.query(query, values);
-
-		res.status(201).json({
-			status: httpStatusText.SUCCESS,
-			message: result.rows[0].fn_add_employee_phone,
-			data: values,
-		});
+	  const phoneCheckQuery = 'SELECT employee_phone FROM employees_call_list WHERE employee_phone = $1';
+	  const phoneCheckResult = await client.query(phoneCheckQuery, [employeePhone]);
+  
+	  if (phoneCheckResult.rowCount > 0) {
+		return res.status(400).json({ status: httpStatusText.FAIL, message: 'Phone number is already exist' });
+	  }
+  
+	  const query = 'select fn_add_employee_phone($1, $2)';
+	  await client.query(query, [employeeId, employeePhone]);
+  
+	  res.status(201).json({status: httpStatusText.SUCCESS, data: { employeeId, employeePhone },
+	  });
 	} catch (error) {
-		console.log(error);
-		res.status(500).json({ status: httpStatusText.ERROR, message: "Server Error" });
+	  res.status(500).json({ status: httpStatusText.ERROR, message: 'Server Error' });
 	}
-};
+  };
+  
 
 const addEmployeeSchedule = async (req, res) => {
 	const { employeeId, shiftStartTime, shiftEndTime } = req.body;

@@ -4,6 +4,8 @@ const fs = require("fs");
 const { uploadSingleImage } = require("../middlewares/uploadImageMiddleware");
 const sharp = require('sharp');
 const path = require('path');
+const cloudinary = require('../config/cloudinaryConfig');
+
 
 
 const uploadItemImage = uploadSingleImage("itemImg");
@@ -289,17 +291,35 @@ const changeOrderItemStatus = async(req, res) =>{
 const changeItemPicture = async (req, res) => {
   const { itemId } = req.body;
   const itemImg = req.file ? req.file.filename : null;
-  const oldItemImg = (await client.query(`SELECT picture_path FROM menu_items WHERE item_id = ${itemId}`)).rows[0].picture_path;
-  
+
   try {
+    const oldItemImgResult = await client.query(`SELECT picture_path FROM menu_items WHERE item_id = $1`, [itemId]);
+    const oldItemImg = oldItemImgResult.rows[0]?.picture_path;
+
+    // Upload new image to Cloudinary
+    const uploadPath = path.join(__dirname, '..', 'uploads', 'menu', req.file.filename);
+    fs.writeFileSync(uploadPath, req.file.buffer);
+    const result = await cloudinary.uploader.upload(uploadPath, {
+      folder: 'menu_items'
+    });
+
+    const newImagePath = result.secure_url;
+    console.log(newImagePath);
+
     const query = 'CALL change_item_picture($1, $2)';
-    const values = [itemId, itemImg];
+    const values = [itemId, newImagePath];
     await client.query(query, values);
 
-    fs.writeFileSync(`uploads/menu/${itemImg}`,req.file.buffer)
-    fs.unlinkSync(`uploads/menu/${oldItemImg}`);
-      
-    res.status(200).json({ status: httpStatusText.SUCCESS, data: { itemId, itemImg } });
+    // Delete the temporary file
+    fs.unlinkSync(uploadPath);
+
+    // Delete the old image from Cloudinary, if it exists
+    if (oldItemImg) {
+      const publicId = oldItemImg.split('/').pop().split('.')[0];
+      await cloudinary.uploader.destroy(publicId);
+    }
+
+    res.status(200).json({ status: httpStatusText.SUCCESS, data: { itemId, newImagePath } });
   } catch (err) {
     res.status(500).json({ status: httpStatusText.ERROR, message: err.message });
   }
