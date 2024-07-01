@@ -174,6 +174,56 @@ const changeCustomerPass = [
    validatorMiddleware
  ]
 
+
+const signup = [
+   body('firstName')
+      .trim()
+      .isString()
+      .notEmpty()
+      .withMessage('First name is required'),
+   
+   body('lastName')
+      .trim()
+      .isString()
+      .notEmpty()
+      .withMessage('First name is required'),
+
+   body('gender')
+      .trim()
+      .notEmpty()
+      .withMessage('Gender is required')
+      .isIn(['m', 'f'])
+      .withMessage('Invalid Gender Must be "f" or "m"'),
+
+   body('phone')
+      .trim()
+      .isMobilePhone('ar-EG')
+      .withMessage('Invalid phone number format'),
+
+      body('password')
+      .trim()
+      .notEmpty()
+      .withMessage('password is required')
+      .isLength({ min: 8 })
+      .withMessage('Password must be at least 8 characters long')
+      .matches(/[a-z]/)
+      .withMessage('Password must contain at least one lowercase letter')
+      .matches(/[A-Z]/)
+      .withMessage('Password must contain at least one uppercase letter')
+      .matches(/\d/)
+      .withMessage('Password must contain at least one number')
+      .matches(/[!@#$%^&*(),.?":{}|<>]/)
+      .withMessage('Password must contain at least one special character'),
+
+   body('address')
+      .trim()
+      .notEmpty()
+      .withMessage('address is required'),
+
+
+   validatorMiddleware
+ ]
+
  const changeCustomerImage = [
    body('customerId')
       .trim()
@@ -193,6 +243,7 @@ module.exports = {
     addCustomerAddress,
     addCustomerPhone,
     login,
+    signup,
 
 
     verifyPhone,

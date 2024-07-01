@@ -11,22 +11,20 @@ const cloudinary = require('../config/cloudinaryConfig');
 const uploadCustomerImage = uploadSingleImage("profileImg");
 
 const resizeImage = async (req, res, next) => {
-	try {
-		const filename = `customer-${Date.now()}.jpeg`;
-		if (req.file) {
-			await sharp(req.file.buffer)
-            .resize(600, 600)
-            .toFormat("jpeg")
-            .jpeg({ quality: 95 })
-            .toBuffer();
+  try {
+    if (req.file) {
+      const resizedImageBuffer = await sharp(req.file.buffer)
+        .resize(600, 600)
+        .toFormat('jpeg')
+        .jpeg({ quality: 95 })
+        .toBuffer();
 
-			req.file.path = filename;
-		}
-
-		next();
-	} catch (err) {
-		res.status(500).json({ status: httpStatusText.ERROR, message: "Error processing image" });
-	}
+      req.file.buffer = resizedImageBuffer;
+    }
+    next();
+  } catch (err) {
+    res.status(500).json({ status: 'error', message: 'Error processing image' });
+  }
 };
 
 
@@ -180,7 +178,7 @@ const updateCustomerAddress = async (req, res) => {
     }
   };
 
-  const changeCustomerPass = async (req, res) => {
+const changeCustomerPass = async (req, res) => {
     const { customerId, oldPass, newPass } = req.body;
 
     try {
@@ -211,8 +209,7 @@ const updateCustomerAddress = async (req, res) => {
         res.status(500).json({ status: httpStatusText.ERROR, message: error.message });
     }
 };
-
-  
+ 
 const addCustomer = async (req, res) => {
   const { firstName, lastName, gender, phone, address, city = null, locationCoordinates = null, birthDate = null } = req.body;
 
@@ -286,24 +283,55 @@ const addCustomerAccount = async (req, res) => {
     address,
     city = null,
     locationCoordinates = null,
-    birthDate = null,
-    profileImg = null,
+    birthDate = null
   } = req.body;
-  console.log(req.body);  
 
-  const saltRounds = 10;
-  const hashedPassword = await bcrypt.hash(password, saltRounds);
-  console.log(hashedPassword);
+  const profileImg = req.file; // Assuming multer stores file information in req.file
+
   try {
-    const salt = await bcrypt.genSalt(10);
-    const hashedPassword = await bcrypt.hash(password, salt);
-    const query = `CALL pr_add_account_to_customer ( $1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11)`;
-    const values = [customerId, firstName, lastName, gender, phone, hashedPassword, address, city, locationCoordinates, birthDate, profileImg];
+    // Upload image to Cloudinary
+    const result = await new Promise((resolve, reject) => {
+      const stream = cloudinary.uploader.upload_stream(
+        { folder: 'customers' },
+        (error, result) => {
+          if (error) {
+            // If an error occurs, reject the promise with the error
+            reject(error);
+          } else {
+            // If no error, resolve the promise with the result
+            resolve(result);
+          }
+        }
+      );
+      // End the stream and send the buffer
+      stream.end(profileImg.buffer);
+    });
+
+    // Hash the password
+    const saltRounds = 10;
+    const hashedPassword = await bcrypt.hash(password, saltRounds);
+
+    // Construct the query to call PostgreSQL stored procedure
+    const query = `CALL pr_add_account_to_customer($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11)`;
+    const values = [
+      customerId,
+      firstName,
+      lastName,
+      gender,
+      phone,
+      hashedPassword,
+      address,
+      city,
+      locationCoordinates,
+      birthDate,
+      result.secure_url // Use result.secure_url as the image URL from Cloudinary
+    ];
     await client.query(query, values);
-    console.log();
-    res.status(200).json({ status: httpStatusText.SUCCESS, data: { customerId, firstName, lastName, gender, phone, address }})
-  } catch (error) {
-    res.status(500).json({ status: httpStatusText.ERROR, message: error.message });
+    
+    res.status(200).json({ status: httpStatusText.SUCCESS, data: values });
+  } catch (err) {
+    // Handle any errors that occur during the process
+    res.status(500).json({ status: httpStatusText.ERROR, message: err.message });
   }
 };
 
@@ -343,16 +371,84 @@ const login = async (req, res) => {
 };
 const verifyPhone = async (req, res) => {
   const { phone } = req.body;
+  
   try {
-    const query = `select fn_verify_phone($1)`;
-    const values = [ phone ];
-    await client.query(query, values);
-    res.status(200).json({ status: httpStatusText.SUCCESS, values });
-  } catch (err) {
-    res.status(500).json({ status: httpStatusText.ERROR, message: err.message });
-  }
-};
+    // Verify the phone number
+    const verificationQuery = `SELECT fn_verify_phone($1) AS customer_id`;
+    const verificationValues = [phone];
+    const verificationResult = await client.query(verificationQuery, verificationValues);
 
+    const customerId = verificationResult.rows[0]?.customer_id;
+
+    if (customerId) {
+      // fetch customer information
+      const infoQuery = `SELECT * FROM fn_get_customer_info($1) AS customer_info`;
+      const infoValues = [customerId];
+      const infoResult = await client.query(infoQuery, infoValues);
+
+      res.status(200).json({
+        status: httpStatusText.SUCCESS,
+        data: { information: infoResult.rows },
+      });
+    } else {
+      res.status(404).json({
+        status: httpStatusText.FAIL,
+        message: 'Phone number not found or invalid',
+      });
+    }
+  } catch (err) {
+      res.status(500).json({ status: httpStatusText.ERROR, message: err.message });
+    }
+  };
+
+const customerSignup = async (req, res) => {
+    const {
+        firstName,
+        lastName,
+        gender,
+        phone,
+        password,
+        address,
+        city,
+        locationCoordinates,
+        birthDate
+        
+       
+    } = req.body;
+
+    const profileImg = req.file; // Assuming multer stores file information in req.file
+
+    try {
+        // Upload image to Cloudinary
+        const result = await new Promise((resolve, reject) => {
+          const stream = cloudinary.uploader.upload_stream({ folder: 'customers' }, (error, result) => {
+            if (error) reject(error);
+            else resolve(result);
+          });
+          stream.end(req.file.buffer);
+        });
+
+        // Construct the query to call PostgreSQL stored procedure
+        const query = `CALL pr_customer_signup($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)`;
+        const values = [
+          firstName,
+          lastName,
+          gender,
+          phone,
+          password,
+          address,
+          city,
+          locationCoordinates,
+          birthDate,
+          result.secure_url // Use result.secure_url as the image URL from Cloudinary
+        ];
+        await client.query(query, values);
+        res.status(200).json({ status: httpStatusText.SUCCESS, data: values });
+    } catch (err) {
+        res.status(500).json({ status: httpStatusText.ERROR, message: err.message });
+    }
+};
+ 
 const changeCustomerImage = async (req, res) => {
   const { customerId } = req.body;
 
@@ -416,6 +512,7 @@ module.exports = {
   addFavorite,
   addCustomerAccount,
 
+  customerSignup,
   login,
 
 

@@ -280,7 +280,6 @@ const getEmployeeData = async (req, res) => {
 	}
   };
 
-
 const getEmployeeOrders = async (req, res) => {
 	const { employeeId } = req.params;
 	const { deliveryStatus } = req.query;
@@ -569,9 +568,6 @@ const employeeLogin = async (req, res) => {
 	}
   };
   
-
-
-
 const addEmployee = async (req, res) => {
 	const {
 		ssn,
@@ -623,7 +619,6 @@ const addEmployeePhone = async (req, res) => {
 	}
   };
   
-
 const addEmployeeSchedule = async (req, res) => {
 	const { employeeId, shiftStartTime, shiftEndTime } = req.body;
 
@@ -735,6 +730,7 @@ module.exports = {
 	changePosition,
 	changeSalary,
 	changeEmployeePass,
+	changeEmployeePicture,
 
 	activeEmployeesList,
 	inactiveEmployeesList,
@@ -757,5 +753,5 @@ module.exports = {
 	updateEmployeeAddress,
 	updateEmployeePhone,
 	updateEmployeeSalaryPosition,
-	changeEmployeePicture,
+	
 };
