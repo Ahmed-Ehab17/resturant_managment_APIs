@@ -512,26 +512,45 @@ const updateEmployeePhone = async (req, res) => {
 	}
 };
 
-const addEmployeeAccount = async (req, res, next) => {
+const addEmployeeAccount = async (req, res) => {
 	const { employeeId, email, password } = req.body;
-	const profileImg = req.file ? req.file.path : null;
-
-
-	 try {
-    const salt = await bcrypt.genSalt(10);
-    const hashedPassword = await bcrypt.hash(password, salt);
-
-    const query = 'CALL pr_insert_employee_account($1, $2, $3, $4)';
-    const values = [employeeId, email, hashedPassword, profileImg];
-    await client.query(query, values);
-
-	fs.writeFileSync(`uploads/employees/${profileImg}`,req.file.buffer)
-
-    res.status(201).json({ status: httpStatusText.SUCCESS, data: values });
-  } catch (err) {
-    res.status(500).json({ status: httpStatusText.ERROR, message: err.message });
-  }
-};
+	const profileImg = req.file; 
+  
+	try {
+	  // Hash the password
+	  const salt = await bcrypt.genSalt(10);
+	  const hashedPassword = await bcrypt.hash(password, salt);
+  
+	  let profileImgUrl = null;
+  
+	  if (profileImg) {
+		// Upload image to Cloudinary
+		const result = await new Promise((resolve, reject) => {
+		  const stream = cloudinary.uploader.upload_stream(
+			{ folder: 'employees' },
+			(error, result) => {
+			  if (error) {
+				reject(error);
+			  } else {
+				resolve(result);
+			  }
+			}
+		  );
+		  stream.end(profileImg.buffer);
+		});
+  
+		profileImgUrl = result.secure_url; 
+	  }
+	  
+	  const query = 'CALL pr_insert_employee_account($1, $2, $3, $4)';
+	  const values = [employeeId, email, hashedPassword, profileImgUrl];
+	  await client.query(query, values);
+  
+	  res.status(201).json({ status: 'success', data: values });
+	} catch (err) {
+	  res.status(500).json({ status: 'error', message: err.message });
+	}
+  };
 
 const employeeLogin = async (req, res) => {
 	const { email, password } = req.body;

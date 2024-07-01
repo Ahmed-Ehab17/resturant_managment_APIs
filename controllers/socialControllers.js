@@ -70,11 +70,25 @@ const getFriendsFavoriteItem = async(req, res) => {
     }
 };
 
+const getAccountByPhone = async (req, res) => {
+    const phone = req.params.phone;
+  
+    try {
+      const query = `SELECT * FROM get_account_id_by_phone($1)`;
+      const values = [phone];
+      const result = await client.query(query, values);
+      res.status(200).json({status: httpStatusText.SUCCESS, data: result.rows });
+    } catch (err) {
+      res.status(500).json({ status: httpStatusText.ERROR, message: err.message });
+    }
+  };
+
 module.exports = {
     getFriendRequests,
     addFriendRequests,
     updateFriendRequest,
     getFriendsList,
-    getFriendsFavoriteItem
+    getFriendsFavoriteItem,
+    getAccountByPhone
 
 };
