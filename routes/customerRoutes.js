@@ -2,6 +2,8 @@ const express = require("express");
 const router = express.Router();
 const customerControllers = require('../controllers/customerControllers');
 const customerValidator = require('../utils/validators/customerValidator')
+const multerMiddleware = require('../middlewares/uploadImageMiddleware'); // Assuming your middleware file is named multerMiddleware.js
+
 
 
 router.get('/customerAddresses/:customerId', customerControllers.getCustomerAddresses);
@@ -26,9 +28,10 @@ router.post("/customer",customerValidator.addCustomer, customerControllers.addCu
 router.post("/customer-address",customerValidator.addCustomerAddress, customerControllers.addCustomerAddress);
 router.post("/customer-phone",customerValidator.addCustomerPhone, customerControllers.addCustomerPhone);
 router.post('/addFavorite', customerControllers.addFavorite);
-router.post('/addCustomerAccount', customerValidator.addCustomerAccount, customerControllers.addCustomerAccount);
+router.post('/addCustomerAccount',customerControllers.uploadCustomerImage,customerControllers.resizeImage,customerValidator.addCustomerAccount, customerControllers.addCustomerAccount);
 router.post('/login',customerValidator.login, customerControllers.login);
 router.post('/verifyPhone',customerValidator.verifyPhone, customerControllers.verifyPhone);
+router.post('/signup',customerControllers.uploadCustomerImage, customerControllers.resizeImage,customerValidator.signup, customerControllers.customerSignup);
 
 
 
