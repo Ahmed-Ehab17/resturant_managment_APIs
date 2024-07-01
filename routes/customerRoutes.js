@@ -9,8 +9,6 @@ const multerMiddleware = require('../middlewares/uploadImageMiddleware'); // Ass
 router.get('/customerAddresses/:customerId', customerControllers.getCustomerAddresses);
 router.get('/customerInformation/:customerId', customerControllers.getCustomerInformation);
 router.get('/customerPhones/:customerId', customerControllers.getCustomerPhones);
-router.get('/friendRequests/:accountId', customerControllers.getFriendRequests);
-router.get('/friendsList/:accountId', customerControllers.getFriendsList);
 router.get('/customerOrders/:customerId/:limit/:status', customerControllers.getCustomerOrders);
 router.get('/customerBookings/:customerId', customerControllers.getCustomerBookings);
 router.get('/CustomerSignInInfo/:customerPhone', customerControllers.getCustomerSignInInfo);
