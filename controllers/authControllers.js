@@ -17,24 +17,24 @@ const register = async (req, res) => {
         const result = await client.query(query, values)
         res.status(201).json({status: httpStatusText.SUCCESS, message: Object.values(result.rows[0])[0]})
     }catch (err) {
-        console.log(err.message);
-        return res.status(500).json({status: httpStatusText.ERROR, message: "Internal server Error" });
+        return res.status(500).json({status: httpStatusText.ERROR, message: err.message });
     }
 };
 const employeeAccount = async (req, res) => {
     const { id, email, password } = req.body;
 
+    console.log(id, email, password);
     const saltRounds = 10;
-    hashedPassword = await bcrypt.hash(password, saltRounds);
+    const hashedPassword = await bcrypt.hash(password, saltRounds);
 
-    query = `SELECT fn_insert_employee_account($1, $2, $3)`;
+    query = `CALL pr_insert_employee_account($1, $2, $3)`;
     values = [id, email, hashedPassword];
     try {
         const result = await client.query(query, values);
         res.status(201).json({status: httpStatusText.SUCCESS, message: Object.values(result.rows[0])[0]})
     }catch (err) {
         console.log(err);
-        res.status(500).json({status: httpStatusText.ERROR, message: "Internal server Error"});
+        res.status(500).json({status: httpStatusText.ERROR, message: err.message});
     }
 };
 
@@ -62,8 +62,8 @@ const login = async (req, res) => {
 
         res.status(200).json({ status: httpStatusText.SUCCESS, data: { employee, token }});
     } catch (err) {
-        res.status(500).json({ status: httpStatusText.ERROR, message: "Internal Server Error" });
-        console.log(err)
+        res.status(500).json({ status: httpStatusText.ERROR, message: err.message });
+
     }
 };
 
