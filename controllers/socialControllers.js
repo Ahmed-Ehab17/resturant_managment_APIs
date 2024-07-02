@@ -32,14 +32,15 @@ const addFriendRequests = async (req, res) => {
 };
 
 const updateFriendRequest = async (req, res) => {
-    const { requestId, requestStatus } = req.params
+    const { requestId, requestStatus } = req.body;
+
     try {
         const query = `CALL pr_update_friend_request($1, $2)`;
-        const values = [ requestId, requestStatus ];
+        const values = [requestId, requestStatus];
         await client.query(query, values);
+
         res.status(200).json({ status: httpStatusText.SUCCESS, data: values });
     } catch (err) {
-        console.log(err);
         res.status(500).json({ status: httpStatusText.ERROR, message: err.message });
     }
 };
