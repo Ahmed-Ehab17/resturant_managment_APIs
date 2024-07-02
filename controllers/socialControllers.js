@@ -44,28 +44,54 @@ const updateFriendRequest = async (req, res) => {
     }
 };
 
-const getFriendsList = async(req, res) => {
-    const { accountId } = req.params
-    console.log( accountId);
-    try{
+const getFriendsList = async (req, res) => {
+    const { accountId } = req.params;
+    try {
         const query = `SELECT fn_get_friends_list($1)`;
         const values = [accountId];
         const result = await client.query(query, values);
-        console.log({'Resulttt':result});
-        res.status(200).json({ status: httpStatusText.SUCCESS, data: { friends : result.rows } });
-    }catch(err){
+
+        // Assuming fn_get_friends_list returns a string in the format "(id,\"name\")"
+        const friends = result.rows.map(row => {
+            // Remove the surrounding parentheses
+            const rawFriend = row.fn_get_friends_list.slice(1, -1);
+            // Split the string by comma
+            const [id, name] = rawFriend.split(',');
+
+            // Format the name by removing the surrounding quotes
+            const formattedName = name.slice(1, -1);
+
+            return { id, name: formattedName };
+        });
+
+        res.status(200).json({ status: httpStatusText.SUCCESS, data: { friends } });
+    } catch (err) {
         res.status(500).json({ status: httpStatusText.ERROR, message: err.message });
     }
 };
 
-const getFriendsFavoriteItem = async(req, res) => {
-    const { customerId } = req.params
-    try{
+const getFriendsFavoriteItem = async (req, res) => {
+    const { customerId } = req.params;
+    try {
         const query = `SELECT get_friends_favorite_items($1)`;
         const values = [customerId];
         const result = await client.query(query, values);
-        res.status(200).json({ status: httpStatusText.SUCCESS, data: { favoriteItems : result.rows } });
-    }catch(err){
+
+        // Assuming get_friends_favorite_items returns a string in the format "(item_id,\"item_name\")"
+        const favoriteItems = result.rows.map(row => {
+            // Remove the surrounding parentheses
+            const rawItem = row.get_friends_favorite_items.slice(1, -1);
+            // Split the string by comma
+            const [id, name] = rawItem.split(',');
+
+            // Format the name by removing the surrounding quotes
+            const formattedName = name.slice(1, -1);
+
+            return { id, name: formattedName };
+        });
+
+        res.status(200).json({ status: httpStatusText.SUCCESS, data: { favoriteItems } });
+    } catch (err) {
         res.status(500).json({ status: httpStatusText.ERROR, message: err.message });
     }
 };
