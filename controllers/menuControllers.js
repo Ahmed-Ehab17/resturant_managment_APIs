@@ -104,15 +104,35 @@ const getItemRecipes = async (req, res) => {
 
 const getItemRecommendations = async(req, res) => {
     const { itemId } = req.params
-    try{
-        const query = `SELECT get_item_recommendations($1)`;
-        const values = [itemId];
-        const result = await client.query(query, values);
-        res.status(200).json({ status: httpStatusText.SUCCESS, data: { favoriteItems : result.rows } });
-    }catch(err){
-        res.status(500).json({ status: httpStatusText.ERROR, message: err.message });
-    }
-};
+    try {
+      const response = await axios.post('http://localhost:5002/recommend_item', req.body, {
+          headers: {
+              'Content-Type': 'application/json'
+          }
+      });
+      res.json(response.data);
+  } catch (error) {
+      console.error(error);
+      res.status(500).json({ error: 'Failed to get recommendations from Flask service' });
+  }
+}
+const getCustomerItemRecommendations = async(req, res) => {
+    const { customerId } = req.params
+    try {
+      const response = await axios.post('http://localhost:5001/recommend', req.body, {
+          headers: {
+              'Content-Type': 'application/json'
+          }
+      });
+      res.json(response.data);
+  } catch (error) {
+      console.error(error);
+      res.status(500).json({ error: 'Failed to get recommendations from Flask service' });
+  }
+}
+
+
+
 
 
 const branchMenuFilter = async (req, res) => {
@@ -386,6 +406,7 @@ module.exports = {
     getItemPriceChanges,
     getItemRecipes,
     getItemRecommendations,
+    getCustomerItemRecommendations,
 
     branchMenuFilter,
     
