@@ -3,29 +3,8 @@ const httpStatusText = require("../utils/httpStatusText");
 const bcrypt = require('bcrypt')
 require("dotenv").config();
 const createToken = require("../utils/createToken");
-const { uploadSingleImage } = require("../middlewares/uploadImageMiddleware");
-const sharp = require("sharp");
 const cloudinary = require('../config/cloudinaryConfig');
 
-
-const uploadCustomerImage = uploadSingleImage("profileImg");
-
-const resizeImage = async (req, res, next) => {
-  try {
-    if (req.file) {
-      const resizedImageBuffer = await sharp(req.file.buffer)
-        .resize(600, 600)
-        .toFormat('jpeg')
-        .jpeg({ quality: 95 })
-        .toBuffer();
-
-      req.file.buffer = resizedImageBuffer;
-    }
-    next();
-  } catch (err) {
-    res.status(500).json({ status: 'error', message: 'Error processing image' });
-  }
-};
 
 
 const getCustomerAddresses = async (req, res) => {
@@ -460,9 +439,6 @@ const changeCustomerImage = async (req, res) => {
 
 
 module.exports = {
-  uploadCustomerImage,
-  resizeImage,
-
   getCustomerAddresses,
   getCustomerInformation,
   getCustomerPhones,

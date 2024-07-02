@@ -1,54 +1,10 @@
 const { client } = require("../config/dbConfig");
 const httpStatusText = require("../utils/httpStatusText");
-const { uploadSingleImage } = require("../middlewares/uploadImageMiddleware");
-const sharp = require('sharp');
+
 const cloudinary = require('../config/cloudinaryConfig');
 
 
 
-const uploadItemImage = uploadSingleImage("itemImg");
-
-const resizeItemImage = async (req, res, next) => {
-  try {
-    if (req.file) {
-      const filename = `menu-${Date.now()}.jpeg`;
-
-      await sharp(req.file.buffer)
-        .resize(600, 600)
-        .toFormat('jpeg')
-        .jpeg({ quality: 95 })
-        .toBuffer();
-
-      req.file.filename = filename;
-
-      next();
-    } 
-  } catch (err) {
-    res.status(500).json({ status: httpStatusText.ERROR, message: `Error processing image: ${err.message}` });
-  }
-};
-
-const uploadCategoryImage = uploadSingleImage("categoryImg");
-
-const resizeImage = async (req, res, next) => {
-	try {
-    if (req.file) {
-		const filename = `category-${Date.now()}.jpeg`;
-
-			await sharp(req.file.buffer)
-            .resize(600, 600)
-            .toFormat("jpeg")
-            .jpeg({ quality: 95 })
-            .toBuffer();
-
-			req.file.path = filename;
-
-      next();
-		}
-	} catch (err) {
-		res.status(500).json({ status: httpStatusText.ERROR, message: "Error processing image" });
-	}
-};
 
 const seasonList = async (req, res) => {  
     try{
@@ -377,12 +333,6 @@ const changeCategoryPicture = async (req, res) => {
 
 
 module.exports = {
-
-    uploadItemImage,
-    uploadCategoryImage,
-    resizeItemImage,
-    resizeImage,
-
     seasonList,
     sectionList,
     orderItemSectionList,
