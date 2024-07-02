@@ -105,7 +105,7 @@ const getItemRecipes = async (req, res) => {
 const getItemRecommendations = async(req, res) => {
     const { itemId } = req.params
     try {
-      const response = await axios.post('http://localhost:5002/recommend_item', req.body, {
+      const response = await axios.post('http://localhost:5002/recommend_item', req.params, {
           headers: {
               'Content-Type': 'application/json'
           }
@@ -119,7 +119,7 @@ const getItemRecommendations = async(req, res) => {
 const getCustomerItemRecommendations = async(req, res) => {
     const { customerId } = req.params
     try {
-      const response = await axios.post('http://localhost:5001/recommend', req.body, {
+      const response = await axios.post('http://localhost:5001/recommend', req.params, {
           headers: {
               'Content-Type': 'application/json'
           }
