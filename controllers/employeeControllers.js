@@ -7,6 +7,29 @@ const bcrypt = require("bcrypt");
 const createToken = require("../utils/createToken");
 const jwt = require('jsonwebtoken');
 const cloudinary = require('../config/cloudinaryConfig');
+const { uploadSingleImage } = require("../middlewares/uploadImageMiddleware");
+const sharp = require("sharp");
+
+const uploadEmployeeImage = uploadSingleImage("profileImg");
+
+const resizeImage = async (req, res, next) => {
+	try {
+		const filename = `employees-${Date.now()}.jpeg`;
+		if (req.file) {
+			await sharp(req.file.buffer)
+            .resize(600, 600)
+            .toFormat("jpeg")
+            .jpeg({ quality: 95 })
+            .toBuffer();
+
+			req.file.path = filename;
+		}
+
+		next();
+	} catch (err) {
+		res.status(500).json({ status: httpStatusText.ERROR, message: "Error processing image" });
+	}
+};
 
 
 
@@ -493,44 +516,42 @@ const updateEmployeePhone = async (req, res) => {
 };
 
 const addEmployeeAccount = async (req, res) => {
-	const { employeeId, email, password } = req.body;
-	const profileImg = req.file; 
-  
-	try {
-	  // Hash the password
-	  const salt = await bcrypt.genSalt(10);
-	  const hashedPassword = await bcrypt.hash(password, salt);
-  
-	  let profileImgUrl = null;
-  
-	  if (profileImg) {
-		// Upload image to Cloudinary
-		const result = await new Promise((resolve, reject) => {
-		  const stream = cloudinary.uploader.upload_stream(
-			{ folder: 'employees' },
-			(error, result) => {
-			  if (error) {
-				reject(error);
-			  } else {
-				resolve(result);
-			  }
-			}
-		  );
-		  stream.end(profileImg.buffer);
-		});
-  
-		profileImgUrl = result.secure_url; 
-	  }
-	  
-	  const query = 'CALL pr_insert_employee_account($1, $2, $3, $4)';
-	  const values = [employeeId, email, hashedPassword, profileImgUrl];
-	  await client.query(query, values);
-  
-	  res.status(201).json({ status: 'success', data: values });
-	} catch (err) {
-	  res.status(500).json({ status: 'error', message: err.message });
-	}
-  };
+  const { employeeId, email, password } = req.body;
+  const profileImg = req.file; // Assuming multer stores file information in req.file
+
+  try {
+    // Hash the password
+    const salt = await bcrypt.genSalt(10);
+    const hashedPassword = await bcrypt.hash(password, salt);
+
+    let profileImgUrl = null;
+
+    if (profileImg) {
+      // Upload image to Cloudinary
+      const result = await new Promise((resolve, reject) => {
+        const stream = cloudinary.uploader.upload_stream(
+          { folder: 'employees' },
+          (error, result) => {
+            if (error) reject(error);
+            else resolve(result);
+          }
+        );
+        stream.end(profileImg.buffer);
+      });
+
+      profileImgUrl = result.secure_url; // Use result.secure_url as the image URL from Cloudinary
+    }
+
+    // Insert employee account details into the database
+    const query = 'CALL pr_insert_employee_account($1, $2, $3, $4)';
+    const values = [employeeId, email, hashedPassword, profileImgUrl];
+    await client.query(query, values);
+
+    res.status(201).json({ status: httpStatusText.SUCCESS, data: { employeeId, email, profileImgUrl } });
+  } catch (err) {
+    res.status(500).json({ status: httpStatusText.ERROR, message: err.message });
+  }
+};
 
 const employeeLogin = async (req, res) => {
 	const { email, password } = req.body;
@@ -675,7 +696,7 @@ const changeEmployeePicture = async (req, res) => {
 	const { employeeId } = req.body;
   
 	try {
-	  // Fetch old profile image path
+	  // Fetch old profile image path from the database
 	  const oldProfileImgResult = await client.query('SELECT picture_path FROM employees_accounts WHERE employee_id = $1', [employeeId]);
 	  const oldProfileImg = oldProfileImgResult.rows[0]?.picture_path;
   
@@ -706,8 +727,7 @@ const changeEmployeePicture = async (req, res) => {
 	} catch (err) {
 	  res.status(500).json({ status: httpStatusText.ERROR, message: err.message });
 	}
-  };
-  
+  };  
 
 module.exports = {
 	addPosition,
@@ -750,5 +770,10 @@ module.exports = {
 	updateEmployeeAddress,
 	updateEmployeePhone,
 	updateEmployeeSalaryPosition,
+
+
+
+	uploadEmployeeImage,
+	resizeImage,
 	
 };

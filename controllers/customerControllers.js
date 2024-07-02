@@ -4,7 +4,29 @@ const bcrypt = require('bcrypt')
 require("dotenv").config();
 const createToken = require("../utils/createToken");
 const cloudinary = require('../config/cloudinaryConfig');
+const { uploadSingleImage } = require("../middlewares/uploadImageMiddleware");
+const sharp = require("sharp");
 
+
+const uploadCustomerImage = uploadSingleImage("profileImg");
+
+const resizeImage = async (req, res, next) => {
+	try {
+		const filename = `customer-${Date.now()}.jpeg`;
+		if (req.file) {
+			await sharp(req.file.buffer)
+            .resize(600, 600)
+            .toFormat("jpeg")
+            .jpeg({ quality: 95 })
+            .toBuffer();
+
+			req.file.path = filename;
+		}
+    next();
+	} catch (err) {
+		res.status(500).json({ status: httpStatusText.ERROR, message: "Error processing image" });
+	}
+};
 
 
 const getCustomerAddresses = async (req, res) => {
@@ -463,4 +485,8 @@ module.exports = {
 
 
   verifyPhone,
+
+
+  uploadCustomerImage,
+  resizeImage,
 };
