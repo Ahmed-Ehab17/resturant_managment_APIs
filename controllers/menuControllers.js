@@ -103,23 +103,21 @@ const getItemRecipes = async (req, res) => {
          }
   }
 
-  const getItemRecommendations = async (req, res) => {
-    const { item_Id } = req.body;
-    console.log(req.body);
+
+const getItemRecommendations = async (req, res) => {
     try {
-        const response = await axios.post('http://localhost:5002/recommend_item', req.body , {
+        const response = await axios.post('http://localhost:5002/recommend_item', req.body, {
             headers: {
                 'Content-Type': 'application/json'
             }
         });
         res.json(response.data);
     } catch (error) {
-        console.log(error);
+        console.error('Request body on error:', req.body);
         res.status(500).json({ error: error.message });
     }
 };
 const getCustomerItemRecommendations = async (req, res) => {
-  const { customer_Id } = req.body;
   try {
       const response = await axios.post('http://localhost:5001/recommend', req.body , {
           headers: {
@@ -128,7 +126,6 @@ const getCustomerItemRecommendations = async (req, res) => {
       });
       res.json(response.data);
   } catch (error) {
-      console.error(error);
       res.status(500).json({ error: error.message });
   }
 };
