@@ -7,7 +7,6 @@ const corsOptions = require("./config/corsOptions");
 
 const PORT = process.env.PORT || 4000;
 
-app.use('/uploads', express.static('uploads'));
 
 app.use(express.urlencoded({ extended: false }));
 app.use(express.json());

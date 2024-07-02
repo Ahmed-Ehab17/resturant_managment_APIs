@@ -9,7 +9,7 @@ const config = {
     // Beware! The ssl object is overwritten when parsing the connectionString
     ssl: {
       rejectUnauthorized: false,
-      ca: fs.readFileSync('./web server key.PEM').toString(),
+      ca: fs.readFileSync('./web server key3.pem').toString(),
     },
   }
 const client = new Client(
