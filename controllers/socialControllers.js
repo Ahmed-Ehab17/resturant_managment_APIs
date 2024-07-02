@@ -77,17 +77,18 @@ const getFriendsFavoriteItem = async (req, res) => {
         const values = [customerId];
         const result = await client.query(query, values);
 
-        // Assuming get_friends_favorite_items returns a string in the format "(item_id,\"item_name\")"
         const favoriteItems = result.rows.map(row => {
             // Remove the surrounding parentheses
             const rawItem = row.get_friends_favorite_items.slice(1, -1);
-            // Split the string by comma
-            const [id, name] = rawItem.split(',');
+            // Extract the ID and the names part
+            const idEndIndex = rawItem.indexOf(',');
+            const id = rawItem.slice(0, idEndIndex);
+            const namesPart = rawItem.slice(idEndIndex + 1);
 
-            // Format the name by removing the surrounding quotes
-            const formattedName = name.slice(1, -1);
+            // Remove surrounding quotes from namesPart and split by ','
+            const names = namesPart.match(/"([^"]*)"/g).map(name => name.replace(/"/g, ''));
 
-            return { id, name: formattedName };
+            return { id, names };
         });
 
         res.status(200).json({ status: httpStatusText.SUCCESS, data: { favoriteItems } });
