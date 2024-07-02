@@ -104,23 +104,24 @@ const getItemRecipes = async (req, res) => {
   }
 
   const getItemRecommendations = async (req, res) => {
-    const { itemId } = req.params;
+    const { item_Id } = req.body;
+    console.log(req.body);
     try {
-        const response = await axios.post('http://ec2-54-235-40-102.compute-1.amazonaws.com/recommend_item', { itemId }, {
+        const response = await axios.post('http://localhost:5002/recommend_item', req.body , {
             headers: {
                 'Content-Type': 'application/json'
             }
         });
         res.json(response.data);
     } catch (error) {
-        console.error(error);
-        res.status(500).json({ error: 'Failed to get recommendations from Flask service' });
+        console.log(error);
+        res.status(500).json({ error: error.message });
     }
 };
 const getCustomerItemRecommendations = async (req, res) => {
-  const { customerId } = req.params;
+  const { customer_Id } = req.body;
   try {
-      const response = await axios.post('http://localhost:5001/recommend', { customerId }, {
+      const response = await axios.post('http://localhost:5001/recommend', req.body , {
           headers: {
               'Content-Type': 'application/json'
           }
