@@ -22,8 +22,6 @@ router.get('/tokenData', employeeControllers.getTokenData);
 
 router.post(
 	"/employeeAccount",
-	employeeControllers.uploadEmployeeImage,
-	employeeControllers.resizeImage,
 	employeeValidator.addEmployeeAccount,
 	employeeControllers.addEmployeeAccount
 );
@@ -53,7 +51,7 @@ router.patch("/updateEmployeeSalaryPosition",employeeValidator.updateEmployeeSal
 router.patch("/update-employee-address",employeeValidator.updateEmployeeAddress, employeeControllers.updateEmployeeAddress);
 router.patch("/update-employee-phone",employeeValidator.updateEmployeePhone, employeeControllers.updateEmployeePhone);
 router.patch("/changeEmployeePass", employeeControllers.changeEmployeePass);
-router.patch("/changeEmployeePicture", employeeControllers.uploadEmployeeImage, employeeControllers.resizeImage, employeeValidator.changeEmployeeImage, employeeControllers.changeEmployeePicture);
+router.patch("/changeEmployeePicture", employeeValidator.changeEmployeeImage, employeeControllers.changeEmployeePicture);
 
 
 

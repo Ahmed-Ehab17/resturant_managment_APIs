@@ -3,32 +3,12 @@ const fs = require("fs");
 const { client } = require("../config/dbConfig");
 const httpStatusText = require("../utils/httpStatusText");
 const bcrypt = require("bcrypt");
-const { uploadSingleImage } = require("../middlewares/uploadImageMiddleware");
-const sharp = require("sharp");
+
 const createToken = require("../utils/createToken");
 const jwt = require('jsonwebtoken');
 const cloudinary = require('../config/cloudinaryConfig');
 
-const uploadEmployeeImage = uploadSingleImage("profileImg");
 
-const resizeImage = async (req, res, next) => {
-	try {
-		const filename = `employee-${Date.now()}.jpeg`;
-		if (req.file) {
-			await sharp(req.file.buffer)
-            .resize(600, 600)
-            .toFormat("jpeg")
-            .jpeg({ quality: 95 })
-            .toBuffer();
-
-			req.file.path = filename;
-		}
-
-		next();
-	} catch (err) {
-		res.status(500).json({ status: httpStatusText.ERROR, message: "Error processing image" });
-	}
-};
 
 const managerEmployeesList = async (req, res) => {
 	try {
@@ -730,8 +710,6 @@ const changeEmployeePicture = async (req, res) => {
   
 
 module.exports = {
-	uploadEmployeeImage,
-	resizeImage,
 	addPosition,
 	addEmployee,
 	addEmployeePhone,
