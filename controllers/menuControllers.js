@@ -3,6 +3,7 @@ const httpStatusText = require("../utils/httpStatusText");
 const { uploadSingleImage } = require("../middlewares/uploadImageMiddleware");
 const sharp = require('sharp');
 const cloudinary = require('../config/cloudinaryConfig');
+const axios = require('axios');
 
 
 const uploadItemImage = uploadSingleImage("itemImg");
@@ -102,10 +103,24 @@ const getItemRecipes = async (req, res) => {
          }
   }
 
-const getItemRecommendations = async(req, res) => {
-    const { itemId } = req.params
+  const getItemRecommendations = async (req, res) => {
+    const { itemId } = req.params;
     try {
-      const response = await axios.post('http://localhost:5002/recommend_item', req.params, {
+        const response = await axios.post('http://ec2-54-235-40-102.compute-1.amazonaws.com/recommend_item', { itemId }, {
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        });
+        res.json(response.data);
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ error: 'Failed to get recommendations from Flask service' });
+    }
+};
+const getCustomerItemRecommendations = async (req, res) => {
+  const { customerId } = req.params;
+  try {
+      const response = await axios.post('http://localhost:5001/recommend', { customerId }, {
           headers: {
               'Content-Type': 'application/json'
           }
@@ -113,23 +128,9 @@ const getItemRecommendations = async(req, res) => {
       res.json(response.data);
   } catch (error) {
       console.error(error);
-      res.status(500).json({ error: 'Failed to get recommendations from Flask service' });
+      res.status(500).json({ error: error.message });
   }
-}
-const getCustomerItemRecommendations = async(req, res) => {
-    const { customerId } = req.params
-    try {
-      const response = await axios.post('http://localhost:5001/recommend', req.params, {
-          headers: {
-              'Content-Type': 'application/json'
-          }
-      });
-      res.json(response.data);
-  } catch (error) {
-      console.error(error);
-      res.status(500).json({ error: 'Failed to get recommendations from Flask service' });
-  }
-}
+};
 
 
 
