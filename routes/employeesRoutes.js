@@ -22,6 +22,8 @@ router.get('/tokenData', employeeControllers.getTokenData);
 
 router.post(
 	"/employeeAccount",
+	employeeControllers.uploadEmployeeImage,
+	employeeControllers.resizeImage,
 	employeeValidator.addEmployeeAccount,
 	employeeControllers.addEmployeeAccount
 );
@@ -39,7 +41,6 @@ router.post("/timeInAttendance", employeeControllers.addTimeInAttendance);
 router.post("/timeOutAttendance", employeeControllers.addTimeOutAttendance);
 router.post("/employeeTransfer", employeeControllers.employeeTransfer);
 router.post("/employeeStatusChange", employeeControllers.employeeStatusChange);
-router.post('/employeeAccount', employeeValidator.addEmployeeAccount, employeeControllers.uploadEmployeeImage, employeeControllers.resizeImage, employeeControllers.addEmployeeAccount);
 router.post('/login',employeeValidator.login, employeeControllers.employeeLogin);
 
 
