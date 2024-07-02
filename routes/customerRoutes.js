@@ -29,7 +29,7 @@ router.post('/addFavorite', customerControllers.addFavorite);
 router.post('/addCustomerAccount',customerValidator.addCustomerAccount, customerControllers.addCustomerAccount);
 router.post('/login',customerValidator.login, customerControllers.login);
 router.post('/verifyPhone',customerValidator.verifyPhone, customerControllers.verifyPhone);
-router.post('/signup',customerValidator.signup, customerControllers.customerSignup);
+router.post('/signup', customerControllers.uploadCustomerImage, customerControllers.resizeImage, customerValidator.signup, customerControllers.customerSignup);
 
 
 
