@@ -20,7 +20,7 @@ router.get('/customerMenuRatings/:customerId', customerControllers.getCustomerMe
 
 router.patch('/update-customer-address', customerValidator.updateCustomerAddress, customerControllers.updateCustomerAddress);
 router.patch('/changeCustomerPass', customerValidator.changeCustomerPass, customerControllers.changeCustomerPass);
-router.patch('/changeCustomerImage', customerValidator.changeCustomerImage, customerControllers.changeCustomerImage);
+router.patch('/changeCustomerImage',customerControllers.uploadCustomerImage, customerControllers.resizeImage, customerValidator.changeCustomerImage, customerControllers.changeCustomerImage);
 
 router.post("/customer",customerValidator.addCustomer, customerControllers.addCustomer);
 router.post("/customer-address",customerValidator.addCustomerAddress, customerControllers.addCustomerAddress);

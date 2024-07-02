@@ -49,10 +49,11 @@ const addRecipes = [
 
  const changeCategoryImage = [
     body('categoryId')
-       .trim()
-       .isInt()
-       .notEmpty()
-       .withMessage('ID is required'),
+      .trim()
+      .isInt()
+      .withMessage('Category ID must be an integer')
+      .notEmpty()
+      .withMessage('ID is required'),
  
     validatorMiddleware
   ]

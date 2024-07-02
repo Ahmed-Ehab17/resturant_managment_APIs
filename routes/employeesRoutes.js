@@ -39,7 +39,7 @@ router.post("/timeInAttendance", employeeControllers.addTimeInAttendance);
 router.post("/timeOutAttendance", employeeControllers.addTimeOutAttendance);
 router.post("/employeeTransfer", employeeControllers.employeeTransfer);
 router.post("/employeeStatusChange", employeeControllers.employeeStatusChange);
-router.post('/employeeAccount',employeeValidator.addEmployeeAccount, employeeControllers.addEmployeeAccount);
+router.post('/employeeAccount', employeeValidator.addEmployeeAccount, employeeControllers.uploadEmployeeImage, employeeControllers.resizeImage, employeeControllers.addEmployeeAccount);
 router.post('/login',employeeValidator.login, employeeControllers.employeeLogin);
 
 
@@ -51,7 +51,7 @@ router.patch("/updateEmployeeSalaryPosition",employeeValidator.updateEmployeeSal
 router.patch("/update-employee-address",employeeValidator.updateEmployeeAddress, employeeControllers.updateEmployeeAddress);
 router.patch("/update-employee-phone",employeeValidator.updateEmployeePhone, employeeControllers.updateEmployeePhone);
 router.patch("/changeEmployeePass", employeeControllers.changeEmployeePass);
-router.patch("/changeEmployeePicture", employeeValidator.changeEmployeeImage, employeeControllers.changeEmployeePicture);
+router.patch("/changeEmployeePicture", employeeControllers.uploadEmployeeImage, employeeControllers.resizeImage, employeeValidator.changeEmployeeImage, employeeControllers.changeEmployeePicture);
 
 
 
