@@ -13,8 +13,8 @@ router.get('/orderItemsList', menuControllers.orderItemSectionList);
 router.get('/itemPriceChanges/:itemId', menuControllers.getItemPriceChanges);
 router.get('/itemRecipes/:itemId', menuControllers.getItemRecipes);
 router.get('/branchMenuFilter/:branchId/:seasonId?/:itemType?/:categoryId?/:itemStatus?/:vegetarian?/:healthy?', menuControllers.branchMenuFilter);
-router.post('/itemRecommendations', menuControllers.getItemRecommendations);
-router.post('/customerRecommendations', menuControllers.getCustomerItemRecommendations);
+router.get('/itemRecommendations/:item_id', menuControllers.getItemRecommendations);
+router.get('/customerRecommendations/:customer_id', menuControllers.getCustomerItemRecommendations);
 
 
 router.post('/itemBySeason', menuControllers.addItemTimeBySeason);
