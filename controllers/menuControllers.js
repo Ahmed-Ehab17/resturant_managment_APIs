@@ -106,20 +106,28 @@ const getItemRecipes = async (req, res) => {
 
   const getItemRecommendations = async (req, res) => {
     try {
-        const queryParams = req.params;
+        // Extract parameters from query string and convert them to numbers if necessary
+        const queryParams = { item_id: Number(req.params.item_id) };
+        console.log(queryParams);
+
+        // Send the request with the converted parameters
         const response = await axios.post('http://localhost:5002/recommend_item', queryParams, {
             headers: {
                 'Content-Type': 'application/json'
             }
         });
+
+        // Respond with the data received
         res.json(response.data);
     } catch (error) {
+        console.error('Error during request:', error.message);
         res.status(500).json({ error: error.message });
     }
 };
 const getCustomerItemRecommendations = async (req, res) => {
   try {
-      const queryParams = req.params;
+    const queryParams = { customer_id: Number(req.params.customer_id) };
+      console.log(queryParams);
       const response = await axios.post('http://localhost:5001/recommend', queryParams,  {
           headers: {
               'Content-Type': 'application/json'
