@@ -3,6 +3,7 @@ const router = express.Router();
 const branchControllers = require("../controllers/branchControllers");
 const branchValidator = require("../utils/validators/branchValidator");
 const auth = require("../middlewares/auth");
+const {allowedTo} = require("../controllers/authControllers")
 
 
 router.get("/add-new", (req, res) => {
@@ -58,7 +59,7 @@ router.post("/add-menu-item", branchControllers.addMenuItem);
 router.post("/add-ingredient", branchValidator.addIngredientValidator, branchControllers.addIngredient);
 router.post("/addIngredientToStock", branchControllers.addIngredientToStock);
 router.post("/addItemBranchMenu", branchValidator.addItemBranchMenuValidator,branchControllers.addItemBranchMenu);
-router.post("/addBooking",branchValidator.addBooking, branchControllers.addBooking);
+router.post("/addBooking", auth, allowedTo("cashier"), branchValidator.addBooking, branchControllers.addBooking);
 router.post("/addOrderToBooking",branchValidator.addOrderToBooking, branchControllers.addOrderToBooking);
 
 

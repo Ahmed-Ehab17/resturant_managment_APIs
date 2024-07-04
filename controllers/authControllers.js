@@ -3,6 +3,19 @@ const bcrypt = require("bcrypt");
 const httpStatusText = require("../utils/httpStatusText"); 
 const { client } = require("../config/dbConfig");
 
+const allowedTo = (...roles) =>
+    async (req, res, next) => {
+        console.log(req);
+      // 1) access roles
+      // 2) access registered user (req.user.role)
+      if (!roles.includes(req.user.employee_position)) {
+        return next(
+            res.status(403).json({status: httpStatusText.FAIL, message: "NOT ALLOWED!" })
+        );
+      }
+      next();
+    };
+
 const register = async (req, res) => {
     const { ssn, firstName, lastName, gender, salary, positionId, status, branchId, sectionId, birthDate, address, dateHired} = req.body;
 
@@ -41,26 +54,32 @@ const employeeAccount = async (req, res) => {
 const login = async (req, res) => {
     const { email, password } = req.body;
     try {
-        const query = `SELECT * FROM employees_accounts WHERE employee_email = $1`;
-        const values = [email];
-        const queryResult = await client.query(query, values);
-        const employee = queryResult.rows[0]
+        const getPasswordQuery = `SELECT fn_get_employee_hash($1) AS hashed_password`;
+	  const passwordResult = await client.query(getPasswordQuery, [email]);
+	  const hashedPassword = passwordResult.rows[0]?.hashed_password;
+  
+	  if (!hashedPassword) {
+		return res.status(404).json({ status: httpStatusText.FAIL, message: 'Incorrect Email or password' });
+	  }
+  
+	  //Compare the provided password with the hashed password
+	  const isPasswordMatch = await bcrypt.compare(password, hashedPassword);
+  
+	  if (!isPasswordMatch) {
+		return res.status(401).json({ status: httpStatusText.FAIL, message: 'Incorrect Email or password' });
+	  }
 
-        if (queryResult.rows.length === 0) {
-            return res.status(401).json({status: httpStatusText.FAIL, message: "Invalid email or password"});
-        }
+      const getInfoQuery = `SELECT * FROM fn_get_employee_sign_in_info($1)`;
+	  const infoResult = await client.query(getInfoQuery, [email]);
+	  const employeeInfo = infoResult.rows[0];
 
-        const dbPassword = employee.employee_password;
-        const isMatch = await bcrypt.compare(password, dbPassword);
-        if (!isMatch) {
-            return res.status(401).json({status: httpStatusText.FAIL, message: "Invalid email or password"});
-        }
-
-        const token = await createToken({id: employee.employee_id});
-        delete employee.employee_password;
-        delete employee.account_created_date;
-
-        res.status(200).json({ status: httpStatusText.SUCCESS, data: { employee, token }});
+      const employeePosition = employeeInfo.employee_position;
+      console.log(employeePosition);
+	  // Generate a JWT token
+	  const token = await createToken (employeeInfo);
+  
+	  //Send the token to the frontend
+	  res.status(200).json({ status: httpStatusText.SUCCESS, token });
     } catch (err) {
         res.status(500).json({ status: httpStatusText.ERROR, message: err.message });
 
@@ -68,6 +87,7 @@ const login = async (req, res) => {
 };
 
 module.exports = {
+    allowedTo,
     login,
     employeeAccount,
     register,
