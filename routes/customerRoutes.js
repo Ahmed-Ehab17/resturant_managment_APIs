@@ -1,14 +1,16 @@
 const express = require("express");
 const router = express.Router();
 const customerControllers = require('../controllers/customerControllers');
-const customerValidator = require('../utils/validators/customerValidator')
+const customerValidator = require('../utils/validators/customerValidator');
+const auth = require("../middlewares/auth");
+const { allowedTo } = require("../controllers/authControllers");
 
 
 
 
-router.get('/customerAddresses/:customerId', customerControllers.getCustomerAddresses);
-router.get('/customerInformation/:customerId', customerControllers.getCustomerInformation);
-router.get('/customerPhones/:customerId', customerControllers.getCustomerPhones);
+router.get('/customerAddresses/:customerId', auth, allowedTo("cashier"), customerControllers.getCustomerAddresses);
+router.get('/customerInformation/:customerId', auth, allowedTo("cashier"), customerControllers.getCustomerInformation);
+router.get('/customerPhones/:customerId', auth, allowedTo("cashier"), customerControllers.getCustomerPhones);
 router.get('/customerOrders/:customerId/:limit/:status', customerControllers.getCustomerOrders);
 router.get('/customerBookings/:customerId', customerControllers.getCustomerBookings);
 router.get('/CustomerSignInInfo/:customerPhone', customerControllers.getCustomerSignInInfo);

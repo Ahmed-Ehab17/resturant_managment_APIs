@@ -3,6 +3,7 @@ const router = express.Router();
 const employeeControllers = require("../controllers/employeeControllers");
 const employeeValidator = require("../utils/validators/employeeValidator");
 const auth = require("../middlewares/auth");
+const { allowedTo } = require("../controllers/authControllers");
 
 router.get("/manager-employees-list", employeeControllers.managerEmployeesList);
 router.get("/active-employees-list", employeeControllers.activeEmployeesList);
@@ -28,15 +29,11 @@ router.post(
 	employeeControllers.addEmployeeAccount
 );
 router.post("/add-position", employeeValidator.addPosition, employeeControllers.addPosition);
-router.post("/employee", employeeValidator.addEmployee, employeeControllers.addEmployee);
-router.post("/employee-phone", employeeValidator.addEmployeePhone, employeeControllers.addEmployeePhone);
+router.post("/employee", auth, allowedTo("hr"),employeeValidator.addEmployee, employeeControllers.addEmployee);
+router.post("/employee-phone", auth, allowedTo("hr"),employeeValidator.addEmployeePhone, employeeControllers.addEmployeePhone);
 router.post("/employee-schedule", employeeValidator.addEmployeeSchedule, employeeControllers.addEmployeeSchedule);
-router.post("/employee-vacation", employeeValidator.addEmployeeVacation, employeeControllers.addEmployeeVacation);
+router.post("/employee-vacation",employeeValidator.addEmployeeVacation, employeeControllers.addEmployeeVacation);
 router.post("/ingredient-supplier", employeeValidator.addIngredientSupplier, employeeControllers.addIngredientSupplier);
-router.post("/add-employee", employeeValidator.addEmployee, employeeControllers.addEmployee);
-router.post("/add-employee-phone", employeeValidator.addEmployeePhone, employeeControllers.addEmployeePhone);
-router.post("/add-employee-schedule", employeeValidator.addEmployeeSchedule, employeeControllers.addEmployeeSchedule);
-router.post("/add-employee-vacation", employeeValidator.addEmployeeVacation, employeeControllers.addEmployeeVacation);
 router.post("/timeInAttendance", employeeControllers.addTimeInAttendance);
 router.post("/timeOutAttendance", employeeControllers.addTimeOutAttendance);
 router.post("/employeeTransfer", employeeControllers.employeeTransfer);

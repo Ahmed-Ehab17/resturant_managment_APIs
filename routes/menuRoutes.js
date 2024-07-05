@@ -2,6 +2,8 @@ const express = require("express");
 const router = express.Router();
 const menuControllers = require('../controllers/menuControllers');
 const menuValidator = require("../utils/validators/menuValidator");
+const auth = require("../middlewares/auth");
+const { allowedTo } = require("../controllers/authControllers");
 
 
 
@@ -19,7 +21,7 @@ router.get('/customerRecommendations/:customer_id', menuControllers.getCustomerI
 
 router.post('/itemBySeason', menuControllers.addItemTimeBySeason);
 router.post('/itemByTime', menuControllers.addItemTimeByTime);
-router.post('/recipe', menuValidator.addRecipes, menuControllers.addRecipes);
+router.post('/recipe', auth, allowedTo("kitchen manager", "head bar"), menuValidator.addRecipes, menuControllers.addRecipes);
 router.post('/season', menuControllers.addSeason);
 router.post('/category',menuValidator.addCategory, menuControllers.addCategory);
 router.post('/addRating', menuControllers.addRating);
