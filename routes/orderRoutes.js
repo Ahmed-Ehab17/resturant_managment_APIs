@@ -9,7 +9,7 @@ router.get("/virtualOrderDetails/:orderId", orderControllers.getVirtualOrderDeta
 router.get("/nonVirtualOrderDetails/:orderId", auth, allowedTo("chief"), orderControllers.getNonVirtualOrderDetails);
 router.get("/orderItemsBySection/:sectionId/:branchId/:Status?", auth, allowedTo("chief"), orderControllers.getOrderItemsBySection);
 router.get("/orderItemsStatus/:orderId/:status?", auth, allowedTo("chief"), orderControllers.getOrderItemsStatus);
-router.get("/orders/:branchId?/:orderType?", auth, allowedTo("cashier"), orderControllers.getOrders);
+router.get("/orders/:branchId?/:orderType?", auth, allowedTo("cashier", "branch manager", "assistant manager"), orderControllers.getOrders);
 
 
 router.post("/VirtualOrder", orderControllers.addVirtualOrder);

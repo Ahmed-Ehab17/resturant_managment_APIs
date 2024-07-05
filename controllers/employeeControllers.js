@@ -615,7 +615,7 @@ const addEmployee = async (req, res) => {
 		});
 	} catch (error) {
 		console.log(error);
-		res.status(500).json({ status: httpStatusText.ERROR, message: "Server Error" });
+		res.status(500).json({ status: httpStatusText.ERROR, message: getSystemErrorMap.message });
 	}
 };
 

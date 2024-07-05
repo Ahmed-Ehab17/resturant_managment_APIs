@@ -7,7 +7,7 @@ const { allowedTo } = require("../controllers/authControllers");
 
 
 
-router.get('/seasonsList', menuControllers.seasonList);
+router.get('/seasonsList', auth, allowedTo("logistics coordinator"), menuControllers.seasonList);
 router.get('/sectionsList', menuControllers.sectionList);
 router.get('/orderItemsList', menuControllers.orderItemSectionList);
 
@@ -22,7 +22,7 @@ router.get('/customerRecommendations/:customer_id', menuControllers.getCustomerI
 router.post('/itemBySeason', menuControllers.addItemTimeBySeason);
 router.post('/itemByTime', menuControllers.addItemTimeByTime);
 router.post('/recipe', auth, allowedTo("kitchen manager", "head bar"), menuValidator.addRecipes, menuControllers.addRecipes);
-router.post('/season', menuControllers.addSeason);
+router.post('/season', auth, allowedTo("logistics coordinator"), menuControllers.addSeason);
 router.post('/category',menuValidator.addCategory, menuControllers.addCategory);
 router.post('/addRating', menuControllers.addRating);
 
