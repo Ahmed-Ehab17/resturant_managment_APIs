@@ -459,7 +459,7 @@ const updateStock = async (req, res) => {
 		});
 	} catch (error) {
 		console.error("Error updating address:", error);
-		res.status(500).json({ status: httpStatusText.ERROR, message: "server error" });
+		res.status(500).json({ status: httpStatusText.ERROR, message: error.message });
 	}
 };
 

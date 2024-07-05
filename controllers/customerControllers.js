@@ -386,12 +386,14 @@ const customerSignup = async (req, res) => {
         locationCoordinates,
         birthDate
         
-       
+        
     } = req.body;
+    const profileImg = req.file;
 
-    const profileImg = req.file; // Assuming multer stores file information in req.file
+    let profileImgUrl = null;
 
     try {
+      if (profileImg) {
         // Upload image to Cloudinary
         const result = await new Promise((resolve, reject) => {
           const stream = cloudinary.uploader.upload_stream({ folder: 'customers' }, (error, result) => {
@@ -400,6 +402,8 @@ const customerSignup = async (req, res) => {
           });
           stream.end(req.file.buffer);
         });
+        profileImgUrl = result.secure_url
+      }
 
         // Construct the query to call PostgreSQL stored procedure
         const query = `CALL pr_customer_signup($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)`;
@@ -413,7 +417,7 @@ const customerSignup = async (req, res) => {
           city,
           locationCoordinates,
           birthDate,
-          result.secure_url // Use result.secure_url as the image URL from Cloudinary
+          profileImgUrl // Use result.secure_url as the image URL from Cloudinary
         ];
         await client.query(query, values);
         res.status(200).json({ status: httpStatusText.SUCCESS, data: values });
