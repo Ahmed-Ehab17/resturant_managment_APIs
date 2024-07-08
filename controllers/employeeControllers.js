@@ -1,10 +1,7 @@
 require("dotenv").config();
-const fs = require("fs");
 const { client } = require("../config/dbConfig");
 const httpStatusText = require("../utils/httpStatusText");
 const bcrypt = require("bcrypt");
-
-const createToken = require("../utils/createToken");
 const jwt = require('jsonwebtoken');
 const cloudinary = require('../config/cloudinaryConfig');
 const { uploadSingleImage } = require("../middlewares/uploadImageMiddleware");

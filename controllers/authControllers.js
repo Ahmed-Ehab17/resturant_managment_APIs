@@ -2,6 +2,7 @@ const createToken = require("../utils/createToken");
 const bcrypt = require("bcrypt");
 const httpStatusText = require("../utils/httpStatusText"); 
 const { client } = require("../config/dbConfig");
+const cloudinary = require('../config/cloudinaryConfig');
 
 const allowedTo = (...roles) =>
     async (req, res, next) => {
