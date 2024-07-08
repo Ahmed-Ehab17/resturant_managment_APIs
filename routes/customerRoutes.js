@@ -8,13 +8,13 @@ const { allowedTo } = require("../controllers/authControllers");
 
 
 
-router.get('/customerAddresses/:customerId', auth, allowedTo("cashier"), customerControllers.getCustomerAddresses);
-router.get('/customerInformation/:customerId', auth, allowedTo("cashier"), customerControllers.getCustomerInformation);
-router.get('/customerPhones/:customerId', auth, allowedTo("cashier"), customerControllers.getCustomerPhones);
-router.get('/customerOrders/:customerId/:limit/:status', auth, allowedTo("branch manager"), customerControllers.getCustomerOrders);
-router.get('/customerBookings/:customerId', auth, allowedTo("branch manager"), customerControllers.getCustomerBookings);
+router.get('/customerAddresses/:customerId', customerControllers.getCustomerAddresses);
+router.get('/customerInformation/:customerId', customerControllers.getCustomerInformation);
+router.get('/customerPhones/:customerId', customerControllers.getCustomerPhones);
+router.get('/customerOrders/:customerId/:limit/:status', customerControllers.getCustomerOrders);
+router.get('/customerBookings/:customerId', customerControllers.getCustomerBookings);
 router.get('/CustomerSignInInfo/:customerPhone', customerControllers.getCustomerSignInInfo);
-router.get('/customerMenuRatings/:customerId', auth, allowedTo("branch manager"), customerControllers.getCustomerMenuRatings);
+router.get('/customerMenuRatings/:customerId', customerControllers.getCustomerMenuRatings);
 
 
 
