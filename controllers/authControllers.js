@@ -225,6 +225,9 @@ const customerSignup = async (req, res) => {
     let profileImgUrl = null;
 
     try {
+      // Hash the password
+    const salt = await bcrypt.genSalt(10);
+    const hashedPassword = await bcrypt.hash(password, salt);
       if (profileImg) {
         // Upload image to Cloudinary
         const result = await new Promise((resolve, reject) => {
@@ -244,7 +247,7 @@ const customerSignup = async (req, res) => {
           lastName,
           gender,
           phone,
-          password,
+          hashedPassword,
           address,
           city,
           locationCoordinates,
