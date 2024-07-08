@@ -28,10 +28,7 @@ router.post("/customer",customerValidator.addCustomer, customerControllers.addCu
 router.post("/customer-address",customerValidator.addCustomerAddress, customerControllers.addCustomerAddress);
 router.post("/customer-phone",customerValidator.addCustomerPhone, customerControllers.addCustomerPhone);
 router.post('/addFavorite', customerControllers.addFavorite);
-router.post('/addCustomerAccount',customerValidator.addCustomerAccount, customerControllers.addCustomerAccount);
-router.post('/login',customerValidator.login, customerControllers.login);
 router.post('/verifyPhone',customerValidator.verifyPhone, customerControllers.verifyPhone);
-router.post('/signup', customerControllers.uploadCustomerImage, customerControllers.resizeImage, customerValidator.signup, customerControllers.customerSignup);
 
 
 
