@@ -11,8 +11,8 @@ const customerControllers = require("../controllers/customerControllers");
 
 
 router.post("/login", authValidator.loginValidator, authControllers.login);
-router.post("/register", auth, allowedTo("hr"), authValidator.registerValidator, authControllers.register);
-router.post('/employeeAccount', auth, allowedTo("hr"), employeeControllers.uploadEmployeeImage, employeeControllers.resizeImage, authValidator.employeeAccountValidator, authControllers.employeeAccount);
+router.post("/register", authValidator.registerValidator, authControllers.register);
+router.post('/employeeAccount', employeeControllers.uploadEmployeeImage, employeeControllers.resizeImage, authValidator.employeeAccountValidator, authControllers.employeeAccount);
 
 
 router.post('/CustomerAccount',customerControllers.uploadCustomerImage, customerControllers.resizeImage, customerValidator.addCustomerAccount, authControllers.customerAccount);

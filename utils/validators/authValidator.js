@@ -2,7 +2,7 @@ const { body } = require("express-validator");
 const validatorMiddleware = require('../../middlewares/validatorMiddleware');
 
 const employeeAccountValidator = [
-    body('id')
+    body('employeeId')
     .notEmpty()
     .withMessage('id is required')
     .isInt()
