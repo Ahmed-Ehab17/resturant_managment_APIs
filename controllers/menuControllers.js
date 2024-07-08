@@ -145,66 +145,40 @@ const getCustomerItemRecommendations = async (req, res) => {
 
 
 const branchMenuFilter = async (req, res) => {
-    const { branchId } = req.params;
-    const {seasonId, itemType, categoryId, itemStatus, vegetarian, healthy} = req.query;
-  
-    try {
-      // Base query to call the PostgreSQL function
-      let query = `SELECT * FROM filter_menu_items($1`;
-      let values = [branchId];
-      let valueCounter = 2; 
-  
-      if (seasonId) {
-        query += `, $${valueCounter++}`;
-        values.push(seasonId);
-      } else {
-        query += `, NULL`;
-      }
-  
-      if (itemType) {
-        query += `, $${valueCounter++}`;
-        values.push(itemType);
-      } else {
-        query += `, NULL`;
-      }
-  
-      if (categoryId) {
-        query += `, $${valueCounter++}`;
-        values.push(categoryId);
-      } else {
-        query += `, NULL`;
-      }
-  
-      if (itemStatus) {
-        query += `, $${valueCounter++}`;
-        values.push(itemStatus);
-      } else {
-        query += `, NULL`;
-      }
-  
-      if (vegetarian) {
-        query += `, $${valueCounter++}`;
-        values.push(vegetarian);
-      } else {
-        query += `, NULL`;
-      }
-  
-      if (healthy) {
-        query += `, $${valueCounter++}`;
-        values.push(healthy);
-      } else {
-        query += `, NULL`;
-      }
-  
-      query += `)`;
-  
-      const result = await client.query(query, values);
-      res.status(200).json({ status: 'success', data: result.rows });
-    } catch (err) {
-      res.status(500).json({ status: 'error', message: err.message });
-    }
-  };
+  const { branchId } = req.params;
+  const { seasonId, itemType, categoryId, itemStatus, vegetarian, healthy } = req.query;
 
+  try {
+    let query = `SELECT * FROM filter_menu_items($1`;
+    let values = [parseInt(branchId)];
+    let valueCounter = 2;
+
+    const params = [
+      seasonId ? parseInt(seasonId) : null,
+      itemType,
+      categoryId ? parseInt(categoryId) : null,
+      itemStatus,
+      vegetarian,
+      healthy
+    ];
+
+    params.forEach(param => {
+      if (param !== null && param !== undefined) {
+        query += `, $${valueCounter++}`;
+        values.push(param);
+      } else {
+        query += `, NULL`;
+      }
+    });
+
+    query += `)`;
+
+    const result = await client.query(query, values);
+    res.status(200).json({ status: httpStatusText.SUCCESS, data: result.rows });
+  } catch (err) {
+    res.status(500).json({ status: httpStatusText.ERROR, message: err.message });
+  }
+};
 
 const addItemTimeBySeason = async(req, res) => {
   const {itemId, seasonId} = req.body;
