@@ -5,7 +5,7 @@ const { client } = require("../config/dbConfig");
 
 const allowedTo = (...roles) =>
     async (req, res, next) => {
-        console.log(req);
+        console.log(req.user);
       // 1) access roles
       // 2) access registered user (req.user.role)
       if (!roles.includes(req.user.employee_position)) {
