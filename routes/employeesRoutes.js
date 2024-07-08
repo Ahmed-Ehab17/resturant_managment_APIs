@@ -21,16 +21,8 @@ router.get('/employeeData/:branchId?/:status?', auth, allowedTo("hr"),employeeCo
 router.get('/employeeOrders/:employeeId/:deliveryStatus?', auth, allowedTo("hr"), employeeControllers.getEmployeeOrders);
 router.get('/tokenData', employeeControllers.getTokenData);
 
-router.post(
-	"/employeeAccount",
-	auth, allowedTo("hr"),
-	employeeControllers.uploadEmployeeImage,
-	employeeControllers.resizeImage,
-	employeeValidator.addEmployeeAccount,
-	employeeControllers.addEmployeeAccount
-);
+
 router.post("/add-position", employeeValidator.addPosition, employeeControllers.addPosition);
-router.post("/employee", auth, allowedTo("hr"),employeeValidator.addEmployee, employeeControllers.addEmployee);
 router.post("/employee-phone", auth, allowedTo("hr"),employeeValidator.addEmployeePhone, employeeControllers.addEmployeePhone);
 router.post("/employee-schedule", employeeValidator.addEmployeeSchedule, employeeControllers.addEmployeeSchedule);
 router.post("/employee-vacation", auth, allowedTo("branch manager"), employeeValidator.addEmployeeVacation, employeeControllers.addEmployeeVacation);
@@ -39,7 +31,7 @@ router.post("/timeInAttendance", employeeControllers.addTimeInAttendance);
 router.post("/timeOutAttendance", employeeControllers.addTimeOutAttendance);
 router.post("/employeeTransfer", auth, allowedTo("operation manager"), employeeControllers.employeeTransfer);
 router.post("/employeeStatusChange", auth, allowedTo("hr"), employeeControllers.employeeStatusChange);
-router.post('/login',employeeValidator.login, employeeControllers.employeeLogin);
+
 
 
 

@@ -515,109 +515,6 @@ const updateEmployeePhone = async (req, res) => {
 	}
 };
 
-const addEmployeeAccount = async (req, res) => {
-  const { employeeId, email, password } = req.body;
-  const profileImg = req.file; // Assuming multer stores file information in req.file
-
-  try {
-    // Hash the password
-    const salt = await bcrypt.genSalt(10);
-    const hashedPassword = await bcrypt.hash(password, salt);
-
-    let profileImgUrl = null;
-
-    if (profileImg) {
-      // Upload image to Cloudinary
-      const result = await new Promise((resolve, reject) => {
-        const stream = cloudinary.uploader.upload_stream(
-          { folder: 'employees' },
-          (error, result) => {
-            if (error) reject(error);
-            else resolve(result);
-          }
-        );
-        stream.end(profileImg.buffer);
-      });
-
-      profileImgUrl = result.secure_url; // Use result.secure_url as the image URL from Cloudinary
-    }
-
-    // Insert employee account details into the database
-    const query = 'CALL pr_insert_employee_account($1, $2, $3, $4)';
-    const values = [employeeId, email, hashedPassword, profileImgUrl];
-    await client.query(query, values);
-
-    res.status(201).json({ status: httpStatusText.SUCCESS, data: { employeeId, email, profileImgUrl } });
-  } catch (err) {
-    res.status(500).json({ status: httpStatusText.ERROR, message: err.message });
-  }
-};
-
-const employeeLogin = async (req, res) => {
-	const { email, password } = req.body;
-  
-	try {
-	  //Get the hashed password from the database
-	  const getPasswordQuery = `SELECT fn_get_employee_hash($1) AS hashed_password`;
-	  const passwordResult = await client.query(getPasswordQuery, [email]);
-	  const hashedPassword = passwordResult.rows[0]?.hashed_password;
-  
-	  if (!hashedPassword) {
-		return res.status(404).json({ status: httpStatusText.FAIL, message: 'Incorrect Email or password' });
-	  }
-  
-	  //Compare the provided password with the hashed password
-	  const isPasswordMatch = await bcrypt.compare(password, hashedPassword);
-  
-	  if (!isPasswordMatch) {
-		return res.status(401).json({ status: httpStatusText.FAIL, message: 'Incorrect Email or password' });
-	  }
-  
-	  //Get the employee's information from the database
-	  const getInfoQuery = `SELECT * FROM fn_get_employee_sign_in_info($1)`;
-	  const infoResult = await client.query(getInfoQuery, [email]);
-	  const employeeInfo = infoResult.rows[0];
-  
-	  // Generate a JWT token
-	  const token = await createToken (employeeInfo);
-  
-	  //Send the token to the frontend
-	  res.status(200).json({ status: httpStatusText.SUCCESS, token });
-	} catch (err) {
-	  res.status(500).json({ status: httpStatusText.ERROR, message: err.message });
-	}
-  };
-  
-const addEmployee = async (req, res) => {
-	const {
-		ssn,
-		firstName,
-		lastName,
-		gender,
-		salary,
-		positionId,
-		status,
-		branchId = null,
-		sectionId = null,
-		birthDate,
-		address,
-		dateHired = null,
-	} = req.body;
-
-	try {
-		query = `SELECT fn_add_employee($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12)`;
-		values = [ssn, firstName, lastName, gender, salary, positionId, status, branchId, sectionId, birthDate, address, dateHired];
-		const result = await client.query(query, values);
-
-		res.status(201).json({
-			status: httpStatusText.SUCCESS,
-			data: values,
-		});
-	} catch (error) {
-		console.log(error);
-		res.status(500).json({ status: httpStatusText.ERROR, message: getSystemErrorMap.message });
-	}
-};
 
 const addEmployeePhone = async (req, res) => {
 	const { employeeId, employeePhone } = req.body;
@@ -731,18 +628,16 @@ const changeEmployeePicture = async (req, res) => {
 
 module.exports = {
 	addPosition,
-	addEmployee,
 	addEmployeePhone,
 	addEmployeeSchedule,
 	addEmployeeVacation,
 	addIngredientSupplier,
 	addTimeInAttendance,
 	addTimeOutAttendance,
-	addEmployeeAccount,
 	employeeTransfer,
 	employeeStatusChange,
 
-	employeeLogin,
+	
 
 	changePosition,
 	changeSalary,

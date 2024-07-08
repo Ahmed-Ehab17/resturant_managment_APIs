@@ -6,8 +6,8 @@ const auth = require("../middlewares/auth");
 const { allowedTo } = require("../controllers/authControllers");
 
 router.get("/branches-list", auth, allowedTo("operation manager"), branchControllers.branchesList);
-router.get("/ingredient-suppliers-list", branchControllers.ingredientSuppliersList);
-router.get("/categories-list", allowedTo("operation manager"), branchControllers.categoriesList);
+//router.get("/ingredient-suppliers-list", branchControllers.ingredientSuppliersList);
+router.get("/categories-list", auth, allowedTo("operation manager"), branchControllers.categoriesList);
 router.get("/recipes-list", auth, allowedTo("kitchen manager", "chief", "head bar"), branchControllers.recipesList);
 router.get("/general-menu-list",auth, allowedTo("operation manager"), branchControllers.generalMenuList);
 router.get("/branch-price-changes-list",auth, allowedTo("operation manager"), branchControllers.branchPriceChangesList);
