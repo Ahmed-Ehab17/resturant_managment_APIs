@@ -38,14 +38,16 @@ Hosted on an **AWS EC2** server, this backend powers two applications:
 
 ## 📁 Project Structure
 
+```plaintext
 resturant_managment_APIs/
 │
-├── controllers/ # Business logic for each route
-├── models/ # Sequelize models and DB config
-├── routes/ # API route definitions
-├── middlewares/ # Authentication and error handling
-├── config/ # DB and environment config
-├── app.js # Main Express app setup
-├── server.js # Server entry point
+├── controllers/       # Business logic for each route
+├── models/            # Sequelize models and DB config
+├── routes/            # API route definitions
+├── middlewares/       # Authentication and error handling
+├── config/            # DB and environment config
+├── app.js             # Main Express app setup
+├── server.js          # Server entry point
 └── README.md
+
 
