@@ -81,7 +81,7 @@ cp .env.example .env
 
 # Start the server
 npm start
-
+```
 ## 📬 API Documentation
 
 Use [Postman](https://www.postman.com/) or similar tools to test the following API endpoints.
